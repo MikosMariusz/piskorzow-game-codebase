@@ -1,0 +1,23 @@
+/**
+ * src/styles/settings.scss
+ *
+ * Configures SASS variables and Vuetify overwrites
+ */
+
+// https://vuetifyjs.com/features/sass-variables/`
+// @use 'vuetify/settings' with (
+//   $color-pack: false
+// );
+html,
+body {
+    overflow: auto; // keep scrolling, hide bars
+    -ms-overflow-style: none; // IE / Edge
+    scrollbar-width: none; // Firefox
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none; // WebKit
+}
