@@ -11,7 +11,7 @@
 
 <script setup>
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { createMap, detach, setTarget, updateSize, animateFilterChange } from '@/services/olMap'
+import { createMap, detach, setTarget, updateSize, animateToMode } from '@/services/olMap'
 import { useAppStore } from '@/stores/app'
 
 const props = defineProps({
@@ -25,21 +25,12 @@ const appStore = useAppStore()
 const mapEl = ref(null)
 let ro = null
 
-const updateMapFilter = () => {
-    const isDark = appStore.isDarkEnabled
-    const targetFilter = isDark
-        ? 'brightness(0.7) contrast(1.2) saturate(0.8) hue-rotate(15deg)'
-        : 'none'
-    animateFilterChange(targetFilter)
-}
-
 onMounted(async () => {
     createMap(mapEl.value, {
         center: undefined,
         zoom: props.zoom,
     })
     await nextTick()
-    updateMapFilter()
     updateSize()
 
     ro = new ResizeObserver(() => updateSize())
@@ -63,7 +54,7 @@ watch(
 
 watch(
     () => appStore.isDarkEnabled,
-    () => updateMapFilter(),
+    () => animateToMode(),
 )
 </script>
 
