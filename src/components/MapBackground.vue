@@ -1,4 +1,3 @@
-<!-- src/components/MapBackground.vue -->
 <template>
     <div
         ref="mapEl"
@@ -12,17 +11,8 @@
 
 <script setup>
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
-import {
-    createMap,
-    detach,
-    setTarget,
-    updateSize,
-    animateFilterChange,
-    enableDarkMode,
-    disableDarkMode,
-    getOSMDuration,
-} from '@/services/olMap'
+import { createMap, detach, setTarget, updateSize, animateFilterChange } from '@/services/olMap'
+import { useAppStore } from '@/stores/app'
 
 const props = defineProps({
     interactive: { type: Boolean, default: true },
@@ -31,42 +21,26 @@ const props = defineProps({
     zoom: { type: Number, default: 12 },
 })
 
-const route = useRoute()
+const appStore = useAppStore()
 const mapEl = ref(null)
 let ro = null
 
-function shouldUseDarkFilter(routePath) {
-    return routePath === '/' || routePath === '/index'
-}
-
-function updateMapFilter(animate = true) {
-    const isDark = shouldUseDarkFilter(route.path)
-
-    if (animate) {
-        const targetFilter = isDark
-            ? 'brightness(0.7) contrast(1.2) saturate(0.8) hue-rotate(15deg)'
-            : 'none'
-
-        animateFilterChange(targetFilter)
-    } else {
-        if (isDark) {
-            enableDarkMode()
-        } else {
-            disableDarkMode()
-        }
-    }
+const updateMapFilter = () => {
+    const isDark = appStore.isDarkEnabled
+    const targetFilter = isDark
+        ? 'brightness(0.7) contrast(1.2) saturate(0.8) hue-rotate(15deg)'
+        : 'none'
+    animateFilterChange(targetFilter)
 }
 
 onMounted(async () => {
-    await nextTick()
     createMap(mapEl.value, {
         center: undefined,
         zoom: props.zoom,
     })
-
+    await nextTick()
+    updateMapFilter()
     updateSize()
-
-    setTimeout(() => updateMapFilter(false), getOSMDuration())
 
     ro = new ResizeObserver(() => updateSize())
     ro.observe(mapEl.value)
@@ -88,12 +62,8 @@ watch(
 )
 
 watch(
-    () => route.path,
-    () => {
-        setTimeout(() => {
-            updateMapFilter()
-        }, 200)
-    },
+    () => appStore.isDarkEnabled,
+    () => updateMapFilter(),
 )
 </script>
 

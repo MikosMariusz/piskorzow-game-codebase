@@ -8,10 +8,18 @@ import { setupLayouts } from 'virtual:generated-layouts'
 // Composables
 import { createRouter, createWebHistory } from 'vue-router'
 import { routes } from 'vue-router/auto-routes'
+import { useAppStore } from '@/stores/app'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: setupLayouts(routes),
+})
+
+// Global before guard - aktualizuj dark mode przed każdą nawigacją
+router.beforeEach((to, from, next) => {
+    const appStore = useAppStore()
+    appStore.updateDarkModeFromRoute(to.path)
+    next()
 })
 
 // Workaround for https://github.com/vitejs/vite/issues/11804

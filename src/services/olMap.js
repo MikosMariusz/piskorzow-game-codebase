@@ -9,24 +9,12 @@ let _map = null
 let _tileLayer = null
 let _darkModeEnabled = false
 let _isAnimating = false
-let _animationCallbacks = []
 
 const DEFAULT_CENTER = fromLonLat([16.62, 50.69]) // okolice Piskorzowa / Pieszyc
 const DEFAULT_ZOOM = 12
-const OSM_COLOR_ANIMATION_DURATION = 300
+const OSM_COLOR_ANIMATION_DURATION = 700
 
 export const getOSMDuration = () => OSM_COLOR_ANIMATION_DURATION
-
-export function addAnimationCallback(callback) {
-    _animationCallbacks.push(callback)
-}
-
-export function removeAnimationCallback(callback) {
-    const index = _animationCallbacks.indexOf(callback)
-    if (index > -1) {
-        _animationCallbacks.splice(index, 1)
-    }
-}
 
 export function isDarkModeEnabled() {
     return _darkModeEnabled
@@ -95,57 +83,6 @@ export function updateSize() {
     }
 }
 
-export function enableDarkMode() {
-    if (!_map || _darkModeEnabled) return
-
-    _darkModeEnabled = true
-
-    function tryApplyFilter(attempts = 0) {
-        const mapElement = _map.getTarget()
-
-        if (mapElement) {
-            const canvasElements = mapElement.querySelectorAll('canvas')
-
-            if (canvasElements.length > 0) {
-                canvasElements.forEach((canvas) => {
-                    canvas.style.filter = 'grayscale(90%) brightness(0.3) contrast(1.2)'
-                    canvas.style.transition = 'filter 1s ease-in-out'
-                })
-            } else {
-                mapElement.style.filter = 'grayscale(90%) brightness(0.3) contrast(1.2)'
-                mapElement.style.transition = 'filter 1s ease-in-out'
-            }
-
-            if (attempts > 5 && canvasElements.length === 0) {
-                mapElement.style.filter = 'grayscale(90%) brightness(0.3) contrast(1.2)'
-                mapElement.style.transition = 'filter 1s ease-in-out'
-            }
-        } else if (attempts < 20) {
-            setTimeout(() => tryApplyFilter(attempts + 1), OSM_COLOR_ANIMATION_DURATION)
-        }
-    }
-
-    tryApplyFilter()
-}
-
-export function disableDarkMode() {
-    if (!_map || !_darkModeEnabled) return
-
-    _darkModeEnabled = false
-
-    const mapElement = _map.getTarget()
-    if (mapElement) {
-        mapElement.style.filter = 'none'
-        mapElement.style.transition = 'filter 1s ease-in-out'
-
-        const canvasElements = mapElement.querySelectorAll('canvas')
-        canvasElements.forEach((canvas) => {
-            canvas.style.filter = 'none'
-            canvas.style.transition = 'filter 1s ease-in-out'
-        })
-    }
-}
-
 export function animateToMode(isDark, duration = OSM_COLOR_ANIMATION_DURATION) {
     if (!_tileLayer || _isAnimating) {
         return
@@ -156,9 +93,6 @@ export function animateToMode(isDark, duration = OSM_COLOR_ANIMATION_DURATION) {
     }
 
     _isAnimating = true
-
-    // Powiadom wszystkie callbacki o rozpoczęciu animacji
-    _animationCallbacks.forEach((callback) => callback({ type: 'start', isDark, duration }))
 
     const canvas = findCanvas()
     if (!canvas) {
@@ -182,15 +116,6 @@ export function animateToMode(isDark, duration = OSM_COLOR_ANIMATION_DURATION) {
         const currentGrayscale = startGrayscale + (endGrayscale - startGrayscale) * eased
         const currentBrightness = startBrightness + (endBrightness - startBrightness) * eased
 
-        _animationCallbacks.forEach((callback) =>
-            callback({
-                type: 'progress',
-                isDark,
-                progress: eased,
-                elapsed,
-            }),
-        )
-
         if (progress < 1) {
             canvas.style.filter = `grayscale(${currentGrayscale}%) brightness(${currentBrightness}) contrast(1.2)`
             requestAnimationFrame(animateFilters)
@@ -203,9 +128,6 @@ export function animateToMode(isDark, duration = OSM_COLOR_ANIMATION_DURATION) {
             } else {
                 canvas.style.filter = 'none'
             }
-
-            // Powiadom callbacki o zakończeniu animacji
-            _animationCallbacks.forEach((callback) => callback({ type: 'end', isDark }))
         }
     }
 
@@ -214,5 +136,5 @@ export function animateToMode(isDark, duration = OSM_COLOR_ANIMATION_DURATION) {
 
 export function animateFilterChange(targetFilter) {
     const isDark = targetFilter !== 'none'
-    animateToMode(isDark, getOSMDuration())
+    animateToMode(isDark)
 }

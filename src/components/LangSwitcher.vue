@@ -14,12 +14,23 @@ const model = computed({
 <template>
     <v-btn-toggle
         v-model="model"
-        variant="outlined"
+        variant="elevated"
         density="comfortable"
-        rounded="lg"
         divided
+        color="primary"
+        elevation="4"
     >
-        <v-btn value="pl">PL</v-btn>
-        <v-btn value="en">EN</v-btn>
+        <v-btn
+            value="pl"
+            size="small"
+        >
+            PL
+        </v-btn>
+        <v-btn
+            value="en"
+            size="small"
+        >
+            EN
+        </v-btn>
     </v-btn-toggle>
 </template>
