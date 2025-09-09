@@ -58,7 +58,7 @@
                                     rounded="lg"
                                 >
                                     <p class="text-center text-h5 font-weight-light ma-2">
-                                        {{ tile.title }}
+                                        {{ $t(tile.title) }}
                                     </p>
                                 </v-sheet>
                             </div>
@@ -78,19 +78,19 @@ const router = useRouter()
 const tiles = [
     {
         id: 'game',
-        title: 'Gra terenowa',
+        title: 'terrainGame',
         route: '/game',
         image: new URL('../assets/images/gra_terenowa_logo.png', import.meta.url).href,
-        alt: 'Gra terenowa',
-        fallbackText: 'Gra terenowa',
+        alt: 'terrainGame',
+        fallbackText: 'terrainGame',
     },
     {
         id: 'presentation',
-        title: 'Interaktywna prezentacja wsi',
+        title: 'villagePresentation',
         route: '/presentation',
         image: new URL('../assets/images/interaktywna_prezentacja.png', import.meta.url).href,
-        alt: 'Prezentacja Piskorzów',
-        fallbackText: 'Prezentacja o Piskorzowie',
+        alt: 'villagePresentation',
+        fallbackText: 'villagePresentation',
     },
 ]
 
@@ -110,7 +110,7 @@ function go(path) {
     z-index: 1200; /* ponad warstwą mapy */
 }
 
-.tiles-wrapper {
+.tile-card {
     pointer-events: auto;
 }
 

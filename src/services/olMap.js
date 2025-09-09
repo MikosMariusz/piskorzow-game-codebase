@@ -9,12 +9,28 @@ let _map = null
 let _tileLayer = null
 let _darkModeEnabled = false
 let _isAnimating = false
+let _animationCallbacks = []
 
 const DEFAULT_CENTER = fromLonLat([16.62, 50.69]) // okolice Piskorzowa / Pieszyc
 const DEFAULT_ZOOM = 12
 const OSM_COLOR_ANIMATION_DURATION = 300
 
 export const getOSMDuration = () => OSM_COLOR_ANIMATION_DURATION
+
+export function addAnimationCallback(callback) {
+    _animationCallbacks.push(callback)
+}
+
+export function removeAnimationCallback(callback) {
+    const index = _animationCallbacks.indexOf(callback)
+    if (index > -1) {
+        _animationCallbacks.splice(index, 1)
+    }
+}
+
+export function isDarkModeEnabled() {
+    return _darkModeEnabled
+}
 
 function findCanvas() {
     if (!_tileLayer) return null
@@ -23,7 +39,7 @@ function findCanvas() {
     if (mapElement) {
         const canvasElements = mapElement.querySelectorAll('canvas')
         if (canvasElements.length > 0) {
-            return canvasElements[0] // Weź pierwszy canvas
+            return canvasElements[0]
         }
     }
 
@@ -92,16 +108,16 @@ export function enableDarkMode() {
 
             if (canvasElements.length > 0) {
                 canvasElements.forEach((canvas) => {
-                    canvas.style.filter = 'grayscale(90%) brightness(0.7) contrast(1.2)'
+                    canvas.style.filter = 'grayscale(90%) brightness(0.3) contrast(1.2)'
                     canvas.style.transition = 'filter 1s ease-in-out'
                 })
             } else {
-                mapElement.style.filter = 'grayscale(90%) brightness(0.7) contrast(1.2)'
+                mapElement.style.filter = 'grayscale(90%) brightness(0.3) contrast(1.2)'
                 mapElement.style.transition = 'filter 1s ease-in-out'
             }
 
             if (attempts > 5 && canvasElements.length === 0) {
-                mapElement.style.filter = 'grayscale(90%) brightness(0.7) contrast(1.2)'
+                mapElement.style.filter = 'grayscale(90%) brightness(0.3) contrast(1.2)'
                 mapElement.style.transition = 'filter 1s ease-in-out'
             }
         } else if (attempts < 20) {
@@ -141,6 +157,9 @@ export function animateToMode(isDark, duration = OSM_COLOR_ANIMATION_DURATION) {
 
     _isAnimating = true
 
+    // Powiadom wszystkie callbacki o rozpoczęciu animacji
+    _animationCallbacks.forEach((callback) => callback({ type: 'start', isDark, duration }))
+
     const canvas = findCanvas()
     if (!canvas) {
         _isAnimating = false
@@ -150,8 +169,8 @@ export function animateToMode(isDark, duration = OSM_COLOR_ANIMATION_DURATION) {
     const startTime = Date.now()
     const startGrayscale = _darkModeEnabled ? 90 : 0
     const endGrayscale = isDark ? 90 : 0
-    const startBrightness = _darkModeEnabled ? 0.7 : 1.0
-    const endBrightness = isDark ? 0.7 : 1.0
+    const startBrightness = _darkModeEnabled ? 0.3 : 1.0
+    const endBrightness = isDark ? 0.3 : 1.0
 
     function animateFilters() {
         const elapsed = Date.now() - startTime
@@ -163,6 +182,15 @@ export function animateToMode(isDark, duration = OSM_COLOR_ANIMATION_DURATION) {
         const currentGrayscale = startGrayscale + (endGrayscale - startGrayscale) * eased
         const currentBrightness = startBrightness + (endBrightness - startBrightness) * eased
 
+        _animationCallbacks.forEach((callback) =>
+            callback({
+                type: 'progress',
+                isDark,
+                progress: eased,
+                elapsed,
+            }),
+        )
+
         if (progress < 1) {
             canvas.style.filter = `grayscale(${currentGrayscale}%) brightness(${currentBrightness}) contrast(1.2)`
             requestAnimationFrame(animateFilters)
@@ -171,10 +199,13 @@ export function animateToMode(isDark, duration = OSM_COLOR_ANIMATION_DURATION) {
             _darkModeEnabled = isDark
 
             if (isDark) {
-                canvas.style.filter = 'grayscale(90%) brightness(0.7) contrast(1.2)'
+                canvas.style.filter = 'grayscale(90%) brightness(0.3) contrast(1.2)'
             } else {
                 canvas.style.filter = 'none'
             }
+
+            // Powiadom callbacki o zakończeniu animacji
+            _animationCallbacks.forEach((callback) => callback({ type: 'end', isDark }))
         }
     }
 

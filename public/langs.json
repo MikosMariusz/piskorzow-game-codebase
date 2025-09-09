@@ -1,0 +1,16 @@
+{
+    "pl": {
+        "save": "Zapisz",
+        "cancel": "Anuluj",
+        "terrainGame": "Gra terenowa",
+        "villagePresentation": "Interaktywna prezentacja wsi",
+        "gameTitle": "Piskorzów Interaktywnie"
+    },
+    "en": {
+        "save": "Save",
+        "cancel": "Cancel",
+        "terrainGame": "Village Quest",
+        "villagePresentation": "Interactive Village Presentation",
+        "gameTitle": "Piskorzów Interactively"
+    }
+}

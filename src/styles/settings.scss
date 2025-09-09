@@ -21,3 +21,7 @@ body::-webkit-scrollbar {
     height: 0;
     display: none; // WebKit
 }
+
+.gradient-anim {
+    transition: background 300ms linear;
+}

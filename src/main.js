@@ -18,6 +18,6 @@ import 'unfonts.css'
 
 const app = createApp(App)
 
-registerPlugins(app)
+await registerPlugins(app)
 
 app.mount('#app')
