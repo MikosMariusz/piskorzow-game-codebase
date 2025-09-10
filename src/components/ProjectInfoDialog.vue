@@ -35,7 +35,7 @@
 
             <v-divider />
 
-            <v-card-text class="scrollable-content pa-6">
+            <v-card-text class="scrollable-content pa-0">
                 <AppCard
                     class="mb-4 pa-4 content-wrapper"
                     :opacity="0.9"
@@ -271,16 +271,20 @@ defineExpose({
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 2rem;
+    box-sizing: border-box;
 }
 
 .content-wrapper {
     max-width: 800px;
-    max-height: calc(100dvh - 200px);
+    max-height: calc(100dvh - 240px);
     margin: 0 auto;
     padding: 2rem;
     background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(8px);
     overflow-y: auto;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .project-description {
@@ -317,7 +321,11 @@ defineExpose({
 
     .content-wrapper {
         padding: 1.5rem 1rem;
-        max-height: calc(100dvh - 180px);
+        max-height: calc(100dvh - 220px);
+    }
+
+    .scrollable-content {
+        padding: 1.5rem;
     }
 }
 
@@ -354,7 +362,11 @@ defineExpose({
 
     .content-wrapper {
         padding: 1rem 0.5rem;
-        max-height: calc(100dvh - 160px);
+        max-height: calc(100dvh - 200px);
+    }
+
+    .scrollable-content {
+        padding: 1.5rem;
     }
 }
 </style>
