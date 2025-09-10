@@ -3,14 +3,80 @@
         "save": "Zapisz",
         "cancel": "Anuluj",
         "terrainGame": "Gra terenowa",
+        "terrainGameUnavailable": "Gra terenowa niedostępna na urządzeniu bez moduły GPS",
         "villagePresentation": "Interaktywna prezentacja wsi",
-        "gameTitle": "Piskorzów Interaktywnie"
+        "gameTitle": "Piskorzów Interaktywnie",
+        "loading": {
+            "initializing": "Inicjalizacja aplikacji...",
+            "gpsInfo": "Sprawdzanie dostępu do lokalizacji GPS...",
+            "status": {
+                "loading": "Ładowanie aplikacji...",
+                "components": "Inicjalizacja komponentów...",
+                "gps": "Sprawdzanie uprawnień GPS...",
+                "map": "Konfiguracja mapy...",
+                "game": "Przygotowywanie gry terenowej..."
+            }
+        },
+        "projectInfo": {
+            "title": "Piskorzów Interaktywnie",
+            "subtitle": "Odkryj historię i kulturę wsi Piskorzów",
+            "showInfo": "Pokaż informacje o projekcie",
+            "aboutTitle": "O projekcie",
+            "description1": "Witamy w interaktywnej prezentacji wsi Piskorzów! Ten projekt został stworzony w ramach programu finansowanego przez Unię Europejską, mającego na celu promocję lokalnego dziedzictwa kulturowego i historycznego.",
+            "description2": "Nasza aplikacja oferuje wirtualną wędrówkę po wsi, gdzie możesz poznać jej bogatą historię, tradycje i współczesne życie mieszkańców. Dzięki interaktywnej mapie i grze terenowej, uczenie staje się zabawą.",
+            "description3": "Projekt ma na celu nie tylko edukację, ale także zachowanie i przekazanie przyszłym pokoleniom unikalnego dziedzictwa kulturowego regionu.",
+            "fundingTitle": "Informacje o finansowaniu",
+            "euFunding": "Projekt współfinansowany przez Unię Europejską",
+            "projectPeriod": "Okres realizacji: 2024-2025",
+            "location": "Lokalizacja: Piskorzów, Polska",
+            "objectivesTitle": "Cele projektu",
+            "objective1": "Promocja dziedzictwa kulturowego wsi Piskorzów",
+            "objective2": "Stworzenie interaktywnych narzędzi edukacyjnych",
+            "objective3": "Zachowanie lokalnych tradycji dla przyszłych pokoleń",
+            "objective4": "Zwiększenie świadomości o znaczeniu kultury lokalnej",
+            "dontShowAgain": "Nie pokazuj ponownie",
+            "close": "Zamknij",
+            "startExploring": "Zacznij eksplorację"
+        }
     },
     "en": {
         "save": "Save",
         "cancel": "Cancel",
         "terrainGame": "Village Quest",
+        "terrainGameUnavailable": "Terrain game unavailable on device without GPS module",
         "villagePresentation": "Interactive Village Presentation",
-        "gameTitle": "Piskorzów Interactively"
+        "gameTitle": "Piskorzów Interactively",
+        "loading": {
+            "initializing": "Initializing application...",
+            "gpsInfo": "Checking GPS location access...",
+            "status": {
+                "loading": "Loading application...",
+                "components": "Initializing components...",
+                "gps": "Checking GPS permissions...",
+                "map": "Configuring map...",
+                "game": "Preparing terrain game..."
+            }
+        },
+        "projectInfo": {
+            "title": "Piskorzów Interactively",
+            "subtitle": "Discover the history and culture of Piskorzów village",
+            "showInfo": "Show project information",
+            "aboutTitle": "About the project",
+            "description1": "Welcome to the interactive presentation of Piskorzów village! This project was created as part of a program funded by the European Union, aimed at promoting local cultural and historical heritage.",
+            "description2": "Our application offers a virtual journey through the village, where you can learn about its rich history, traditions, and contemporary life of residents. Thanks to the interactive map and field game, learning becomes fun.",
+            "description3": "The project aims not only to educate but also to preserve and pass on to future generations the unique cultural heritage of the region.",
+            "fundingTitle": "Funding information",
+            "euFunding": "Project co-financed by the European Union",
+            "projectPeriod": "Implementation period: 2024-2025",
+            "location": "Location: Piskorzów, Poland",
+            "objectivesTitle": "Project objectives",
+            "objective1": "Promotion of cultural heritage of Piskorzów village",
+            "objective2": "Creation of interactive educational tools",
+            "objective3": "Preservation of local traditions for future generations",
+            "objective4": "Increasing awareness of the importance of local culture",
+            "dontShowAgain": "Don't show again",
+            "close": "Close",
+            "startExploring": "Start exploring"
+        }
     }
 }

@@ -16,8 +16,8 @@ const model = computed({
         v-model="model"
         variant="elevated"
         density="comfortable"
-        divided
         color="primary"
+        rounded="sm"
         elevation="4"
     >
         <v-btn

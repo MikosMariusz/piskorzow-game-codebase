@@ -5,19 +5,24 @@
             fluid
         >
             <v-row
-                class="justify-center ga-8 tiles-wrapper"
+                class="justify-center tiles-wrapper"
                 no-gutters
             >
                 <v-col
                     v-for="tile in tiles"
                     :key="tile.id"
                     cols="12"
-                    sm="6"
-                    md="4"
+                    sm="12"
+                    md="6"
+                    lg="4"
                     class="d-flex justify-center"
                 >
                     <v-card
-                        class="glass-card tile-card position-relative cursor-pointer"
+                        class="glass-card tile-card position-relative"
+                        :class="{
+                            'cursor-not-allowed': tile.id === 'game' && !appStore.hasGpsAccess,
+                            'cursor-pointer': !(tile.id === 'game' && !appStore.hasGpsAccess),
+                        }"
                         role="button"
                         elevation="8"
                         tabindex="0"
@@ -34,6 +39,10 @@
                                 height="100%"
                                 width="100%"
                                 class="position-absolute"
+                                :class="{
+                                    'grayscale-filter':
+                                        tile.id === 'game' && !appStore.hasGpsAccess,
+                                }"
                                 style="top: 0; left: 0"
                             />
                             <div
@@ -57,8 +66,14 @@
                                     elevation="4"
                                     rounded="lg"
                                 >
-                                    <p class="text-center text-h5 font-weight-light ma-2">
-                                        {{ $t(tile.title) }}
+                                    <p
+                                        class="text-center text-h5 font-weight-light ma-2"
+                                        :class="{
+                                            'text-primary':
+                                                tile.id === 'game' && !appStore.hasGpsAccess,
+                                        }"
+                                    >
+                                        {{ getTileTitle(tile) }}
                                     </p>
                                 </v-sheet>
                             </div>
@@ -72,8 +87,12 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
+import { useAppStore } from '@/stores/app'
+import { useI18n } from 'vue-i18n'
 
 const router = useRouter()
+const appStore = useAppStore()
+const { t } = useI18n()
 
 const tiles = [
     {
@@ -95,7 +114,18 @@ const tiles = [
 ]
 
 function go(path) {
+    const tile = tiles.find((t) => t.route === path)
+    if (tile && tile.id === 'game' && !appStore.hasGpsAccess) {
+        return
+    }
     router.push(path)
+}
+
+function getTileTitle(tile) {
+    if (tile.id === 'game' && !appStore.hasGpsAccess) {
+        return t('terrainGameUnavailable')
+    }
+    return t(tile.title)
 }
 </script>
 
@@ -159,8 +189,19 @@ function go(path) {
     background: rgba(255, 255, 255, 0.12) !important;
 }
 
+.grayscale-filter {
+    filter: grayscale(100%) brightness(0.5) !important;
+}
+
+.cursor-not-allowed {
+    cursor: not-allowed !important;
+}
+
 /* Responsywność dla różnych rozmiarów ekranów */
 @media (max-width: 480px) {
+    .home-layer {
+        padding-top: 64px; /* mniejszy padding na małych ekranach */
+    }
     .tile-card {
         width: min(85vw, 320px);
         margin: 0.5rem;

@@ -1,5 +1,8 @@
 <template>
-    <v-app-bar :image="bg">
+    <v-app-bar
+        :image="bg"
+        style="z-index: 1300"
+    >
         <template v-slot:image>
             <div class="gradient-container">
                 <v-img
@@ -20,6 +23,18 @@
             $t('gameTitle')
         }}</v-toolbar-title>
         <v-spacer />
+        <v-btn
+            icon="mdi-information-outline"
+            variant="elevated"
+            size="small"
+            elevation="4"
+            rounded="sm"
+            class="mr-5"
+            color="primary"
+            :title="$t('projectInfo.showInfo')"
+            @click="$emit('show-project-info')"
+            @contextmenu.prevent="$emit('reset-project-info')"
+        />
         <lang-switcher class="mr-4" />
     </v-app-bar>
 </template>
@@ -28,6 +43,8 @@
 import { computed } from 'vue'
 import { useAppStore } from '@/stores/app'
 import { getOSMDuration } from '@/services/olMap'
+
+defineEmits(['show-project-info', 'reset-project-info'])
 
 const bg = new URL('../assets/images/bar-background.png', import.meta.url).href
 const appStore = useAppStore()
@@ -53,5 +70,11 @@ const opacity = computed(() => (appStore.isDarkEnabled ? 1 : 0))
     width: 100%;
     height: 100%;
     transition: opacity 0.3s ease-in-out;
+}
+
+/* Hover effect for home button */
+.v-btn:hover {
+    transform: translateY(-1px);
+    transition: transform 0.2s ease-in-out;
 }
 </style>
