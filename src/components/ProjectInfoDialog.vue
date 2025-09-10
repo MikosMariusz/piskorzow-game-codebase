@@ -1,8 +1,8 @@
 <template>
     <v-dialog
         v-model="dialog"
-        max-width="100vw"
-        max-height="100vh"
+        width="100dvw"
+        height="100dvh"
         persistent
         class="project-info-dialog"
     >
@@ -216,8 +216,13 @@ defineExpose({
 <style scoped>
 .project-info-dialog :deep(.v-overlay__content) {
     margin: 0;
-    height: 100vh;
-    width: 100vw;
+    height: 100dvh;
+    width: 100dvw;
+    max-height: 100dvh;
+    max-width: 100dvw;
+    top: 0 !important;
+    left: 0 !important;
+    position: fixed !important;
 }
 
 .project-info-dialog :deep(.v-overlay__scrim) {
@@ -225,12 +230,14 @@ defineExpose({
 }
 
 .project-info-dialog :deep(.v-overlay__content) {
-    z-index: 9998;
+    z-index: 9999;
 }
 
 .project-info-card {
-    height: 100vh;
-    max-height: 100vh;
+    height: 100dvh;
+    max-height: 100dvh;
+    width: 100dvw;
+    max-width: 100dvw;
     display: flex;
     flex-direction: column;
     position: relative;
@@ -268,7 +275,7 @@ defineExpose({
 
 .content-wrapper {
     max-width: 800px;
-    max-height: calc(100vh - 200px);
+    max-height: calc(100dvh - 200px);
     margin: 0 auto;
     padding: 2rem;
     background: rgba(255, 255, 255, 0.85);
@@ -287,14 +294,21 @@ defineExpose({
 /* Responsywność */
 @media (max-width: 960px) {
     .project-info-dialog :deep(.v-overlay__content) {
-        margin: 0;
-        height: 100vh;
-        width: 100vw;
+        margin: 0 !important;
+        height: 100dvh !important;
+        width: 100dvw !important;
+        max-height: 100dvh !important;
+        max-width: 100dvw !important;
+        top: 0 !important;
+        left: 0 !important;
+        position: fixed !important;
     }
 
     .project-info-card {
-        height: 100vh;
-        max-height: 100vh;
+        height: 100dvh;
+        max-height: 100dvh;
+        width: 100dvw;
+        max-width: 100dvw;
     }
 
     .project-header .text-h4 {
@@ -303,10 +317,22 @@ defineExpose({
 
     .content-wrapper {
         padding: 1.5rem 1rem;
+        max-height: calc(100dvh - 180px);
     }
 }
 
 @media (max-width: 600px) {
+    .project-info-dialog :deep(.v-overlay__content) {
+        margin: 0 !important;
+        height: 100dvh !important;
+        width: 100dvw !important;
+        max-height: 100dvh !important;
+        max-width: 100dvw !important;
+        top: 0 !important;
+        left: 0 !important;
+        position: fixed !important;
+    }
+
     .project-header {
         padding: 1rem !important;
     }
@@ -328,6 +354,7 @@ defineExpose({
 
     .content-wrapper {
         padding: 1rem 0.5rem;
+        max-height: calc(100dvh - 160px);
     }
 }
 </style>
