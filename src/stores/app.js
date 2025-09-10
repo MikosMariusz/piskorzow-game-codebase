@@ -11,7 +11,11 @@ export const useAppStore = defineStore('app', () => {
 
     // Getters
     const isDarkEnabled = computed(() => darkEnabled.value)
-    const hasGpsAccess = computed(() => gpsAccess.value === true)
+    const hasGpsAccess = computed(() => {
+        const result = gpsAccess.value === true
+        console.log('🔎 hasGpsAccess computed:', result, 'gpsAccess.value:', gpsAccess.value)
+        return result
+    })
     const getGpsInfo = computed(() => gpsInfo.value)
     const isGpsChecked = computed(() => gpsAccess.value !== null)
     const getIsLoading = computed(() => isLoading.value)
