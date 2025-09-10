@@ -1,73 +1,101 @@
+import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { checkGpsAccessAndAccuracy } from '@/services/gps'
 
-export const useAppStore = defineStore('app', {
-    state: () => ({
-        darkEnabled: true,
-        gpsAccess: null, // null = not checked yet, true/false based on access
-        gpsInfo: null, // stores additional GPS information (accuracy, reason, etc.)
-        isLoading: true, // loading screen state
-    }),
+export const useAppStore = defineStore('app', () => {
+    // State
+    const darkEnabled = ref(true)
+    const gpsAccess = ref(null) // null = not checked yet
+    const gpsInfo = ref(null)
+    const isLoading = ref(true)
 
-    getters: {
-        isDarkEnabled: (state) => state.darkEnabled,
-        hasGpsAccess: (state) => state.gpsAccess,
-        getGpsInfo: (state) => state.gpsInfo,
-        isGpsChecked: (state) => state.gpsAccess !== null,
-        getIsLoading: (state) => state.isLoading,
-    },
+    // Getters
+    const isDarkEnabled = computed(() => darkEnabled.value)
+    const hasGpsAccess = computed(() => gpsAccess.value === true)
+    const getGpsInfo = computed(() => gpsInfo.value)
+    const isGpsChecked = computed(() => gpsAccess.value !== null)
+    const getIsLoading = computed(() => isLoading.value)
 
-    actions: {
-        setDarkEnabled(value) {
-            this.darkEnabled = value
-        },
+    // Actions
+    const setDarkEnabled = (value) => {
+        darkEnabled.value = value
+    }
 
-        toggleDarkEnabled() {
-            this.darkEnabled = !this.darkEnabled
-        },
+    const toggleDarkEnabled = () => {
+        darkEnabled.value = !darkEnabled.value
+    }
 
-        shouldUseDarkMode(routePath) {
-            return routePath === '/' || routePath === '/index'
-        },
+    const shouldUseDarkMode = (routePath) => {
+        return routePath === '/' || routePath === '/index'
+    }
 
-        updateDarkModeFromRoute(routePath) {
-            const shouldBeDark = this.shouldUseDarkMode(routePath)
-            this.setDarkEnabled(shouldBeDark)
-            return shouldBeDark
-        },
+    const updateDarkModeFromRoute = (routePath) => {
+        const shouldBeDark = shouldUseDarkMode(routePath)
+        setDarkEnabled(shouldBeDark)
+        return shouldBeDark
+    }
 
-        async checkGpsAccess() {
-            try {
-                const gpsResult = await checkGpsAccessAndAccuracy()
-                this.gpsAccess = gpsResult.access
-                this.gpsInfo = gpsResult
-                console.log('GPS access check completed:', gpsResult)
+    const checkGpsAccess = async () => {
+        console.log('🔍 Sprawdzam dostęp do GPS...')
 
-                setTimeout(() => {
-                    this.setLoading(false)
-                }, 3000)
+        try {
+            const gpsResult = await checkGpsAccessAndAccuracy()
+            console.log('📍 GPS result:', gpsResult)
 
-                return gpsResult
-            } catch (error) {
-                console.error('Error checking GPS access:', error)
-                this.gpsAccess = false
-                this.gpsInfo = { access: false, reason: 'Check failed', error: error.message }
+            gpsAccess.value = gpsResult.access
+            gpsInfo.value = gpsResult
 
-                setTimeout(() => {
-                    this.setLoading(false)
-                }, 3000)
+            // Dodaj debugging
+            console.log('📱 Is mobile:', gpsResult.isMobile)
+            console.log('✅ GPS access:', gpsResult.access)
+            console.log('📍 Accuracy:', gpsResult.accuracy)
 
-                return this.gpsInfo
-            }
-        },
+            setTimeout(() => {
+                setLoading(false)
+            }, 3000)
 
-        setGpsAccess(access, info = null) {
-            this.gpsAccess = access
-            this.gpsInfo = info
-        },
+            return gpsResult
+        } catch (error) {
+            console.error('❌ Error checking GPS access:', error)
+            gpsAccess.value = false
+            gpsInfo.value = { access: false, reason: 'Check failed', error: error.message }
 
-        setLoading(isLoading) {
-            this.isLoading = isLoading
-        },
-    },
+            setTimeout(() => {
+                setLoading(false)
+            }, 3000)
+
+            return gpsInfo.value
+        }
+    }
+
+    const setGpsAccess = (access, info = null) => {
+        gpsAccess.value = access
+        gpsInfo.value = info
+    }
+
+    const setLoading = (loadingState) => {
+        isLoading.value = loadingState
+    }
+
+    return {
+        // state
+        darkEnabled,
+        gpsAccess,
+        gpsInfo,
+        isLoading,
+        // getters
+        isDarkEnabled,
+        hasGpsAccess,
+        getGpsInfo,
+        isGpsChecked,
+        getIsLoading,
+        // actions
+        setDarkEnabled,
+        toggleDarkEnabled,
+        shouldUseDarkMode,
+        updateDarkModeFromRoute,
+        checkGpsAccess,
+        setGpsAccess,
+        setLoading,
+    }
 })
