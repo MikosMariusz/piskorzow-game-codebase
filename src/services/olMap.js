@@ -1,30 +1,423 @@
-import TileLayer from 'ol/layer/Tile'
+import WebGLTileLayer from 'ol/layer/WebGLTile'
+import VectorLayer from 'ol/layer/Vector'
+import VectorSource from 'ol/source/Vector'
 import Map from 'ol/Map'
-import { fromLonLat } from 'ol/proj'
+import { fromLonLat, toLonLat } from 'ol/proj'
 import XYZ from 'ol/source/XYZ'
 import View from 'ol/View'
+import { GeoJSON } from 'ol/format'
+import { Style, Stroke, Fill } from 'ol/style'
 import { useAppStore } from '@/stores/app'
 
 let _map = null
-let _tileLayer = null
+let _normalTileLayer = null
+let _darkTileLayer = null
+let _vectorLayer = null
 let _isAnimating = false
+let _coordinatesCallback = null
+let _zoomCallback = null
+let _clickCallback = null
+let _moveEndCallback = null
 
-const DEFAULT_CENTER = fromLonLat([16.62, 50.69])
+// Zmienne dla animacji lotu na stronie głównej
+let _flightAnimation = null
+let _isFlying = false
+let _flightPoints = []
+let _currentFlightIndex = 0
+
+const DEFAULT_CENTER = fromLonLat([16.561, 50.733])
 const DEFAULT_ZOOM = 12
 const OSM_COLOR_ANIMATION_DURATION = 700
 
 export const getOSMDuration = () => OSM_COLOR_ANIMATION_DURATION
 
-const findCanvas = () => {
-    if (!_tileLayer) return null
-    const mapElement = _map.getTarget()
-    if (mapElement) {
-        const canvasElements = mapElement.querySelectorAll('canvas')
-        if (canvasElements.length > 0) {
-            return canvasElements[0]
-        }
+/**
+ * Generuje losowe punkty wokół centrum mapy dla animacji lotu
+ * @param {Array} center - Współrzędne centrum [lon, lat]
+ * @param {number} count - Liczba punktów do wygenerowania
+ * @returns {Array} Tablica punktów z współrzędnymi i poziomami zoom
+ */
+const generateFlightPoints = (center, count = 10) => {
+    const points = []
+    const [centerLon, centerLat] = center
+
+    for (let i = 0; i < count; i++) {
+        // Losowy kąt w radianach - większe rozłożenie
+        const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.8
+
+        // Większy promień dla lotu po regionie (0.03 - 0.12 stopni, około 3-12km)
+        const radius = 0.03 + Math.random() * 0.09
+
+        // Oblicz współrzędne punktu
+        const lon = centerLon + Math.cos(angle) * radius
+        const lat = centerLat + Math.sin(angle) * radius
+
+        // Bardzo minimalny zakres zoom (DEFAULT_ZOOM +-1)
+        const zoomVariation = (Math.random() - 0.5) * 2 // -1 do +1
+        const zoom = DEFAULT_ZOOM + zoomVariation
+
+        points.push({
+            coordinates: fromLonLat([lon, lat]),
+            zoom: Math.max(8, Math.min(16, zoom)), // Ograniczenie do sensownego zakresu
+            duration: 4000 + Math.random() * 3000, // 4-7 sekund na punkt dla spokojniejszego lotu
+        })
+    }
+
+    return points
+}
+
+/**
+ * Uruchamia animację lotu po losowych punktach
+ */
+export const startFlightAnimation = () => {
+    if (_isFlying || !_map) return
+
+    const center = toLonLat(DEFAULT_CENTER)
+    _flightPoints = generateFlightPoints(center, 10) // Więcej punktów dla płynniejszego lotu
+    _currentFlightIndex = 0
+    _isFlying = true
+
+    animateToNextFlightPoint()
+}
+
+/**
+ * Zatrzymuje animację lotu
+ */
+export const stopFlightAnimation = () => {
+    _isFlying = false
+    if (_flightAnimation) {
+        clearTimeout(_flightAnimation)
+        _flightAnimation = null
+    }
+}
+
+/**
+ * Animuje do następnego punktu w sekwencji lotu
+ */
+const animateToNextFlightPoint = () => {
+    if (!_isFlying || !_map || _flightPoints.length === 0) return
+
+    const point = _flightPoints[_currentFlightIndex]
+    const view = _map.getView()
+
+    view.animate(
+        {
+            center: point.coordinates,
+            zoom: point.zoom,
+            duration: point.duration,
+        },
+        () => {
+            // Po zakończeniu animacji do tego punktu, przejdź do następnego
+            if (_isFlying) {
+                _currentFlightIndex = (_currentFlightIndex + 1) % _flightPoints.length
+
+                // Dłuższa pauza między punktami dla spokojniejszego lotu (2-3 sekundy)
+                _flightAnimation = setTimeout(
+                    () => {
+                        animateToNextFlightPoint()
+                    },
+                    2000 + Math.random() * 1000,
+                )
+            }
+        },
+    )
+}
+
+/**
+ * Rejestruje callback do aktualizacji współrzędnych kursora
+ * @param {Function} callback - Funkcja wywoływana przy zmianie pozycji kursora
+ */
+export const setCoordinatesCallback = (callback) => {
+    _coordinatesCallback = callback
+}
+
+/**
+ * Usuwa callback współrzędnych
+ */
+export const clearCoordinatesCallback = () => {
+    _coordinatesCallback = null
+}
+
+/**
+ * Rejestruje callback do aktualizacji poziomu zoom
+ * @param {Function} callback - Funkcja wywoływana przy zmianie poziomu zoom
+ */
+export const setZoomCallback = (callback) => {
+    _zoomCallback = callback
+}
+
+/**
+ * Usuwa callback zoom
+ */
+export const clearZoomCallback = () => {
+    _zoomCallback = null
+}
+
+/**
+ * Rejestruje callback do obsługi zakończenia ruchu mapy
+ * @param {Function} callback - Funkcja wywoływana po zakończeniu ruchu mapy (center, zoom)
+ */
+export const setMoveEndCallback = (callback) => {
+    _moveEndCallback = callback
+}
+
+/**
+ * Usuwa callback ruchu mapy
+ */
+export const clearMoveEndCallback = () => {
+    _moveEndCallback = null
+}
+
+/**
+ * Oblicza dystans między dwoma punktami geograficznymi w metrach (wzór Haversine)
+ * @param {number} lat1 - Szerokość geograficzna pierwszego punktu
+ * @param {number} lon1 - Długość geograficzna pierwszego punktu
+ * @param {number} lat2 - Szerokość geograficzna drugiego punktu
+ * @param {number} lon2 - Długość geograficzna drugiego punktu
+ * @returns {number} Dystans w metrach
+ */
+export const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371000 // Promień Ziemi w metrach
+    const dLat = ((lat2 - lat1) * Math.PI) / 180
+    const dLon = ((lon2 - lon1) * Math.PI) / 180
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos((lat1 * Math.PI) / 180) *
+            Math.cos((lat2 * Math.PI) / 180) *
+            Math.sin(dLon / 2) *
+            Math.sin(dLon / 2)
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+    return R * c
+}
+
+/**
+ * Pobiera aktualne centrum mapy w współrzędnych geograficznych
+ * @returns {Array|null} [lon, lat] lub null jeśli mapa nie istnieje
+ */
+export const getMapCenter = () => {
+    if (_map) {
+        const center = _map.getView().getCenter()
+        return toLonLat(center)
     }
     return null
+}
+
+/**
+ * Rejestruje callback do obsługi kliknięć na mapie
+ * @param {Function} callback - Funkcja wywoływana przy kliknięciu na mapę
+ */
+export const setClickCallback = (callback) => {
+    _clickCallback = callback
+}
+
+/**
+ * Usuwa callback kliknięć
+ */
+export const clearClickCallback = () => {
+    _clickCallback = null
+}
+
+/**
+ * Przybliża mapę o jeden poziom
+ */
+export const zoomIn = () => {
+    if (_map) {
+        const view = _map.getView()
+        const currentZoom = view.getZoom()
+        view.animate({ zoom: currentZoom + 1, duration: 300 })
+    }
+}
+
+/**
+ * Oddala mapę o jeden poziom
+ */
+export const zoomOut = () => {
+    if (_map) {
+        const view = _map.getView()
+        const currentZoom = view.getZoom()
+        view.animate({ zoom: currentZoom - 1, duration: 300 })
+    }
+}
+
+/**
+ * Centruje mapę na podanych współrzędnych z animacją
+ * @param {number} lat - Szerokość geograficzna
+ * @param {number} lon - Długość geograficzna
+ * @param {number} zoom - Poziom przybliżenia (opcjonalny)
+ */
+export const centerMapOn = (lat, lon, zoom = null) => {
+    if (_map) {
+        const view = _map.getView()
+        const center = fromLonLat([lon, lat])
+
+        const animationOptions = {
+            center: center,
+            duration: 1000,
+        }
+
+        if (zoom !== null) {
+            animationOptions.zoom = zoom
+        }
+
+        view.animate(animationOptions)
+    }
+}
+
+/**
+ * Pobiera aktualny poziom zoom
+ * @returns {number|null} Aktualny poziom zoom lub null jeśli mapa nie istnieje
+ */
+export const getCurrentZoom = () => {
+    if (_map) {
+        return _map.getView().getZoom()
+    }
+    return null
+}
+
+/**
+ * Ładuje geometrię z lokalnego pliku GeoJSON
+ * @param {string} geojsonPath - Ścieżka do pliku GeoJSON (względem public/)
+ * @returns {Promise<Object|null>} GeoJSON feature lub null w przypadku błędu
+ */
+export const loadGeometryFromFile = async (geojsonPath) => {
+    try {
+        const response = await fetch(geojsonPath)
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`)
+        }
+
+        const geojsonData = await response.json()
+
+        if (!geojsonData) {
+            throw new Error('Pusty plik GeoJSON')
+        }
+
+        let feature = null
+
+        if (geojsonData.type === 'Feature') {
+            feature = geojsonData
+        } else if (geojsonData.type === 'FeatureCollection' && geojsonData.features?.length > 0) {
+            feature = geojsonData.features[0]
+        } else {
+            throw new Error('Nieprawidłowy format GeoJSON')
+        }
+        if (_map) {
+            const displayName =
+                feature.properties?.display_name || feature.properties?.name || 'Obszar'
+            addGeometryToMap(feature.geometry, displayName, feature.properties)
+        }
+        return feature
+    } catch (error) {
+        console.error(`❌ Błąd podczas ładowania geometrii z pliku ${geojsonPath}:`, error)
+        return null
+    }
+}
+
+export const clearGeometry = () => {
+    if (_map && _vectorLayer) {
+        _map.removeLayer(_vectorLayer)
+        _vectorLayer = null
+    }
+}
+
+export const searchLocationGeometry = async (locationName) => {
+    try {
+        const nominatimUrl = `https://nominatim.openstreetmap.org/search?format=geojson&q=${encodeURIComponent(locationName)}&polygon_geojson=1&limit=10&addressdetails=1&extratags=1`
+        const response = await fetch(nominatimUrl)
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`)
+        }
+
+        const data = await response.json()
+
+        if (!data.features || data.features.length === 0) {
+            console.warn(`❌ Nie znaleziono geometrii dla: "${locationName}"`)
+            return null
+        }
+
+        const polygonFeatures = data.features.filter((feature) => {
+            const geometry = feature.geometry
+            const isPolygon = geometry.type === 'Polygon' || geometry.type === 'MultiPolygon'
+            return isPolygon
+        })
+
+        if (polygonFeatures.length === 0) {
+            console.warn(`❌ Nie znaleziono poligonów dla obrębu: "${locationName}"`)
+            return null
+        }
+
+        let bestFeature = polygonFeatures[0]
+        const administrativePolygons = polygonFeatures.filter((feature) => {
+            const props = feature.properties
+            return (
+                props.type === 'administrative' ||
+                props.class === 'boundary' ||
+                (props.extratags && props.extratags.admin_level)
+            )
+        })
+
+        if (administrativePolygons.length > 0) {
+            bestFeature = administrativePolygons[0]
+        }
+
+        const completeFeature = {
+            type: 'Feature',
+            geometry: geometry,
+            properties: properties,
+        }
+
+        if (_map) {
+            addGeometryToMap(geometry, properties.display_name, properties)
+        }
+
+        return { geometry, properties, feature: completeFeature }
+    } catch (error) {
+        console.error('❌ Błąd podczas wyszukiwania geometrii obrębu:', error)
+        return null
+    }
+}
+
+const addGeometryToMap = (geometry, locationName, properties = {}) => {
+    if (!_map) return
+    if (_vectorLayer) {
+        _map.removeLayer(_vectorLayer)
+    }
+    const feature = {
+        type: 'Feature',
+        geometry: geometry,
+        properties: {
+            name: locationName,
+            ...properties,
+        },
+    }
+
+    const geojsonObject = {
+        type: 'FeatureCollection',
+        features: [feature],
+    }
+
+    const vectorSource = new VectorSource({
+        features: new GeoJSON().readFeatures(geojsonObject, {
+            featureProjection: 'EPSG:3857',
+        }),
+    })
+
+    const vectorStyle = new Style({
+        stroke: new Stroke({
+            color: '#c48600ff',
+            width: 2,
+        }),
+        fill: new Fill({
+            color: 'rgba(118, 79, 0, 0.36)',
+        }),
+    })
+
+    _vectorLayer = new VectorLayer({
+        source: vectorSource,
+        style: vectorStyle,
+    })
+
+    _map.addLayer(_vectorLayer)
 }
 
 export const createMap = (targetEl, options = {}) => {
@@ -34,26 +427,113 @@ export const createMap = (targetEl, options = {}) => {
         }
         return _map
     }
-    _tileLayer = new TileLayer({
+
+    // Warstwa normalna (kolorowa)
+    _normalTileLayer = new WebGLTileLayer({
         source: new XYZ({
             url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
             maxZoom: 20,
         }),
     })
+
+    // Warstwa ciemna (wyszarzona z rozjaśnioną jasnością)
+    _darkTileLayer = new WebGLTileLayer({
+        source: new XYZ({
+            url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+            maxZoom: 20,
+        }),
+        style: {
+            color: [
+                'array',
+                [
+                    '*',
+                    [
+                        '+',
+                        ['*', ['band', 1], 0.299],
+                        ['*', ['band', 2], 0.587],
+                        ['*', ['band', 3], 0.114],
+                    ],
+                    0.6,
+                ],
+                [
+                    '*',
+                    [
+                        '+',
+                        ['*', ['band', 1], 0.299],
+                        ['*', ['band', 2], 0.587],
+                        ['*', ['band', 3], 0.114],
+                    ],
+                    0.6,
+                ],
+                [
+                    '*',
+                    [
+                        '+',
+                        ['*', ['band', 1], 0.299],
+                        ['*', ['band', 2], 0.587],
+                        ['*', ['band', 3], 0.114],
+                    ],
+                    0.6,
+                ],
+                ['band', 4],
+            ],
+        },
+        opacity: 0,
+    })
+
+    // Usunięcie niepotrzebnego timeout i funkcji findLayerCanvas
+
     _map = new Map({
         target: targetEl || undefined,
-        layers: [_tileLayer],
+        layers: [_normalTileLayer, _darkTileLayer],
         view: new View({
             center: options.center || DEFAULT_CENTER,
             zoom: options.zoom ?? DEFAULT_ZOOM,
         }),
         controls: [],
     })
+
     setTimeout(() => animateToMode(), 100)
+
+    _map.on('click', (event) => {
+        if (_clickCallback && event.coordinate) {
+            const [lon, lat] = toLonLat(event.coordinate)
+            _clickCallback(lat, lon)
+        }
+    })
+
+    _map.getView().on('change:resolution', () => {
+        if (_zoomCallback) {
+            const zoom = _map.getView().getZoom()
+            _zoomCallback(zoom)
+        }
+    })
+
+    // Nasłuchiwanie na zakończenie ruchu mapy
+    _map.on('moveend', () => {
+        if (_moveEndCallback) {
+            const center = getMapCenter()
+            const zoom = getCurrentZoom()
+            _moveEndCallback(center, zoom)
+        }
+    })
+
+    const geometryFile =
+        options.geometryFile !== undefined ? options.geometryFile : '/geometries/piskorzow.geojson'
+    if (geometryFile) {
+        setTimeout(() => {
+            loadGeometryFromFile(geometryFile)
+        }, 200)
+    }
+
+    // Test method for development - uncomment to test Nominatim search
+    // searchLocationGeometry('Nazwa lokalizacji')
+
     return _map
 }
 
 export const detach = () => {
+    stopFlightAnimation()
     if (_map) {
         _map.setTarget(null)
     }
@@ -75,23 +555,25 @@ export const updateSize = () => {
 
 export const animateToMode = () => {
     const appStore = useAppStore()
-    const isDark = appStore.darkEnabled
+    const isDark = appStore.homePageActive
     const duration = OSM_COLOR_ANIMATION_DURATION
 
-    if (!_tileLayer) {
+    if (!_normalTileLayer || !_darkTileLayer) {
         return
     }
 
-    const canvas = findCanvas()
-    if (!canvas) {
-        return
-    }
+    const currentNormalOpacity = _normalTileLayer.getOpacity()
+    const currentDarkOpacity = _darkTileLayer.getOpacity()
 
-    const currentFilter = canvas.style.filter
-    const isCurrentlyDark =
-        currentFilter.includes('grayscale') && currentFilter.includes('brightness')
-
+    // Sprawdź czy już jesteśmy w docelowym stanie
+    const isCurrentlyDark = currentDarkOpacity > currentNormalOpacity
     if (isCurrentlyDark === isDark) {
+        // Zarządzaj animacją lotu nawet jeśli kolory się nie zmieniają
+        if (isDark && !_isFlying) {
+            startFlightAnimation()
+        } else if (!isDark && _isFlying) {
+            stopFlightAnimation()
+        }
         return
     }
 
@@ -101,30 +583,48 @@ export const animateToMode = () => {
 
     _isAnimating = true
     const startTime = Date.now()
-    const startGrayscale = isCurrentlyDark ? 90 : 0
-    const endGrayscale = isDark ? 90 : 0
-    const startBrightness = isCurrentlyDark ? 0.3 : 1.0
-    const endBrightness = isDark ? 0.3 : 1.0
 
-    const animateFilters = () => {
+    // Zarządzaj animacją lotu przy zmianie trybu
+    if (isDark) {
+        // Przełączamy na stronę główną - uruchom animację lotu po zakończeniu zmiany kolorów
+        setTimeout(() => {
+            startFlightAnimation()
+        }, duration + 100)
+    } else {
+        // Opuszczamy stronę główną - zatrzymaj animację lotu
+        stopFlightAnimation()
+    }
+
+    // Dla trybu ciemnego: normal opacity: 1->0, dark opacity: 0->1
+    // Dla trybu normalnego: normal opacity: 0->1, dark opacity: 1->0
+    const startNormalOpacity = isDark ? 1 : 0
+    const endNormalOpacity = isDark ? 0 : 1
+    const startDarkOpacity = isDark ? 0 : 1
+    const endDarkOpacity = isDark ? 1 : 0
+
+    const animateOpacity = () => {
         const elapsed = Date.now() - startTime
         const progress = Math.min(elapsed / duration, 1)
+
+        // Easing function (ease-in-out)
         const eased =
             progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2
-        const currentGrayscale = startGrayscale + (endGrayscale - startGrayscale) * eased
-        const currentBrightness = startBrightness + (endBrightness - startBrightness) * eased
+
+        const currentNormal = startNormalOpacity + (endNormalOpacity - startNormalOpacity) * eased
+        const currentDark = startDarkOpacity + (endDarkOpacity - startDarkOpacity) * eased
+
+        _normalTileLayer.setOpacity(currentNormal)
+        _darkTileLayer.setOpacity(currentDark)
 
         if (progress < 1) {
-            canvas.style.filter = `grayscale(${currentGrayscale}%) brightness(${currentBrightness}) contrast(1.2)`
-            requestAnimationFrame(animateFilters)
+            requestAnimationFrame(animateOpacity)
         } else {
             _isAnimating = false
-            if (isDark) {
-                canvas.style.filter = 'grayscale(90%) brightness(0.3) contrast(1.2)'
-            } else {
-                canvas.style.filter = 'none'
-            }
+            // Ustaw finalne wartości
+            _normalTileLayer.setOpacity(endNormalOpacity)
+            _darkTileLayer.setOpacity(endDarkOpacity)
         }
     }
-    requestAnimationFrame(animateFilters)
+
+    requestAnimationFrame(animateOpacity)
 }

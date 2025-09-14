@@ -1,21 +1,11 @@
 <template>
     <div class="home-layer">
-        <v-container
-            class="pa-0"
-            fluid
-        >
-            <v-row
-                class="justify-center tiles-wrapper"
-                no-gutters
-            >
-                <v-col
+        <div class="tiles-container">
+            <div class="tiles-grid">
+                <div
                     v-for="tile in tiles"
                     :key="tile.id"
-                    cols="12"
-                    sm="12"
-                    md="6"
-                    lg="4"
-                    class="d-flex justify-center"
+                    class="tile-wrapper"
                 >
                     <v-card
                         class="glass-card tile-card position-relative"
@@ -47,8 +37,7 @@
                             />
                             <div
                                 v-else
-                                class="h-100 w-100 d-flex align-center justify-center pa-4 text-center text-white font-weight-medium"
-                                style="font-size: 1.05rem; letter-spacing: 0.5px"
+                                class="h-100 w-100 d-flex align-center justify-center pa-2 text-center text-white font-weight-medium fallback-text"
                             >
                                 {{ tile.fallbackText }}
                             </div>
@@ -62,12 +51,12 @@
                                 "
                             >
                                 <v-sheet
-                                    class="tile-label-sheet pa-3"
+                                    class="tile-label-sheet pa-2"
                                     elevation="4"
                                     rounded="lg"
                                 >
                                     <p
-                                        class="text-center text-h5 font-weight-light ma-2"
+                                        class="text-center tile-title font-weight-light ma-1"
                                         :class="{
                                             'text-primary':
                                                 tile.id === 'game' && !appStore.hasGpsAccess,
@@ -79,9 +68,9 @@
                             </div>
                         </div>
                     </v-card>
-                </v-col>
-            </v-row>
-        </v-container>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -136,23 +125,47 @@ function getTileTitle(tile) {
     display: flex;
     align-items: center;
     justify-content: center;
-    pointer-events: none; /* przepuszcza klik poza kafelkami */
-    z-index: 1200; /* ponad warstwą mapy */
+    pointer-events: none;
+    z-index: 1200;
+    overflow: hidden;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+        env(safe-area-inset-left);
+}
+
+.tiles-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.tiles-grid {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    max-width: 100%;
+    width: 100%;
+    max-width: 1200px; /* maksymalna szerokość całego kontenera */
+    justify-items: center;
+}
+
+.tile-wrapper {
+    width: 100%;
+    max-width: 400px;
+    aspect-ratio: 1;
 }
 
 .tile-card {
     pointer-events: auto;
-}
-
-.tile-card {
-    width: min(90vw, 600px);
-    aspect-ratio: 1;
+    width: 100%;
+    height: 100%;
     overflow: hidden;
     transition:
         transform 0.25s,
         box-shadow 0.25s,
         background 0.25s;
-    margin: 1rem;
 }
 
 .tile-label-sheet {
@@ -163,6 +176,24 @@ function getTileTitle(tile) {
     box-shadow:
         0 4px 16px rgba(0, 0, 0, 0.15),
         0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    max-width: 90%;
+    word-wrap: break-word;
+    hyphens: auto;
+}
+
+.tile-title {
+    font-size: clamp(0.9rem, 3.5vw, 1.5rem);
+    line-height: 1.2;
+    word-break: break-word;
+    hyphens: auto;
+    text-align: center;
+}
+
+.fallback-text {
+    font-size: clamp(0.8rem, 3vw, 1.2rem);
+    letter-spacing: 0.3px;
+    line-height: 1.3;
+    word-break: break-word;
 }
 
 .tile-card:focus-visible {
@@ -198,37 +229,153 @@ function getTileTitle(tile) {
 }
 
 /* Responsywność dla różnych rozmiarów ekranów */
-@media (max-width: 480px) {
-    .home-layer {
-        padding-top: 64px; /* mniejszy padding na małych ekranach */
+@media (max-width: 599px) {
+    .tiles-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 10px;
     }
-    .tile-card {
-        width: min(85vw, 320px);
-        margin: 0.5rem;
+
+    .tile-wrapper {
+        max-width: min(85vw, 320px);
+    }
+
+    .tiles-container {
+        padding: 15px;
+    }
+
+    .tile-title {
+        font-size: clamp(0.8rem, 4vw, 1.1rem) !important;
+        line-height: 1.1;
+    }
+
+    .tile-label-sheet {
+        padding: 0.5rem !important;
+        max-width: 85%;
+    }
+
+    .fallback-text {
+        font-size: clamp(0.7rem, 3.5vw, 1rem) !important;
     }
 }
 
-@media (min-width: 481px) and (max-width: 768px) {
-    .tile-card {
-        width: min(70vw, 400px);
+@media (min-width: 600px) and (max-width: 959px) {
+    .tiles-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        max-width: 700px;
+    }
+
+    .tile-wrapper {
+        max-width: 300px;
+    }
+
+    .tiles-container {
+        padding: 20px;
+    }
+
+    .tile-title {
+        font-size: clamp(0.8rem, 3vw, 1.2rem) !important;
+        line-height: 1.1;
+    }
+
+    .tile-label-sheet {
+        padding: 0.6rem !important;
+        max-width: 88%;
+    }
+
+    .fallback-text {
+        font-size: clamp(0.75rem, 2.5vw, 1rem) !important;
     }
 }
 
-@media (min-width: 769px) and (max-width: 1024px) {
-    .tile-card {
-        width: min(45vw, 500px);
+@media (min-width: 960px) and (max-width: 1279px) {
+    .tiles-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        max-width: 800px;
+    }
+
+    .tile-wrapper {
+        max-width: 350px;
+    }
+
+    .tiles-container {
+        padding: 25px;
+    }
+
+    .tile-title {
+        font-size: clamp(1rem, 2.5vw, 1.3rem) !important;
+        line-height: 1.2;
+    }
+
+    .tile-label-sheet {
+        padding: 0.8rem !important;
+        max-width: 90%;
     }
 }
 
-@media (min-width: 1025px) {
-    .tile-card {
-        width: min(40vw, 600px);
+@media (min-width: 1280px) {
+    .tiles-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        max-width: 900px;
+    }
+
+    .tile-wrapper {
+        max-width: 400px;
+    }
+
+    .tiles-container {
+        padding: 30px;
+    }
+
+    .tile-title {
+        font-size: clamp(1.1rem, 2vw, 1.4rem) !important;
+        line-height: 1.2;
+    }
+
+    .tile-label-sheet {
+        padding: 1rem !important;
+        max-width: 90%;
     }
 }
 
-@media (max-width: 640px) {
-    .tiles-wrapper {
-        gap: 1rem !important;
+/* Dla bardzo dużych ekranów - możemy pokazać 3 kafelki, jeśli jest więcej */
+@media (min-width: 1600px) {
+    .tiles-grid {
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        max-width: 1200px;
+    }
+}
+
+/* Orientacja landscape na mobilnych */
+@media (max-width: 959px) and (orientation: landscape) and (max-height: 600px) {
+    .tiles-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+
+    .tile-wrapper {
+        max-width: min(40vh, 250px);
+    }
+
+    .tiles-container {
+        padding: 10px;
+    }
+
+    .tile-title {
+        font-size: clamp(0.7rem, 3vh, 1rem) !important;
+        line-height: 1.1;
+    }
+
+    .tile-label-sheet {
+        padding: 0.4rem !important;
+        max-width: 85%;
+    }
+
+    .fallback-text {
+        font-size: clamp(0.6rem, 2.5vh, 0.9rem) !important;
     }
 }
 </style>

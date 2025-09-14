@@ -11,6 +11,15 @@
             @start-exploring="handleStartExploring"
         />
 
+        <!-- Game Card - używamy CardWrapper z GameCard jako slot -->
+        <CardWrapper
+            :visible="appStore.isGameCardVisible"
+            :title="$t('gameCard.title')"
+            @update:visible="appStore.setGameCardVisible"
+        >
+            <GameCard />
+        </CardWrapper>
+
         <!-- Komponenty aplikacji - ukryj podczas ładowania -->
         <template v-if="!appStore.getIsLoading">
             <AppBar
@@ -30,6 +39,8 @@ import { useAppStore } from '@/stores/app'
 import MapBackground from '@/components/MapBackground.vue'
 import ProjectInfoDialog from '@/components/ProjectInfoDialog.vue'
 import LoadingOverlay from '@/components/LoadingOverlay.vue'
+import CardWrapper from '@/components/CardWrapper.vue'
+import GameCard from '@/components/GameCard.vue'
 
 // Composables
 const router = useRouter()

@@ -24,13 +24,19 @@ const model = computed({
             value="pl"
             size="small"
         >
-            PL
+            <span class="fi fi-pl"></span>
         </v-btn>
         <v-btn
             value="en"
             size="small"
         >
-            EN
+            <span class="fi fi-gb"></span>
+        </v-btn>
+        <v-btn
+            value="es"
+            size="small"
+        >
+            <span class="fi fi-es"></span>
         </v-btn>
     </v-btn-toggle>
 </template>

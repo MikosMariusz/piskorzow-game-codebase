@@ -7,22 +7,46 @@
             pointerEvents: interactive ? 'auto' : 'none',
         }"
     />
+    <!-- Komponent z licencjami i współrzędnymi -->
+    <MapAttributions
+        v-if="interactive"
+        ref="attributionsRef"
+    />
+
+    <!-- Przyciski zoom - ukryj na stronie głównej -->
+    <MapZoomControls v-if="interactive && !appStore.isHomePage" />
+
+    <!-- Przycisk GPS - ukryj na stronie głównej -->
+    <MapGpsControls v-if="interactive && !appStore.isHomePage" />
 </template>
 
 <script setup>
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { createMap, detach, setTarget, updateSize, animateToMode } from '@/services/olMap'
+import {
+    createMap,
+    detach,
+    setTarget,
+    updateSize,
+    animateToMode,
+    setClickCallback,
+    clearClickCallback,
+    clearZoomCallback,
+} from '@/services/olMap'
 import { useAppStore } from '@/stores/app'
+import MapAttributions from './MapAttributions.vue'
+import MapZoomControls from './MapZoomControls.vue'
+import MapGpsControls from './MapGpsControls.vue'
 
 const props = defineProps({
     interactive: { type: Boolean, default: true },
-    zIndex: { type: [Number, String], default: 0 }, // tło; treść aplikacji niech ma >0
+    zIndex: { type: [Number, String], default: 0 },
     center: { type: Array, default: () => [16.62, 50.69] }, // lon, lat (WGS84)
     zoom: { type: Number, default: 12 },
 })
 
 const appStore = useAppStore()
 const mapEl = ref(null)
+const attributionsRef = ref(null)
 let ro = null
 
 onMounted(async () => {
@@ -33,6 +57,12 @@ onMounted(async () => {
     await nextTick()
     updateSize()
 
+    // Konfiguracja callbacku dla współrzędnych
+    if (attributionsRef.value && props.interactive) {
+        setClickCallback((lat, lon) => {
+            attributionsRef.value.updateCoordinates(lat, lon)
+        })
+    }
     ro = new ResizeObserver(() => updateSize())
     ro.observe(mapEl.value)
 
@@ -42,6 +72,8 @@ onMounted(async () => {
 onBeforeUnmount(() => {
     if (ro) ro.disconnect()
     window.removeEventListener('resize', updateSize)
+    clearClickCallback()
+    clearZoomCallback()
     detach()
 })
 
@@ -53,7 +85,7 @@ watch(
 )
 
 watch(
-    () => appStore.isDarkEnabled,
+    () => appStore.isHomePage,
     () => animateToMode(),
 )
 </script>

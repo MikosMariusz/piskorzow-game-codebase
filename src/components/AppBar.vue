@@ -19,10 +19,21 @@
                 ></v-img>
             </div>
         </template>
-        <v-toolbar-title :class="{ 'text-shadow text-white': appStore.isDarkEnabled }">{{
+        <v-toolbar-title :class="{ 'text-shadow text-white': appStore.isHomePage }">{{
             $t('gameTitle')
         }}</v-toolbar-title>
         <v-spacer />
+        <v-btn
+            icon="mdi-gamepad-variant"
+            variant="elevated"
+            size="small"
+            elevation="4"
+            rounded="sm"
+            class="mr-2"
+            color="accent"
+            :title="$t('gameCard.openGame')"
+            @click="appStore.toggleGameCard()"
+        />
         <v-btn
             icon="mdi-information-outline"
             variant="elevated"
@@ -53,7 +64,7 @@ const darkGradient = 'to top right, rgba(34,34,34,0.8), rgba(60,60,60,0.7)'
 const osmGradient =
     '90deg, rgba(182,227,182,0.7) 0%, rgba(120,200,120,0.7) 50%, rgba(163,193,218,0.5) 100%'
 
-const opacity = computed(() => (appStore.isDarkEnabled ? 1 : 0))
+const opacity = computed(() => (appStore.isHomePage ? 1 : 0))
 </script>
 
 <style scoped>

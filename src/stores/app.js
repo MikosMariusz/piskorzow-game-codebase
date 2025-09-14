@@ -4,13 +4,14 @@ import { checkGpsAccessAndAccuracy } from '@/services/gps'
 
 export const useAppStore = defineStore('app', () => {
     // State
-    const darkEnabled = ref(true)
+    const homePageActive = ref(true)
     const gpsAccess = ref(null) // null = not checked yet
     const gpsInfo = ref(null)
     const isLoading = ref(true)
+    const gameCardVisible = ref(false)
 
     // Getters
-    const isDarkEnabled = computed(() => darkEnabled.value)
+    const isHomePage = computed(() => homePageActive.value)
     const hasGpsAccess = computed(() => {
         const result = gpsAccess.value === true
         console.log('🔎 hasGpsAccess computed:', result, 'gpsAccess.value:', gpsAccess.value)
@@ -19,24 +20,25 @@ export const useAppStore = defineStore('app', () => {
     const getGpsInfo = computed(() => gpsInfo.value)
     const isGpsChecked = computed(() => gpsAccess.value !== null)
     const getIsLoading = computed(() => isLoading.value)
+    const isGameCardVisible = computed(() => gameCardVisible.value)
 
     // Actions
-    const setDarkEnabled = (value) => {
-        darkEnabled.value = value
+    const setHomePage = (value) => {
+        homePageActive.value = value
     }
 
-    const toggleDarkEnabled = () => {
-        darkEnabled.value = !darkEnabled.value
+    const toggleHomePage = () => {
+        homePageActive.value = !homePageActive.value
     }
 
-    const shouldUseDarkMode = (routePath) => {
+    const isHomePageRoute = (routePath) => {
         return routePath === '/' || routePath === '/index'
     }
 
-    const updateDarkModeFromRoute = (routePath) => {
-        const shouldBeDark = shouldUseDarkMode(routePath)
-        setDarkEnabled(shouldBeDark)
-        return shouldBeDark
+    const updateHomePageFromRoute = (routePath) => {
+        const shouldBeHomePage = isHomePageRoute(routePath)
+        setHomePage(shouldBeHomePage)
+        return shouldBeHomePage
     }
 
     const checkGpsAccess = async () => {
@@ -81,25 +83,37 @@ export const useAppStore = defineStore('app', () => {
         isLoading.value = loadingState
     }
 
+    const setGameCardVisible = (visible) => {
+        gameCardVisible.value = visible
+    }
+
+    const toggleGameCard = () => {
+        gameCardVisible.value = !gameCardVisible.value
+    }
+
     return {
         // state
-        darkEnabled,
+        homePageActive,
         gpsAccess,
         gpsInfo,
         isLoading,
+        gameCardVisible,
         // getters
-        isDarkEnabled,
+        isHomePage,
         hasGpsAccess,
         getGpsInfo,
         isGpsChecked,
         getIsLoading,
+        isGameCardVisible,
         // actions
-        setDarkEnabled,
-        toggleDarkEnabled,
-        shouldUseDarkMode,
-        updateDarkModeFromRoute,
+        setHomePage,
+        toggleHomePage,
+        isHomePageRoute,
+        updateHomePageFromRoute,
         checkGpsAccess,
         setGpsAccess,
         setLoading,
+        setGameCardVisible,
+        toggleGameCard,
     }
 })

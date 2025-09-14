@@ -18,7 +18,18 @@ export function createI18nInstance(messages, initialLocale = 'en') {
 
 export async function setupI18n(app, vuetifyInstance) {
     const stored = localStorage.getItem('locale')
-    const browser = navigator.language?.startsWith('pl') ? 'pl' : 'en'
+    const browserLang = navigator.language?.toLowerCase()
+    let browser = 'en' // domyślny
+    
+    // Wykrywanie języka przeglądarki
+    if (browserLang?.startsWith('pl')) {
+        browser = 'pl'
+    } else if (browserLang?.startsWith('es')) {
+        browser = 'es'
+    } else {
+        browser = 'en'
+    }
+    
     let initialLocale = stored || browser || 'en'
 
     const messages = await loadMessages()

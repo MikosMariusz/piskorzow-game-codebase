@@ -15,10 +15,10 @@ const router = createRouter({
     routes: setupLayouts(routes),
 })
 
-// Global before guard - aktualizuj dark mode przed każdą nawigacją
+// Global before guard - aktualizuj home page przed każdą nawigacją
 router.beforeEach((to, from, next) => {
     const appStore = useAppStore()
-    appStore.updateDarkModeFromRoute(to.path)
+    appStore.updateHomePageFromRoute(to.path)
     next()
 })
 

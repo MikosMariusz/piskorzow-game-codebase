@@ -3,6 +3,7 @@ import { registerPlugins } from '@/plugins'
 import { useAppStore } from '@/stores/app'
 import App from './App.vue'
 import 'unfonts.css'
+import 'flag-icons/css/flag-icons.min.css'
 
 const app = createApp(App)
 
