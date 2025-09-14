@@ -7,9 +7,9 @@
             pointerEvents: interactive ? 'auto' : 'none',
         }"
     />
-    <!-- Komponent z licencjami i współrzędnymi -->
+    <!-- Komponent z licencjami i współrzędnymi - ukryj na stronie głównej -->
     <MapAttributions
-        v-if="interactive"
+        v-if="interactive && !appStore.isHomePage"
         ref="attributionsRef"
     />
 

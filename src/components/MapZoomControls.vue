@@ -112,7 +112,7 @@ onBeforeUnmount(() => {
 /* Responsive */
 @media (max-width: 480px) {
     .map-zoom-controls {
-        top: 70px;
+        top: 80px; /* Zwiększone z 70px na 80px dla lepszego odstępu od AppBar na mobile */
         left: 8px;
     }
 

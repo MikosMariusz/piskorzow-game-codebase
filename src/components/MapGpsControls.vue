@@ -197,7 +197,7 @@ onBeforeUnmount(() => {
 /* Responsive */
 @media (max-width: 480px) {
     .map-gps-controls {
-        top: 148px; /* Dostosowane dla mobile */
+        top: 158px; /* Zaktualizowane: 80px (AppBar + margin) + 36px + 36px + 6px = 158px */
         left: 8px;
     }
 

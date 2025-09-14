@@ -130,6 +130,9 @@ function getTileTitle(tile) {
     overflow: hidden;
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
         env(safe-area-inset-left);
+    padding-top: calc(
+        64px + env(safe-area-inset-top)
+    ); /* Dodaj padding dla AppBar (64px to standardowa wysokość v-app-bar) */
 }
 
 .tiles-container {
@@ -230,6 +233,12 @@ function getTileTitle(tile) {
 
 /* Responsywność dla różnych rozmiarów ekranów */
 @media (max-width: 599px) {
+    .home-layer {
+        padding-top: calc(
+            64px + env(safe-area-inset-top) + 10px
+        ); /* Dodatkowe 10px marginesu na mobile */
+    }
+
     .tiles-grid {
         grid-template-columns: 1fr;
         gap: 20px;
