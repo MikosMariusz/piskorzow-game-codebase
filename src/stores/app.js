@@ -10,6 +10,11 @@ export const useAppStore = defineStore('app', () => {
     const isLoading = ref(true)
     const gameCardVisible = ref(false)
 
+    // Card Window Management - only one window can be active at a time
+    const activeWindow = ref(null) // null, 'game', 'projectInfo'
+    const projectInfoDismissed = ref(localStorage.getItem('projectInfoDialogDismissed') === 'true')
+    const isWindowClosedByReplacement = ref(false) // flag to disable close animation when replaced by another window
+
     // Getters
     const isHomePage = computed(() => homePageActive.value)
     const hasGpsAccess = computed(() => {
@@ -20,7 +25,16 @@ export const useAppStore = defineStore('app', () => {
     const getGpsInfo = computed(() => gpsInfo.value)
     const isGpsChecked = computed(() => gpsAccess.value !== null)
     const getIsLoading = computed(() => isLoading.value)
-    const isGameCardVisible = computed(() => gameCardVisible.value)
+    const isGameCardVisible = computed(() => activeWindow.value === 'game')
+
+    // Card Window getters
+    const getActiveWindow = computed(() => activeWindow.value)
+    const isProjectInfoVisible = computed(() => activeWindow.value === 'projectInfo')
+    const isProjectInfoDismissed = computed(() => projectInfoDismissed.value)
+    const shouldShowProjectInfo = computed(
+        () => !isLoading.value && !projectInfoDismissed.value && activeWindow.value === null,
+    )
+    const getIsWindowClosedByReplacement = computed(() => isWindowClosedByReplacement.value)
 
     // Actions
     const setHomePage = (value) => {
@@ -84,11 +98,81 @@ export const useAppStore = defineStore('app', () => {
     }
 
     const setGameCardVisible = (visible) => {
-        gameCardVisible.value = visible
+        if (visible && activeWindow.value !== 'game') {
+            openWindow('game')
+        } else if (!visible && activeWindow.value === 'game') {
+            closeWindow()
+        }
     }
 
     const toggleGameCard = () => {
-        gameCardVisible.value = !gameCardVisible.value
+        if (activeWindow.value === 'game') {
+            closeWindow()
+        } else {
+            openWindow('game')
+        }
+    }
+
+    // Card Window Management Actions
+    const openWindow = (windowType) => {
+        // If there's an active window, mark it for replacement (no close animation)
+        if (activeWindow.value) {
+            isWindowClosedByReplacement.value = true
+            closeWindow()
+            // Reset the flag after a brief delay to allow the closing to complete
+            setTimeout(() => {
+                isWindowClosedByReplacement.value = false
+            }, 50)
+        }
+
+        activeWindow.value = windowType
+
+        if (windowType === 'game') {
+            gameCardVisible.value = true
+        }
+    }
+
+    const closeWindow = () => {
+        const currentWindow = activeWindow.value
+        activeWindow.value = null
+
+        if (currentWindow === 'game') {
+            gameCardVisible.value = false
+        }
+
+        // Reset replacement flag if no new window is being opened
+        if (!isWindowClosedByReplacement.value) {
+            // Normal close - keep animation enabled
+        }
+    }
+
+    const openProjectInfo = () => {
+        openWindow('projectInfo')
+    }
+
+    const closeProjectInfo = () => {
+        closeWindow()
+    }
+
+    const dismissProjectInfo = (permanently = false) => {
+        if (permanently) {
+            projectInfoDismissed.value = true
+            localStorage.setItem('projectInfoDialogDismissed', 'true')
+        }
+        closeProjectInfo()
+    }
+
+    const resetProjectInfoDismissal = () => {
+        projectInfoDismissed.value = false
+        localStorage.removeItem('projectInfoDialogDismissed')
+    }
+
+    const checkAndShowProjectInfo = () => {
+        if (shouldShowProjectInfo.value) {
+            openProjectInfo()
+            return true
+        }
+        return false
     }
 
     return {
@@ -98,6 +182,9 @@ export const useAppStore = defineStore('app', () => {
         gpsInfo,
         isLoading,
         gameCardVisible,
+        activeWindow,
+        projectInfoDismissed,
+        isWindowClosedByReplacement,
         // getters
         isHomePage,
         hasGpsAccess,
@@ -105,6 +192,11 @@ export const useAppStore = defineStore('app', () => {
         isGpsChecked,
         getIsLoading,
         isGameCardVisible,
+        getActiveWindow,
+        isProjectInfoVisible,
+        isProjectInfoDismissed,
+        shouldShowProjectInfo,
+        getIsWindowClosedByReplacement,
         // actions
         setHomePage,
         toggleHomePage,
@@ -115,5 +207,12 @@ export const useAppStore = defineStore('app', () => {
         setLoading,
         setGameCardVisible,
         toggleGameCard,
+        openWindow,
+        closeWindow,
+        openProjectInfo,
+        closeProjectInfo,
+        dismissProjectInfo,
+        resetProjectInfoDismissal,
+        checkAndShowProjectInfo,
     }
 })

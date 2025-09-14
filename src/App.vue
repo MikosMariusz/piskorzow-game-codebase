@@ -1,30 +1,27 @@
 <template>
     <v-app>
-        <!-- Loading overlay component - pokazuj jako pierwszy -->
         <LoadingOverlay />
+        <CardWrapper
+            :visible="appStore.isProjectInfoVisible"
+            :title="$t('projectInfo.title')"
+            :fullPage="true"
+            @update:visible="handleProjectInfoVisibilityChange"
+        >
+            <ProjectInfoContent />
+        </CardWrapper>
 
-        <!-- Project Info Dialog - zawsze renderowany -->
-        <ProjectInfoDialog
-            ref="projectInfoDialog"
-            v-model="showProjectInfo"
-            @close="handleDialogClose"
-            @start-exploring="handleStartExploring"
-        />
-
-        <!-- Game Card - używamy CardWrapper z GameCard jako slot -->
         <CardWrapper
             :visible="appStore.isGameCardVisible"
             :title="$t('gameCard.title')"
-            @update:visible="appStore.setGameCardVisible"
+            @update:visible="handleGameCardVisibilityChange"
         >
             <GameCard />
         </CardWrapper>
 
-        <!-- Komponenty aplikacji - ukryj podczas ładowania -->
         <template v-if="!appStore.getIsLoading">
             <AppBar
-                @show-project-info="showDialog"
-                @reset-project-info="resetDialog"
+                @show-project-info="showProjectInfo"
+                @reset-project-info="resetProjectInfo"
             />
             <router-view />
             <MapBackground />
@@ -33,61 +30,56 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { onMounted, watch } from 'vue'
 import { useAppStore } from '@/stores/app'
 import MapBackground from '@/components/MapBackground.vue'
-import ProjectInfoDialog from '@/components/ProjectInfoDialog.vue'
+import ProjectInfoContent from '@/components/ProjectInfoContent.vue'
 import LoadingOverlay from '@/components/LoadingOverlay.vue'
 import CardWrapper from '@/components/CardWrapper.vue'
 import GameCard from '@/components/GameCard.vue'
 
-// Composables
-const router = useRouter()
 const appStore = useAppStore()
 
-// Reactive data
-const showProjectInfo = ref(false)
-const projectInfoDialog = ref(null)
-
-// Methods
-const handleDialogClose = () => {
-    showProjectInfo.value = false
-}
-
-const handleStartExploring = () => {
-    showProjectInfo.value = false
-    // Przekieruj do gry terenowej lub głównej strony z mapą
-    if (router.currentRoute.value.path === '/') {
-        // Już jesteśmy na głównej stronie
-        return
-    }
-    router.push('/')
-}
-
-// Expose method to show dialog manually (useful for testing or manual trigger)
-const showDialog = () => {
-    if (projectInfoDialog.value) {
-        projectInfoDialog.value.showDialog()
+const handleProjectInfoVisibilityChange = (visible) => {
+    if (!visible) {
+        appStore.closeProjectInfo()
     }
 }
 
-// Reset dialog state
-const resetDialog = () => {
-    if (projectInfoDialog.value) {
-        projectInfoDialog.value.resetDialogState()
-        showDialog()
+const handleGameCardVisibilityChange = (visible) => {
+    if (visible) {
+        appStore.openWindow('game')
+    } else {
+        appStore.closeWindow()
     }
 }
 
-// Lifecycle
+const showProjectInfo = () => {
+    appStore.openProjectInfo()
+}
+
+const resetProjectInfo = () => {
+    appStore.resetProjectInfoDismissal()
+    appStore.openProjectInfo()
+}
+
+watch(
+    () => appStore.getIsLoading,
+    (isLoading) => {
+        if (!isLoading) {
+            appStore.checkAndShowProjectInfo()
+        }
+    },
+)
+
 onMounted(() => {
-    // Dialog automatycznie sprawdzi czy ma się pokazać
-    // na podstawie localStorage w swoim mounted hook
+    if (!appStore.getIsLoading) {
+        appStore.checkAndShowProjectInfo()
+    }
 })
 
-// Make showDialog available globally for debugging
 if (typeof window !== 'undefined') {
-    window.showProjectInfoDialog = showDialog
+    window.showProjectInfoDialog = showProjectInfo
+    window.resetProjectInfoDialog = resetProjectInfo
 }
 </script>

@@ -23,6 +23,7 @@ declare module 'vue' {
     MapBackground: typeof import('./src/components/MapBackground.vue')['default']
     MapGpsControls: typeof import('./src/components/MapGpsControls.vue')['default']
     MapZoomControls: typeof import('./src/components/MapZoomControls.vue')['default']
+    ProjectInfoContent: typeof import('./src/components/ProjectInfoContent.vue')['default']
     ProjectInfoDialog: typeof import('./src/components/ProjectInfoDialog.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
