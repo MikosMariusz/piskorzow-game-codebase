@@ -77,11 +77,28 @@ const props = defineProps({
         type: String,
         default: '',
     },
+    desktopWidth: {
+        type: [String, Number],
+        default: '500px',
+        validator: (value) => {
+            return (
+                typeof value === 'number' ||
+                (typeof value === 'string' && /^\d+(\.\d+)?(px|rem|em|vh|vw|%)$/.test(value))
+            )
+        },
+    },
 })
 
 const emit = defineEmits(['update:visible'])
 
 const isMobileMaximized = ref(false)
+
+const formattedDesktopWidth = computed(() => {
+    if (typeof props.desktopWidth === 'number') {
+        return `${props.desktopWidth}px`
+    }
+    return props.desktopWidth
+})
 
 watch(mobile, (newIsMobile, oldIsMobile) => {
     if (oldIsMobile === true && newIsMobile === false && isMobileMaximized.value) {
@@ -103,7 +120,6 @@ const cardStyles = computed(() => {
     const styles = {
         position: 'fixed',
         zIndex: 2000,
-        opacity: 0.9,
     }
 
     if (isMobileMaximized.value) {
@@ -127,11 +143,13 @@ const contentScrollStyles = computed(() => {
         return {
             maxHeight: 'calc(100vh - 184px)',
             overflowY: 'auto',
+            opacity: 0.9,
         }
     }
 
     return {
         overflowY: 'auto',
+        opacity: 0.9,
     }
 })
 
@@ -155,7 +173,6 @@ const closeCard = () => {
 .card-header-with-bg {
     position: relative;
     overflow: hidden;
-    background: transparent !important;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
     z-index: 1;
 }
@@ -218,7 +235,7 @@ const closeCard = () => {
     top: 74px;
     right: 10px;
     bottom: 10px;
-    width: 450px;
+    width: v-bind(formattedDesktopWidth);
     height: calc(100vh - 84px);
     max-height: calc(100vh - 84px);
 }
@@ -239,11 +256,22 @@ const closeCard = () => {
 .card-wrapper--fullscreen {
     border-radius: 0 !important;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
-    top: unset !important;
     bottom: 0 !important;
     height: calc(100vh - 64px) !important;
     max-height: calc(100vh - 64px) !important;
     transform-origin: bottom center;
+}
+
+@supports (top: env(safe-area-inset-top)) {
+    .card-wrapper--fullscreen {
+        height: calc(
+            100vh - 64px - env(safe-area-inset-top) - env(safe-area-inset-bottom)
+        ) !important;
+        max-height: calc(
+            100vh - 64px - env(safe-area-inset-top) - env(safe-area-inset-bottom)
+        ) !important;
+        bottom: env(safe-area-inset-bottom) !important;
+    }
 }
 
 .card-content-scroll {
