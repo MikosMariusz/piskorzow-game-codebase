@@ -11,13 +11,7 @@ let _gpsPositionCallback = null
 let _currentPosition = null
 
 export const checkGpsAccessAndAccuracy = async () => {
-    // TYMCZASOWO - zawsze zwracaj true do testów
     const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)
-
-    // Tymczasowo zwróć true jeśli mobile
-    if (isMobile) {
-        return { access: true, accuracy: 50, isMobile }
-    }
 
     if (!('geolocation' in navigator)) {
         return { access: false, reason: 'Geolocation API not available' }

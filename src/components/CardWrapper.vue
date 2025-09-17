@@ -38,6 +38,7 @@
                         elevation="2"
                     />
                     <v-btn
+                        v-if="closable"
                         icon="mdi-close"
                         variant="elevated"
                         size="small"
@@ -94,6 +95,14 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    centered: {
+        type: Boolean,
+        default: false,
+    },
+    closable: {
+        type: Boolean,
+        default: true,
+    },
 })
 
 const emit = defineEmits(['update:visible'])
@@ -146,6 +155,11 @@ const cardClasses = computed(() => {
         classes.push('card-wrapper--fullscreen')
     }
 
+    // Dodaj klasę centered tylko na dużych ekranach
+    if (props.centered && mdAndUp.value) {
+        classes.push('card-wrapper--centered')
+    }
+
     return classes.join(' ')
 })
 
@@ -183,6 +197,23 @@ const cardStyles = computed(() => {
         }
     }
 
+    // Wyśrodkowanie TYLKO na dużych ekranach (desktop)
+    if (props.centered && mdAndUp.value) {
+        return {
+            ...styles,
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
+            right: 'unset',
+            bottom: 'unset',
+            margin: 0,
+            width: formattedDesktopWidth.value,
+            height: 'auto',
+            maxHeight: '90vh',
+        }
+    }
+
+    // Na mobile lub gdy nie centered - standardowe pozycjonowanie
     return styles
 })
 
@@ -191,6 +222,7 @@ const toggleMaximize = () => {
 }
 
 const closeCard = () => {
+    if (!props.closable) return
     isMobileMaximized.value = false
     emit('update:visible', false)
 }
@@ -201,6 +233,12 @@ const closeCard = () => {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border-radius: 0 !important;
+}
+
+.card-wrapper--centered {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18) !important;
+    max-height: 90vh !important;
+    /* Wyśrodkowanie tylko na desktopie, na mobile domyślne */
 }
 
 .card-header-with-bg {
@@ -298,6 +336,18 @@ const closeCard = () => {
         height: calc(100vh - 84px) !important;
         max-height: calc(100vh - 84px) !important;
     }
+
+    /* Wyśrodkowane okna na desktopie */
+    .card-wrapper--centered {
+        top: 50% !important;
+        left: 50% !important;
+        right: unset !important;
+        bottom: unset !important;
+        transform: translate(-50%, -50%) !important;
+        width: v-bind(formattedDesktopWidth) !important;
+        height: auto !important;
+        max-height: 90vh !important;
+    }
 }
 
 .card-wrapper--fullscreen {
@@ -325,6 +375,12 @@ const closeCard = () => {
 .card-content-scroll {
     max-height: calc(100vh - 200px);
     overflow-y: auto;
+}
+
+/* Wyśrodkowane okna powinny mieć odpowiednią wysokość */
+.card-wrapper--centered .card-content-scroll {
+    max-height: calc(90vh - 120px);
+    min-height: 200px;
 }
 
 @media (max-width: 959px) {

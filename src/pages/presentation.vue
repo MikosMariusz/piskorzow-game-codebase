@@ -1,5 +1,13 @@
 <template></template>
 
 <script setup>
-// No script needed for this simple component
+import { useAppStore } from '@/stores/app'
+import { setInitialViewForPage } from '@/services/olMap'
+
+const appStore = useAppStore()
+
+onMounted(() => {
+    setInitialViewForPage()
+    appStore.openWindow('game')
+})
 </script>

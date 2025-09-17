@@ -28,6 +28,32 @@ let _currentFlightIndex = 0
 const DEFAULT_CENTER = fromLonLat([16.561, 50.733])
 const DEFAULT_ZOOM = 12
 const OSM_COLOR_ANIMATION_DURATION = 700
+const startView = {
+    mobileCenter: [16.560542, 50.668472],
+    desktopCenter: [16.617904, 50.736058],
+    zoom: 12,
+}
+
+/**
+ * Ustawia widok mapy na początkowy dla podstron (game, presentation) z uwzględnieniem rozmiaru ekranu
+ * Przerywa animację lotu jeśli aktywna
+ */
+export const setInitialViewForPage = () => {
+    if (!_map) return
+    // Przerwij animację lotu jeśli aktywna
+    stopFlightAnimation()
+
+    // Sprawdź rozmiar ekranu (mobile: szerokość < 600px)
+    const isMobile = window.innerWidth < 600
+    const center = isMobile ? startView.mobileCenter : startView.desktopCenter
+    const zoom = startView.zoom
+    const view = _map.getView()
+    view.animate({
+        center: fromLonLat(center),
+        zoom,
+        duration: 600,
+    })
+}
 
 export const getOSMDuration = () => OSM_COLOR_ANIMATION_DURATION
 
@@ -502,12 +528,29 @@ export const createMap = (targetEl, options = {}) => {
         }
     })
 
-    _map.getView().on('change:resolution', () => {
-        if (_zoomCallback) {
-            const zoom = _map.getView().getZoom()
-            _zoomCallback(zoom)
+    // Aktualizuj współrzędne również po przesunięciu mapy (np. drag na desktopie i dotyku)
+    _map.on('moveend', (event) => {
+        if (_moveEndCallback) {
+            const center = getMapCenter()
+            const zoom = getCurrentZoom()
+            _moveEndCallback(center, zoom)
+        }
+        // Dla UX: po każdym przesunięciu mapy aktualizuj współrzędne na środku mapy
+        if (_clickCallback && _map) {
+            const center = _map.getView().getCenter()
+            if (center) {
+                const [lon, lat] = toLonLat(center)
+                _clickCallback(lat, lon)
+            }
         }
     })
+
+    // _map.getView().on('change:resolution', () => {
+    //     if (_zoomCallback) {
+    //         const zoom = _map.getView().getZoom()
+    //         _zoomCallback(zoom)
+    //     }
+    // })
 
     // Nasłuchiwanie na zakończenie ruchu mapy
     _map.on('moveend', () => {
@@ -553,25 +596,54 @@ export const updateSize = () => {
     }
 }
 
-export const animateToMode = () => {
+/**
+ * Ustawia filtr mapy (ciemny/normalny), animację lotu i pozycję startową w zależności od parametrów i rozmiaru ekranu.
+ * @param {Object} opts
+ *   - forceDark: wymuś ciemny filtr (np. /game bez GPS)
+ *   - forceFlight: wymuś animację lotu (np. /game bez GPS)
+ *   - setStartView: ustaw pozycję startową (domyślnie true)
+ */
+export const animateToMode = (opts = {}) => {
     const appStore = useAppStore()
-    const isDark = appStore.homePageActive
     const duration = OSM_COLOR_ANIMATION_DURATION
+    const { forceDark = null, forceFlight = null, setStartView = true } = opts
 
     if (!_normalTileLayer || !_darkTileLayer) {
         return
     }
 
+    // Ustal tryb ciemny
+    let isDark = appStore.homePageActive
+    if (forceDark !== null) isDark = forceDark
+
+    // Ustal czy animować lot
+    let shouldFlight = isDark
+    if (forceFlight !== null) shouldFlight = forceFlight
+
+    // Ustaw pozycję startową jeśli trzeba
+    if (setStartView) {
+        // Sprawdź rozmiar ekranu (mobile: szerokość < 600px)
+        const isMobile = typeof window !== 'undefined' && window.innerWidth < 960
+        const center = isMobile ? startView.mobileCenter : startView.desktopCenter
+        const zoom = startView.zoom
+        const view = _map?.getView()
+        if (view) {
+            view.animate({
+                center: fromLonLat(center),
+                zoom,
+                duration: 600,
+            })
+        }
+    }
+
     const currentNormalOpacity = _normalTileLayer.getOpacity()
     const currentDarkOpacity = _darkTileLayer.getOpacity()
-
-    // Sprawdź czy już jesteśmy w docelowym stanie
     const isCurrentlyDark = currentDarkOpacity > currentNormalOpacity
     if (isCurrentlyDark === isDark) {
         // Zarządzaj animacją lotu nawet jeśli kolory się nie zmieniają
-        if (isDark && !_isFlying) {
+        if (shouldFlight && !_isFlying) {
             startFlightAnimation()
-        } else if (!isDark && _isFlying) {
+        } else if (!shouldFlight && _isFlying) {
             stopFlightAnimation()
         }
         return
@@ -585,13 +657,11 @@ export const animateToMode = () => {
     const startTime = Date.now()
 
     // Zarządzaj animacją lotu przy zmianie trybu
-    if (isDark) {
-        // Przełączamy na stronę główną - uruchom animację lotu po zakończeniu zmiany kolorów
+    if (shouldFlight) {
         setTimeout(() => {
             startFlightAnimation()
         }, duration + 100)
     } else {
-        // Opuszczamy stronę główną - zatrzymaj animację lotu
         stopFlightAnimation()
     }
 

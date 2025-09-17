@@ -73,7 +73,6 @@
             color="primary"
             hide-details
             class="mt-2"
-            @update:model-value="handleDontShowAgainChange"
         />
     </div>
 </template>

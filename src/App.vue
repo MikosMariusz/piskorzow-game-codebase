@@ -12,10 +12,11 @@
 
         <CardWrapper
             :visible="appStore.isGameCardVisible"
-            :title="$t('gameCard.title')"
+            :title="'Dostępne gry terenowe'"
+            :desktopWidth="600"
             @update:visible="handleGameCardVisibilityChange"
         >
-            <GameCard />
+            <GameStoriesCard />
         </CardWrapper>
 
         <template v-if="!appStore.getIsLoading">
@@ -36,7 +37,7 @@ import MapBackground from '@/components/MapBackground.vue'
 import ProjectInfoContent from '@/components/ProjectInfoContent.vue'
 import LoadingOverlay from '@/components/LoadingOverlay.vue'
 import CardWrapper from '@/components/CardWrapper.vue'
-import GameCard from '@/components/GameCard.vue'
+import GameStoriesCard from '@/components/GameStoriesCard.vue'
 
 const appStore = useAppStore()
 

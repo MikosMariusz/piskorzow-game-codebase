@@ -4,24 +4,25 @@
         class="app-map-bg"
         :style="{
             zIndex: String(zIndex),
-            pointerEvents: interactive ? 'auto' : 'none',
+            pointerEvents: isInteractive ? 'auto' : 'none',
         }"
-    />
-    <!-- Komponent z licencjami i współrzędnymi - ukryj na stronie głównej -->
-    <MapAttributions
-        v-if="interactive && !appStore.isHomePage"
-        ref="attributionsRef"
-    />
+    >
+        <!-- Komponent z licencjami i współrzędnymi - ukryj na stronie głównej -->
+        <MapAttributions
+            v-if="isInteractive && !appStore.isHomePage"
+            ref="attributionsRef"
+        />
 
-    <!-- Przyciski zoom - ukryj na stronie głównej -->
-    <MapZoomControls v-if="interactive && !appStore.isHomePage" />
+        <!-- Przyciski zoom - ukryj na stronie głównej -->
+        <MapZoomControls v-if="isInteractive && !appStore.isHomePage" />
 
-    <!-- Przycisk GPS - ukryj na stronie głównej -->
-    <MapGpsControls v-if="interactive && !appStore.isHomePage" />
+        <!-- Przycisk GPS - ukryj na stronie głównej -->
+        <MapGpsControls v-if="isInteractive && !appStore.isHomePage" />
+    </div>
 </template>
 
 <script setup>
-import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { nextTick, onBeforeUnmount, onMounted, ref, watch, computed } from 'vue'
 import {
     createMap,
     detach,
@@ -49,6 +50,16 @@ const mapEl = ref(null)
 const attributionsRef = ref(null)
 let ro = null
 
+// Interaktywność mapy zależna od strony i dostępu do GPS
+const isInteractive = computed(() => {
+    // Strona główna: zawsze brak interakcji
+    if (appStore.isHomePage) return false
+    // Strona gry: brak interakcji jeśli nie ma GPS
+    if (window.location.pathname.startsWith('/game') && !appStore.hasGpsAccess) return false
+    // W innych przypadkach wg props
+    return props.interactive
+})
+
 onMounted(async () => {
     createMap(mapEl.value, {
         center: undefined,
@@ -58,11 +69,27 @@ onMounted(async () => {
     updateSize()
 
     // Konfiguracja callbacku dla współrzędnych
-    if (attributionsRef.value && props.interactive) {
-        setClickCallback((lat, lon) => {
+    ro = new ResizeObserver(() => updateSize())
+    ro.observe(mapEl.value)
+
+    window.addEventListener('resize', updateSize, { passive: true })
+})
+
+// Callback kliknięcia rejestrujemy tylko raz po zamontowaniu mapy
+onMounted(async () => {
+    createMap(mapEl.value, {
+        center: undefined,
+        zoom: props.zoom,
+    })
+    await nextTick()
+    updateSize()
+
+    setClickCallback((lat, lon) => {
+        if (isInteractive.value && attributionsRef.value) {
             attributionsRef.value.updateCoordinates(lat, lon)
-        })
-    }
+        }
+    })
+
     ro = new ResizeObserver(() => updateSize())
     ro.observe(mapEl.value)
 
@@ -76,6 +103,13 @@ onBeforeUnmount(() => {
     clearZoomCallback()
     detach()
 })
+
+watch(
+    () => mapEl.value,
+    (el) => {
+        if (el) setTarget(el)
+    },
+)
 
 watch(
     () => mapEl.value,

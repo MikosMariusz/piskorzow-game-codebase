@@ -15,7 +15,10 @@ declare module 'vue' {
     AppFooter: typeof import('./src/components/AppFooter.vue')['default']
     CardWrapper: typeof import('./src/components/CardWrapper.vue')['default']
     GameCard: typeof import('./src/components/GameCard.vue')['default']
+    GameGpsUnavailableCard: typeof import('./src/components/GameGpsUnavailableCard.vue')['default']
+    GameStoriesCard: typeof import('./src/components/GameStoriesCard.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
+    HomeTile: typeof import('./src/components/HomeTile.vue')['default']
     LangSwitcher: typeof import('./src/components/LangSwitcher.vue')['default']
     LanguageAppBar: typeof import('./src/components/LanguageAppBar.vue')['default']
     LoadingOverlay: typeof import('./src/components/LoadingOverlay.vue')['default']
@@ -26,6 +29,8 @@ declare module 'vue' {
     ProjectInfoContent: typeof import('./src/components/ProjectInfoContent.vue')['default']
     ProjectInfoDialog: typeof import('./src/components/ProjectInfoDialog.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
+    RouterTile: typeof import('./src/components/RouterTile.vue')['default']
+    RouterTileList: typeof import('./src/components/RouterTileList.vue')['default']
     RouterView: typeof import('vue-router')['RouterView']
   }
 }
