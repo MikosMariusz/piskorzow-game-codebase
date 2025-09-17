@@ -90,6 +90,13 @@ onMounted(async () => {
     min-width: 280px;
 }
 
+/* Force RouterTile to respect our sizing */
+.game-story-router-tile :deep(.tile-wrapper) {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+}
+
 /* Responsywność dla różnych rozmiarów ekranów */
 @media (max-width: 599px) {
     .game-stories-card-wrapper {
@@ -106,6 +113,11 @@ onMounted(async () => {
         max-width: 100%;
         min-width: 240px;
     }
+
+    .game-story-router-tile :deep(.tile-wrapper) {
+        max-width: 100% !important;
+        min-width: 0 !important;
+    }
 }
 
 @media (max-width: 480px) {
@@ -117,6 +129,11 @@ onMounted(async () => {
         width: clamp(200px, 50vw, 100%);
         min-width: 200px;
     }
+
+    .game-story-router-tile :deep(.tile-wrapper) {
+        max-width: 100% !important;
+        min-width: 0 !important;
+    }
 }
 
 @media (max-width: 320px) {
@@ -127,6 +144,11 @@ onMounted(async () => {
     .game-story-router-tile {
         width: clamp(150px, 80vw, 100%);
         min-width: 150px;
+    }
+
+    .game-story-router-tile :deep(.tile-wrapper) {
+        max-width: 100% !important;
+        min-width: 0 !important;
     }
 }
 
