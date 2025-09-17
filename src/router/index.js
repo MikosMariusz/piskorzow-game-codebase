@@ -19,6 +19,14 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
     const appStore = useAppStore()
     appStore.updateHomePageFromRoute(to.path)
+    // Zamknij wszystkie karty przy przejściu na stronę domową
+    if (
+        to.path === '/' ||
+        to.path === '/index' ||
+        (to.path === '/game' && !appStore.hasGpsAccess)
+    ) {
+        appStore.closeWindow()
+    }
     next()
 })
 

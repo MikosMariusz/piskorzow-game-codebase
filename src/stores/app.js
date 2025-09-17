@@ -127,7 +127,7 @@ export const useAppStore = defineStore('app', () => {
 
         activeWindow.value = windowType
 
-        if (windowType === 'game') {
+        if (windowType === 'game' && hasGpsAccess.value) {
             gameCardVisible.value = true
         }
     }

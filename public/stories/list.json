@@ -5,7 +5,8 @@
             "title": "storyOneTitle",
             "author": "storyOneAuthor",
             "description": "storyOneDescription",
-            "imagePath": "/stories/storyOne/tile.png"
+            "imagePath": "/stories/storyOne/tile.png",
+            "disabled": true
         },
         {
             "id": "story-2",

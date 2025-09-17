@@ -13,13 +13,12 @@
             <span class="mt-4 text-subtitle-1">Ładowanie gier terenowych...</span>
         </div>
         <div v-else>
-            <h2 class="mb-4 text-h5 text-center">Dostępne scenariusze:</h2>
             <div class="pa-2 game-stories-list">
                 <div
                     v-if="stories.length === 0"
                     class="text-body-1"
                 >
-                    Brak dostępnych gier.
+                    Brak dostępnych scenariuszy.
                 </div>
                 <template v-else>
                     <RouterTile
@@ -85,7 +84,7 @@ onMounted(async () => {
 
 .game-story-router-tile {
     flex: 0 0 auto;
-    width: clamp(280px, 30vw, 400px);
+    width: clamp(280px, 30vw, 300px);
     max-width: 400px;
     min-width: 280px;
 }

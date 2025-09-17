@@ -34,8 +34,8 @@
                     {{ config.fallbackText }}
                 </div>
                 <div
-                    class="position-absolute d-flex align-center justify-center"
-                    style="top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2"
+                    class="position-absolute d-flex align-center justify-center w-90"
+                    style="left: 10px; right: 10px; bottom: 10px; z-index: 2"
                 >
                     <v-sheet
                         class="tile-label-sheet pa-2"
@@ -172,7 +172,7 @@ const handleClick = () => {
 /* Responsywność dla różnych rozmiarów ekranów */
 @media (max-width: 599px) {
     .tile-wrapper {
-        max-width: min(85vw, 320px);
+        max-width: min(70vw, 320px);
     }
 
     .tile-title {

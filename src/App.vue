@@ -13,7 +13,7 @@
         <CardWrapper
             :visible="appStore.isGameCardVisible"
             :title="'Dostępne gry terenowe'"
-            :desktopWidth="600"
+            :desktopWidth="500"
             @update:visible="handleGameCardVisibilityChange"
         >
             <GameStoriesCard />
