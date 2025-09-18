@@ -38,7 +38,7 @@
             </div>
         </v-card-title>
         <transition
-            :name="transitionName"
+            :name="'fade'"
             appear
         >
             <v-card-text
@@ -153,13 +153,6 @@ watch(
     },
     { immediate: true },
 )
-
-const transitionName = computed(() => {
-    if (appStore.getIsWindowClosedByReplacement && !props.visible) {
-        return 'no-animation'
-    }
-    return 'fade'
-})
 
 const formattedDesktopWidth = computed(() => {
     if (props.fullPage) {
@@ -296,6 +289,8 @@ const buttonConfigs = computed(() => [
     right: 10px;
     bottom: 10px;
     width: v-bind(formattedDesktopWidth);
+    height: calc(100vh - 85px);
+    max-height: calc(100vh - 85px);
 }
 
 .card-wrapper--centered {
@@ -477,12 +472,6 @@ const buttonConfigs = computed(() => [
     min-height: 200px;
 }
 
-@media (max-width: 959px) {
-    .card-wrapper--fullscreen .card-content-scroll {
-        flex: 1;
-    }
-}
-
 .card-content-scroll::-webkit-scrollbar {
     width: 6px;
 }
@@ -508,44 +497,13 @@ const buttonConfigs = computed(() => [
 
 .fade-enter-from {
     opacity: 0;
-    transform: translateY(20px) scale(0.95);
-    filter: blur(4px);
+    transform: translateY(100%) scale(0.98);
+    filter: blur(6px);
 }
 
 .fade-leave-to {
     opacity: 0;
-    transform: translateY(20px) scale(0.95);
-    filter: blur(4px);
-}
-
-.no-animation-enter-active,
-.no-animation-leave-active {
-    transition: none;
-}
-
-.no-animation-enter-from,
-.no-animation-leave-to {
-    opacity: 0;
-}
-
-@media (max-width: 959px) {
-    .fade-enter-from {
-        opacity: 0;
-        transform: translateY(100%) scale(0.98);
-        filter: blur(6px);
-    }
-
-    .fade-leave-to {
-        opacity: 0;
-        transform: translateY(100%) scale(0.98);
-        filter: blur(6px);
-    }
-
-    .no-animation-enter-from,
-    .no-animation-leave-to {
-        opacity: 0;
-        transform: none;
-        filter: none;
-    }
+    transform: translateY(100%) scale(0.98);
+    filter: blur(6px);
 }
 </style>
