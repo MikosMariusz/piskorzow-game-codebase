@@ -17,6 +17,7 @@ declare module 'vue' {
     GameCard: typeof import('./src/components/GameCard.vue')['default']
     GameGpsUnavailableCard: typeof import('./src/components/GameGpsUnavailableCard.vue')['default']
     GameStoriesCard: typeof import('./src/components/GameStoriesCard.vue')['default']
+    GameStoryView: typeof import('./src/components/GameStoryView.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     HomeTile: typeof import('./src/components/HomeTile.vue')['default']
     LangSwitcher: typeof import('./src/components/LangSwitcher.vue')['default']

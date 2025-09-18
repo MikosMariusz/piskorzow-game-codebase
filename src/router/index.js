@@ -10,9 +10,23 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { routes } from 'vue-router/auto-routes'
 import { useAppStore } from '@/stores/app'
 
+const routesWithStories = [
+    ...setupLayouts(routes),
+    {
+        path: '/game/:storyId',
+        name: 'game-story',
+        component: () => import('@/components/GameStoryView.vue'),
+    },
+    {
+        path: '/presentation/:storyId',
+        name: 'presentation-story',
+        component: () => import('@/components/GameStoryView.vue'),
+    },
+]
+
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
-    routes: setupLayouts(routes),
+    routes: routesWithStories,
 })
 
 // Global before guard - aktualizuj home page przed każdą nawigacją

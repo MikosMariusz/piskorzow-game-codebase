@@ -32,11 +32,5 @@ const model = computed({
         >
             <span class="fi fi-gb"></span>
         </v-btn>
-        <v-btn
-            value="es"
-            size="small"
-        >
-            <span class="fi fi-es"></span>
-        </v-btn>
     </v-btn-toggle>
 </template>

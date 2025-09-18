@@ -4,6 +4,8 @@
         "cancel": "Anuluj",
         "terrainGame": "Gra terenowa",
         "terrainGameUnavailable": "Gra terenowa niedostępna na urządzeniu bez moduły GPS",
+        "terrainGameModuleUnavailable": "Moduł gry terenowej niedostępny",
+        "selectTerrainGame": "Wybierz grę terenową",
         "villagePresentation": "Interaktywna prezentacja wsi",
         "gameTitle": "Piskorzów Interaktywnie",
         "loading": {
@@ -74,6 +76,8 @@
         "cancel": "Cancel",
         "terrainGame": "Village Quest",
         "terrainGameUnavailable": "Terrain game unavailable on device without GPS module",
+        "terrainGameModuleUnavailable": "Terrain game module unavailable",
+        "selectTerrainGame": "Select terrain game",
         "villagePresentation": "Interactive Village Presentation",
         "gameTitle": "Piskorzów Interactively",
         "loading": {
@@ -136,76 +140,6 @@
             "tips": {
                 "title": "Useful tips",
                 "tip": "Tip"
-            }
-        }
-    },
-    "es": {
-        "save": "Guardar",
-        "cancel": "Cancelar",
-        "terrainGame": "Juego de campo",
-        "terrainGameUnavailable": "Juego de campo no disponible en dispositivo sin módulo GPS",
-        "villagePresentation": "Presentación Interactiva del Pueblo",
-        "gameTitle": "Piskorzów Interactivo",
-        "loading": {
-            "initializing": "Inicializando aplicación...",
-            "gpsInfo": "Verificando acceso a ubicación GPS...",
-            "status": {
-                "loading": "Cargando aplicación...",
-                "components": "Inicializando componentes...",
-                "gps": "Verificando permisos GPS...",
-                "map": "Configurando mapa...",
-                "game": "Preparando juego de campo..."
-            }
-        },
-        "projectInfo": {
-            "title": "Piskorzów Interactivo",
-            "subtitle": "Descubre la historia y cultura del pueblo de Piskorzów",
-            "showInfo": "Mostrar información del proyecto",
-            "aboutTitle": "Acerca del proyecto",
-            "description1": "¡Bienvenido a la presentación interactiva del pueblo de Piskorzów! Este proyecto fue creado como parte de un programa financiado por la Unión Europea, destinado a promover el patrimonio cultural e histórico local.",
-            "description2": "Nuestra aplicación ofrece un viaje virtual por el pueblo, donde puedes conocer su rica historia, tradiciones y la vida contemporánea de los residentes. Gracias al mapa interactivo y al juego de campo, el aprendizaje se vuelve divertido.",
-            "description3": "El proyecto tiene como objetivo no solo educar, sino también preservar y transmitir a las futuras generaciones el patrimonio cultural único de la región.",
-            "fundingTitle": "Información de financiación",
-            "euFunding": "Proyecto cofinanciado por la Unión Europea",
-            "projectPeriod": "Período de implementación: 2024-2025",
-            "location": "Ubicación: Piskorzów, Polonia",
-            "objectivesTitle": "Objetivos del proyecto",
-            "objective1": "Promoción del patrimonio cultural del pueblo de Piskorzów",
-            "objective2": "Creación de herramientas educativas interactivas",
-            "objective3": "Preservación de tradiciones locales para futuras generaciones",
-            "objective4": "Aumentar la conciencia sobre la importancia de la cultura local",
-            "dontShowAgain": "No mostrar de nuevo",
-            "close": "Cerrar",
-            "startExploring": "Comenzar exploración"
-        },
-        "gameCard": {
-            "title": "Juego de Campo de Piskorzów",
-            "openGame": "Abrir juego de campo",
-            "close": "Cerrar",
-            "maximize": "Maximizar",
-            "minimize": "Minimizar",
-            "welcome": "¡Bienvenido al juego de campo!",
-            "instructions": "Explora el pueblo de Piskorzów y descubre sus secretos. Usa el mapa para encontrar puntos de interés y completar tareas.",
-            "locations": {
-                "title": "Ubicaciones por descubrir",
-                "content": "Te esperan varios lugares en el juego: edificios históricos, monumentos, miradores y tesoros escondidos. Cada ubicación tiene su historia única."
-            },
-            "challenges": {
-                "title": "Desafíos y tareas",
-                "content": "Completa tareas interesantes, resuelve acertijos y colecciona puntos. Cuanto más descubras, más aprenderás sobre la historia de Piskorzów."
-            },
-            "team": {
-                "title": "Juego en equipo",
-                "content": "Puedes jugar solo o en equipo. Colabora para resolver acertijos más difíciles y descubrir todos los secretos del pueblo."
-            },
-            "rules": {
-                "title": "Reglas del juego",
-                "rule": "Regla",
-                "description": "Descripción de la regla"
-            },
-            "tips": {
-                "title": "Consejos útiles",
-                "tip": "Consejo"
             }
         }
     }

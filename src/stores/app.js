@@ -5,6 +5,8 @@ import { checkGpsAccessAndAccuracy } from '@/services/gps'
 export const useAppStore = defineStore('app', () => {
     // State
     const homePageActive = ref(true)
+    // Konfiguracja aktualnego scenariusza
+    const currentStoryConfig = ref(null)
     const gpsAccess = ref(null) // null = not checked yet
     const gpsInfo = ref(null)
     const isLoading = ref(true)
@@ -175,16 +177,22 @@ export const useAppStore = defineStore('app', () => {
         return false
     }
 
+    // Ustawianie aktualnego scenariusza
+    const setCurrentStoryConfig = (config) => {
+        currentStoryConfig.value = config
+    }
+
     return {
         // state
         homePageActive,
         gpsAccess,
         gpsInfo,
         isLoading,
-        gameCardVisible,
+        gameCardVisible, // ref widoczności karty gry
         activeWindow,
         projectInfoDismissed,
         isWindowClosedByReplacement,
+        currentStoryConfig,
         // getters
         isHomePage,
         hasGpsAccess,
@@ -214,5 +222,6 @@ export const useAppStore = defineStore('app', () => {
         dismissProjectInfo,
         resetProjectInfoDismissal,
         checkAndShowProjectInfo,
+        setCurrentStoryConfig,
     }
 })

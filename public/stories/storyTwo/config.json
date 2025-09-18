@@ -1,0 +1,15 @@
+{
+    "title": "testScenario",
+    "description": "storyScenarioDescription",
+    "steps": [
+        {
+            "title": "stepOne",
+            "content": [
+                {
+                    "type": "bgImage",
+                    "src": "imageOne.jpg"
+                }
+            ]
+        }
+    ]
+}

@@ -43,9 +43,15 @@
 
 <script setup>
 import RouterTile from '@/components/RouterTile.vue'
-const emit = defineEmits(['story-click'])
+import { useRouter, useRoute } from 'vue-router'
 
-function handleStoryClick(story) {
+const emit = defineEmits(['story-click'])
+const router = useRouter()
+const route = useRoute()
+
+const handleStoryClick = (story) => {
+    const prefix = route.path.startsWith('/presentation') ? '/presentation' : '/game'
+    router.push(`${prefix}/${story.id}`)
     emit('story-click', story)
 }
 

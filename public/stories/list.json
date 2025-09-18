@@ -1,7 +1,7 @@
 {
     "collection": [
         {
-            "id": "story-1",
+            "id": "storyOne",
             "title": "storyOneTitle",
             "author": "storyOneAuthor",
             "description": "storyOneDescription",
@@ -9,7 +9,7 @@
             "disabled": true
         },
         {
-            "id": "story-2",
+            "id": "storyTwo",
             "title": "storyTwoTitle",
             "author": "storyTwoAuthor",
             "description": "storyTwoDescription",

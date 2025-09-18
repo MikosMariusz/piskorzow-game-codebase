@@ -10,15 +10,6 @@
             <ProjectInfoContent />
         </CardWrapper>
 
-        <CardWrapper
-            :visible="appStore.isGameCardVisible"
-            :title="'Dostępne gry terenowe'"
-            :desktopWidth="500"
-            @update:visible="handleGameCardVisibilityChange"
-        >
-            <GameStoriesCard />
-        </CardWrapper>
-
         <template v-if="!appStore.getIsLoading">
             <AppBar
                 @show-project-info="showProjectInfo"
@@ -37,21 +28,12 @@ import MapBackground from '@/components/MapBackground.vue'
 import ProjectInfoContent from '@/components/ProjectInfoContent.vue'
 import LoadingOverlay from '@/components/LoadingOverlay.vue'
 import CardWrapper from '@/components/CardWrapper.vue'
-import GameStoriesCard from '@/components/GameStoriesCard.vue'
 
 const appStore = useAppStore()
 
 const handleProjectInfoVisibilityChange = (visible) => {
     if (!visible) {
         appStore.closeProjectInfo()
-    }
-}
-
-const handleGameCardVisibilityChange = (visible) => {
-    if (visible) {
-        appStore.openWindow('game')
-    } else {
-        appStore.closeWindow()
     }
 }
 

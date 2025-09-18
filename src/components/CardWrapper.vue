@@ -105,6 +105,15 @@ const props = defineProps({
     },
 })
 
+// Synchronizuj widoczność karty z appStore, aby MapBackground mógł reagować
+watch(
+    () => props.visible,
+    (val) => {
+        appStore.gameCardVisible = val
+    },
+    { immediate: true },
+)
+
 const emit = defineEmits(['update:visible'])
 
 const isMobileMaximized = ref(false)
