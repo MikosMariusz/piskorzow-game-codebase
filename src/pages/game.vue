@@ -6,6 +6,7 @@
         :desktopWidth="600"
         :centered="true"
         :closable="false"
+        :minimize="false"
     >
         <GameGpsUnavailableCard />
     </CardWrapper>

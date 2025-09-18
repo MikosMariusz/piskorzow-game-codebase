@@ -6,6 +6,8 @@
         "terrainGameUnavailable": "Gra terenowa niedostępna na urządzeniu bez moduły GPS",
         "terrainGameModuleUnavailable": "Moduł gry terenowej niedostępny",
         "selectTerrainGame": "Wybierz grę terenową",
+        "terrainGameUnavailableDescription": "Niestety na Twoim urządzeniu nie można uruchomić gry terenowej. Możesz przejść do trybu prezentacji.",
+        "goToPresentation": "Przejdź do prezentacji",
         "villagePresentation": "Interaktywna prezentacja wsi",
         "gameTitle": "Piskorzów Interaktywnie",
         "navigation": {
@@ -80,6 +82,8 @@
         "terrainGame": "Village Quest",
         "terrainGameUnavailable": "Terrain game unavailable on device without GPS module",
         "terrainGameModuleUnavailable": "Terrain game module unavailable",
+        "terrainGameUnavailableDescription": "Unfortunately, the terrain game cannot be launched on your device. You can switch to presentation mode.",
+        "goToPresentation": "Go to presentation",
         "selectTerrainGame": "Select terrain game",
         "villagePresentation": "Interactive Village Presentation",
         "gameTitle": "Piskorzów Interactively",

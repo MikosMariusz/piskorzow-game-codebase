@@ -75,16 +75,17 @@ onMounted(async () => {
 <style scoped>
 .game-stories-card-wrapper {
     width: 100%;
+    height: auto;
     max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .game-stories-list {
     display: flex;
     flex-wrap: wrap;
     gap: 24px;
-    padding: 20px 0;
     justify-content: center;
 }
 

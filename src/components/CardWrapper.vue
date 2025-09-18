@@ -1,101 +1,68 @@
 <template>
-    <transition
-        :name="transitionName"
-        appear
+    <app-card
+        v-if="visible"
+        :class="cardClasses"
+        :style="cardStyles"
+        :has-border="true"
+        rounded="0"
+        elevation="6"
     >
-        <app-card
-            v-if="visible"
-            :class="cardClasses"
-            :style="cardStyles"
-            :has-border="true"
-            rounded="0"
-            elevation="6"
+        <v-card-title
+            class="d-flex align-center justify-space-between pa-4 pt-3 card-header-with-bg"
+            :class="{ 'card-header--minimized': isMinimized }"
+            @click="isMinimized ? toggleMinimize() : null"
+            style="user-select: none; height: 64px; min-height: 64px; max-height: 64px"
         >
-            <v-card-title
-                class="d-flex align-center justify-space-between pa-4 pt-3 card-header-with-bg"
-                :class="{ 'card-header--minimized': isMinimized }"
-                @click="isMinimized ? toggleMinimize() : null"
-                style="user-select: none; height: 64px; min-height: 64px; max-height: 64px"
+            <div class="header-background"></div>
+            <span class="text-h6 header-title font-weight-light">{{ title }}</span>
+            <div
+                class="d-flex align-center header-controls"
+                v-if="buttonConfigs.length"
+                @click.stop
             >
-                <div class="header-background"></div>
-                <span class="text-h6 header-title font-weight-light">{{ title }}</span>
-                <div
-                    class="d-flex align-center header-controls"
-                    @click.stop
+                <template
+                    v-for="btn in buttonConfigs"
+                    :key="btn.key"
                 >
                     <v-btn
-                        v-if="!isMinimized"
-                        icon="mdi-minus"
+                        v-if="btn.visible"
+                        :icon="btn.icon"
                         variant="elevated"
                         size="small"
-                        @click="toggleMinimize"
-                        :title="$t('gameCard.minimize')"
+                        @click="btn.action"
+                        :title="t(btn.title)"
                         class="mr-2 square-btn"
                         elevation="2"
                     />
-                    <v-btn
-                        v-if="isMinimized"
-                        icon="mdi-plus"
-                        variant="elevated"
-                        size="small"
-                        @click="toggleMinimize"
-                        :title="$t('gameCard.restore')"
-                        class="mr-2 square-btn"
-                        elevation="2"
-                    />
-                    <v-btn
-                        v-if="smAndDown && !isMobileMaximized && !isMinimized"
-                        icon="mdi-fullscreen"
-                        variant="elevated"
-                        size="small"
-                        @click="toggleMaximize"
-                        :title="$t('gameCard.maximize')"
-                        class="mr-2 square-btn"
-                        elevation="2"
-                    />
-                    <v-btn
-                        v-if="smAndDown && isMobileMaximized && !isMinimized"
-                        icon="mdi-fullscreen-exit"
-                        variant="elevated"
-                        size="small"
-                        @click="toggleMaximize"
-                        :title="$t('gameCard.minimize')"
-                        class="mr-2 square-btn"
-                        elevation="2"
-                    />
-                    <v-btn
-                        v-if="closable"
-                        icon="mdi-close"
-                        variant="elevated"
-                        size="small"
-                        @click="closeCard"
-                        :title="$t('gameCard.close')"
-                        class="square-btn"
-                        elevation="2"
-                    />
-                </div>
-            </v-card-title>
-
-            <div
-                v-if="!isMinimized"
-                class="card-content-container"
-            >
-                <v-divider />
-                <v-card-text class="card-content-scroll pa-6">
-                    <slot />
-                </v-card-text>
+                </template>
             </div>
-        </app-card>
-    </transition>
+        </v-card-title>
+        <transition
+            :name="transitionName"
+            appear
+        >
+            <v-card-text
+                v-if="!isMinimized"
+                class="pa-4"
+                style="overflow-y: auto; height: calc(100% - 64px)"
+            >
+                <div style="height: 100%">
+                    <slot />
+                </div>
+            </v-card-text>
+        </transition>
+    </app-card>
 </template>
 
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { useDisplay } from 'vuetify'
+import { useI18n } from 'vue-i18n'
 import { useAppStore } from '@/stores/app'
 import AppCard from '@/components/AppCard.vue'
 
 const { smAndDown, mdAndUp } = useDisplay()
+const { t } = useI18n()
 const appStore = useAppStore()
 
 const props = defineProps({
@@ -130,6 +97,10 @@ const props = defineProps({
         default: false,
     },
     closable: {
+        type: Boolean,
+        default: true,
+    },
+    minimize: {
         type: Boolean,
         default: true,
     },
@@ -221,8 +192,6 @@ const cardClasses = computed(() => {
 
     if (isMinimized.value) {
         classes.push('card-wrapper--minimized')
-    } else if (props.fullscreen) {
-        classes.push('card-wrapper--fullscreen-mode')
     } else if (isMobileMaximized.value) {
         classes.push('card-wrapper--fullscreen')
     }
@@ -245,33 +214,6 @@ const cardStyles = computed(() => {
             ...styles,
             overflow: 'hidden',
             zIndex: 2100,
-        }
-    }
-
-    if (props.fullscreen) {
-        return {
-            ...styles,
-            left: '0',
-            right: '0',
-            top: '0',
-            bottom: '0',
-            width: '100vw',
-            height: '100vh',
-            maxHeight: '100vh',
-            zIndex: 9999,
-        }
-    }
-
-    if (isMobileMaximized.value) {
-        return {
-            ...styles,
-            left: '0',
-            right: '0',
-            bottom: '0',
-            width: '100vw',
-            height: 'calc(100vh - 64px)',
-            maxHeight: 'calc(100vh - 64px)',
-            zIndex: 2000,
         }
     }
 
@@ -304,6 +246,44 @@ const closeCard = () => {
     appStore.gameCardVisible = false
     emit('update:visible', false)
 }
+
+const buttonConfigs = computed(() => [
+    {
+        key: 'minimize',
+        icon: smAndDown.value ? 'mdi-chevron-down' : 'mdi-chevron-up',
+        title: 'gameCard.minimize',
+        action: toggleMinimize,
+        visible: !isMinimized.value && props.minimize,
+    },
+    {
+        key: 'restore',
+        icon: smAndDown.value ? 'mdi-chevron-up' : 'mdi-chevron-down',
+        title: 'gameCard.restore',
+        action: toggleMinimize,
+        visible: isMinimized.value && props.minimize,
+    },
+    {
+        key: 'maximize',
+        icon: 'mdi-fullscreen',
+        title: 'gameCard.maximize',
+        action: toggleMaximize,
+        visible: smAndDown.value && !isMobileMaximized.value && !isMinimized.value,
+    },
+    {
+        key: 'minimizeFullscreen',
+        icon: 'mdi-fullscreen-exit',
+        title: 'gameCard.minimize',
+        action: toggleMaximize,
+        visible: smAndDown.value && isMobileMaximized.value && !isMinimized.value,
+    },
+    {
+        key: 'close',
+        icon: 'mdi-close',
+        title: 'gameCard.close',
+        action: closeCard,
+        visible: props.closable,
+    },
+])
 </script>
 
 <style scoped>
@@ -316,13 +296,10 @@ const closeCard = () => {
     right: 10px;
     bottom: 10px;
     width: v-bind(formattedDesktopWidth);
-    height: calc(100vh - 94px);
-    max-height: calc(100vh - 94px);
 }
 
 .card-wrapper--centered {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18) !important;
-    max-height: 90vh !important;
 }
 
 .card-header-with-bg {
@@ -409,8 +386,6 @@ const closeCard = () => {
         bottom: 10px !important;
         left: unset !important;
         width: v-bind(formattedDesktopWidth) !important;
-        height: calc(100vh - 94px) !important;
-        max-height: calc(100vh - 94px) !important;
     }
 
     /* Wyśrodkowane okna na desktopie */
@@ -421,8 +396,6 @@ const closeCard = () => {
         bottom: unset !important;
         transform: translate(-50%, -50%) !important;
         width: v-bind(formattedDesktopWidth) !important;
-        height: auto !important;
-        max-height: 90vh !important;
     }
 }
 
@@ -430,22 +403,9 @@ const closeCard = () => {
     border-radius: 0 !important;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
     bottom: 0 !important;
-    height: calc(100vh - 74px) !important;
-    max-height: calc(100vh - 74px) !important;
+    height: calc(100vh - 64px) !important;
+    max-height: calc(100vh - 64px) !important;
     transform-origin: bottom center;
-}
-
-.card-wrapper--fullscreen-mode {
-    border-radius: 0 !important;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
-    height: 100vh !important;
-    max-height: 100vh !important;
-    width: 100vw !important;
-    max-width: 100vw !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
 }
 
 .card-wrapper--minimized {
@@ -483,7 +443,7 @@ const closeCard = () => {
     .card-wrapper--minimized {
         top: 74px !important;
         right: 10px !important;
-        bottom: unset !important;
+        bottom: calc(100vh - 74px - 64px) !important;
         left: unset !important;
         width: v-bind(formattedDesktopWidth) !important;
     }
@@ -497,23 +457,29 @@ const closeCard = () => {
     }
 }
 
+.card-content-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
 .card-content-scroll {
-    max-height: calc(100vh - 220px);
+    height: calc(100% - 64px);
     overflow-y: auto;
 }
 
+.card-wrapper--centered .card-content-container {
+    height: 90vh;
+}
+
 .card-wrapper--centered .card-content-scroll {
-    max-height: calc(90vh - 140px);
+    flex: 1;
     min-height: 200px;
 }
 
 @media (max-width: 959px) {
-    .card-content-scroll {
-        max-height: calc(50vh - 140px);
-    }
-
     .card-wrapper--fullscreen .card-content-scroll {
-        max-height: calc(100vh - 148px) !important;
+        flex: 1;
     }
 }
 
@@ -533,21 +499,6 @@ const closeCard = () => {
 
 .card-content-scroll::-webkit-scrollbar-thumb:hover {
     background: rgba(0, 0, 0, 0.5);
-}
-
-@media (max-width: 959px) {
-    .card-wrapper {
-        animation: slideUpFromBottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-}
-
-@keyframes slideUpFromBottom {
-    from {
-        transform: translateY(100%);
-    }
-    to {
-        transform: translateY(0);
-    }
 }
 
 .fade-enter-active,
