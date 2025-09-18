@@ -35,6 +35,7 @@ import {
     clearClickCallback,
     clearZoomCallback,
     setInitialViewForPage,
+    animateToMode,
 } from '@/services/olMap'
 import { useAppStore } from '@/stores/app'
 import MapAttributions from './MapAttributions.vue'

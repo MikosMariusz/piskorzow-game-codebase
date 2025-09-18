@@ -8,6 +8,9 @@
         "selectTerrainGame": "Wybierz grę terenową",
         "villagePresentation": "Interaktywna prezentacja wsi",
         "gameTitle": "Piskorzów Interaktywnie",
+        "navigation": {
+            "backToHome": "Powrót do strony głównej"
+        },
         "loading": {
             "initializing": "Inicjalizacja aplikacji...",
             "gpsInfo": "Sprawdzanie dostępu do lokalizacji GPS...",
@@ -80,6 +83,9 @@
         "selectTerrainGame": "Select terrain game",
         "villagePresentation": "Interactive Village Presentation",
         "gameTitle": "Piskorzów Interactively",
+        "navigation": {
+            "backToHome": "Back to home"
+        },
         "loading": {
             "initializing": "Initializing application...",
             "gpsInfo": "Checking GPS location access...",

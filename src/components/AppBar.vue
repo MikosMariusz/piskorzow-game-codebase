@@ -19,6 +19,17 @@
                 ></v-img>
             </div>
         </template>
+        <v-btn
+            v-if="!appStore.isHomePage"
+            icon="mdi-arrow-left"
+            variant="elevated"
+            size="small"
+            class="ml-2"
+            elevation="4"
+            rounded="sm"
+            :title="$t('navigation.backToHome')"
+            @click="$router.push('/')"
+        />
         <v-toolbar-title :class="{ 'text-shadow text-white': appStore.isHomePage }">{{
             $t('gameTitle')
         }}</v-toolbar-title>
@@ -52,6 +63,7 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import { getOSMDuration } from '@/services/olMap'
 
@@ -59,6 +71,7 @@ defineEmits(['show-project-info', 'reset-project-info'])
 
 const bg = new URL('../assets/images/bar-background.png', import.meta.url).href
 const appStore = useAppStore()
+const $router = useRouter()
 
 const darkGradient = 'to top right, rgba(34,34,34,0.8), rgba(60,60,60,0.7)'
 const osmGradient =
@@ -83,7 +96,7 @@ const opacity = computed(() => (appStore.isHomePage ? 1 : 0))
     transition: opacity 0.3s ease-in-out;
 }
 
-/* Hover effect for home button */
+/* Hover effect for buttons */
 .v-btn:hover {
     transform: translateY(-1px);
     transition: transform 0.2s ease-in-out;

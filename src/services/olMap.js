@@ -14,7 +14,6 @@ let _normalTileLayer = null
 let _darkTileLayer = null
 let _vectorLayer = null
 let _isAnimating = false
-let _coordinatesCallback = null
 let _zoomCallback = null
 let _clickCallback = null
 let _moveEndCallback = null
@@ -43,8 +42,8 @@ export const setInitialViewForPage = () => {
     // Przerwij animację lotu jeśli aktywna
     stopFlightAnimation()
 
-    // Sprawdź rozmiar ekranu (mobile: szerokość < 600px)
-    const isMobile = window.innerWidth < 600
+    // Sprawdź rozmiar ekranu (mobile: szerokość < 960px - zgodnie z Vuetify breakpoint)
+    const isMobile = window.innerWidth < 960
     const center = isMobile ? startView.mobileCenter : startView.desktopCenter
     const zoom = startView.zoom
     const view = _map.getView()
@@ -147,21 +146,6 @@ const animateToNextFlightPoint = () => {
             }
         },
     )
-}
-
-/**
- * Rejestruje callback do aktualizacji współrzędnych kursora
- * @param {Function} callback - Funkcja wywoływana przy zmianie pozycji kursora
- */
-export const setCoordinatesCallback = (callback) => {
-    _coordinatesCallback = callback
-}
-
-/**
- * Usuwa callback współrzędnych
- */
-export const clearCoordinatesCallback = () => {
-    _coordinatesCallback = null
 }
 
 /**
@@ -361,10 +345,10 @@ export const searchLocationGeometry = async (locationName) => {
             return null
         }
 
+        // Filtruj tylko poligony
         const polygonFeatures = data.features.filter((feature) => {
             const geometry = feature.geometry
-            const isPolygon = geometry.type === 'Polygon' || geometry.type === 'MultiPolygon'
-            return isPolygon
+            return geometry.type === 'Polygon' || geometry.type === 'MultiPolygon'
         })
 
         if (polygonFeatures.length === 0) {
@@ -372,7 +356,7 @@ export const searchLocationGeometry = async (locationName) => {
             return null
         }
 
-        let bestFeature = polygonFeatures[0]
+        // Preferuj poligony administracyjne
         const administrativePolygons = polygonFeatures.filter((feature) => {
             const props = feature.properties
             return (
@@ -382,18 +366,23 @@ export const searchLocationGeometry = async (locationName) => {
             )
         })
 
-        if (administrativePolygons.length > 0) {
-            bestFeature = administrativePolygons[0]
-        }
+        const bestFeature =
+            administrativePolygons.length > 0 ? administrativePolygons[0] : polygonFeatures[0]
+        const geometry = bestFeature.geometry
+        const properties = bestFeature.properties
 
         const completeFeature = {
             type: 'Feature',
-            geometry: geometry,
-            properties: properties,
+            geometry,
+            properties,
         }
 
         if (_map) {
-            addGeometryToMap(geometry, properties.display_name, properties)
+            addGeometryToMap(
+                geometry,
+                properties.display_name || properties.name || locationName,
+                properties,
+            )
         }
 
         return { geometry, properties, feature: completeFeature }
@@ -545,13 +534,6 @@ export const createMap = (targetEl, options = {}) => {
         }
     })
 
-    // _map.getView().on('change:resolution', () => {
-    //     if (_zoomCallback) {
-    //         const zoom = _map.getView().getZoom()
-    //         _zoomCallback(zoom)
-    //     }
-    // })
-
     // Nasłuchiwanie na zakończenie ruchu mapy
     _map.on('moveend', () => {
         if (_moveEndCallback) {
@@ -612,17 +594,12 @@ export const animateToMode = (opts = {}) => {
         return
     }
 
-    // Ustal tryb ciemny
     let isDark = appStore.homePageActive
     if (forceDark !== null) isDark = forceDark
 
-    // Ustal czy animować lot
     let shouldFlight = isDark
     if (forceFlight !== null) shouldFlight = forceFlight
-
-    // Ustaw pozycję startową jeśli trzeba
     if (setStartView) {
-        // Sprawdź rozmiar ekranu (mobile: szerokość < 600px)
         const isMobile = typeof window !== 'undefined' && window.innerWidth < 960
         const center = isMobile ? startView.mobileCenter : startView.desktopCenter
         const zoom = startView.zoom
@@ -640,7 +617,6 @@ export const animateToMode = (opts = {}) => {
     const currentDarkOpacity = _darkTileLayer.getOpacity()
     const isCurrentlyDark = currentDarkOpacity > currentNormalOpacity
     if (isCurrentlyDark === isDark) {
-        // Zarządzaj animacją lotu nawet jeśli kolory się nie zmieniają
         if (shouldFlight && !_isFlying) {
             startFlightAnimation()
         } else if (!shouldFlight && _isFlying) {
@@ -656,7 +632,6 @@ export const animateToMode = (opts = {}) => {
     _isAnimating = true
     const startTime = Date.now()
 
-    // Zarządzaj animacją lotu przy zmianie trybu
     if (shouldFlight) {
         setTimeout(() => {
             startFlightAnimation()
@@ -665,8 +640,6 @@ export const animateToMode = (opts = {}) => {
         stopFlightAnimation()
     }
 
-    // Dla trybu ciemnego: normal opacity: 1->0, dark opacity: 0->1
-    // Dla trybu normalnego: normal opacity: 0->1, dark opacity: 1->0
     const startNormalOpacity = isDark ? 1 : 0
     const endNormalOpacity = isDark ? 0 : 1
     const startDarkOpacity = isDark ? 0 : 1
@@ -676,7 +649,6 @@ export const animateToMode = (opts = {}) => {
         const elapsed = Date.now() - startTime
         const progress = Math.min(elapsed / duration, 1)
 
-        // Easing function (ease-in-out)
         const eased =
             progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2
 
@@ -690,11 +662,9 @@ export const animateToMode = (opts = {}) => {
             requestAnimationFrame(animateOpacity)
         } else {
             _isAnimating = false
-            // Ustaw finalne wartości
             _normalTileLayer.setOpacity(endNormalOpacity)
             _darkTileLayer.setOpacity(endDarkOpacity)
         }
     }
-
     requestAnimationFrame(animateOpacity)
 }

@@ -12,13 +12,39 @@
             elevation="6"
         >
             <v-card-title
-                class="d-flex align-center justify-space-between pa-4 card-header-with-bg"
+                class="d-flex align-center justify-space-between pa-4 pt-3 card-header-with-bg"
+                :class="{ 'card-header--minimized': isMinimized }"
+                @click="isMinimized ? toggleMinimize() : null"
+                style="user-select: none; height: 64px; min-height: 64px; max-height: 64px"
             >
                 <div class="header-background"></div>
                 <span class="text-h6 header-title font-weight-light">{{ title }}</span>
-                <div class="d-flex align-center header-controls">
+                <div
+                    class="d-flex align-center header-controls"
+                    @click.stop
+                >
                     <v-btn
-                        v-if="smAndDown && !isMobileMaximized"
+                        v-if="!isMinimized"
+                        icon="mdi-minus"
+                        variant="elevated"
+                        size="small"
+                        @click="toggleMinimize"
+                        :title="$t('gameCard.minimize')"
+                        class="mr-2 square-btn"
+                        elevation="2"
+                    />
+                    <v-btn
+                        v-if="isMinimized"
+                        icon="mdi-plus"
+                        variant="elevated"
+                        size="small"
+                        @click="toggleMinimize"
+                        :title="$t('gameCard.restore')"
+                        class="mr-2 square-btn"
+                        elevation="2"
+                    />
+                    <v-btn
+                        v-if="smAndDown && !isMobileMaximized && !isMinimized"
                         icon="mdi-fullscreen"
                         variant="elevated"
                         size="small"
@@ -28,7 +54,7 @@
                         elevation="2"
                     />
                     <v-btn
-                        v-if="smAndDown && isMobileMaximized"
+                        v-if="smAndDown && isMobileMaximized && !isMinimized"
                         icon="mdi-fullscreen-exit"
                         variant="elevated"
                         size="small"
@@ -50,22 +76,26 @@
                 </div>
             </v-card-title>
 
-            <v-divider />
-
-            <v-card-text class="card-content-scroll pa-6">
-                <slot />
-            </v-card-text>
+            <div
+                v-if="!isMinimized"
+                class="card-content-container"
+            >
+                <v-divider />
+                <v-card-text class="card-content-scroll pa-6">
+                    <slot />
+                </v-card-text>
+            </div>
         </app-card>
     </transition>
 </template>
 
 <script setup>
-import { computed, ref, watch, nextTick } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useDisplay } from 'vuetify'
 import { useAppStore } from '@/stores/app'
 import AppCard from '@/components/AppCard.vue'
 
-const { mobile, tablet, smAndDown, mdAndUp } = useDisplay()
+const { smAndDown, mdAndUp } = useDisplay()
 const appStore = useAppStore()
 
 const props = defineProps({
@@ -105,21 +135,55 @@ const props = defineProps({
     },
 })
 
-// Synchronizuj widoczność karty z appStore, aby MapBackground mógł reagować
+const emit = defineEmits(['update:visible'])
+
+const isMobileMaximized = ref(false)
+const isMinimized = ref(false)
+const TOGGLE_DELAY = 200
+const RESTORE_DELAY = 400
+
+const toggleMinimizeMobile = () => {
+    if (!isMinimized.value) {
+        appStore.gameCardVisible = false
+        setTimeout(() => {
+            isMinimized.value = true
+        }, TOGGLE_DELAY)
+    } else {
+        isMinimized.value = false
+        setTimeout(() => {
+            appStore.gameCardVisible = true
+        }, RESTORE_DELAY)
+    }
+}
+
+const toggleMinimizeDesktop = () => {
+    isMinimized.value = !isMinimized.value
+}
+
+const toggleMinimize = () => {
+    if (smAndDown.value) {
+        toggleMinimizeMobile()
+    } else {
+        toggleMinimizeDesktop()
+    }
+
+    if (isMinimized.value && isMobileMaximized.value) {
+        isMobileMaximized.value = false
+    }
+}
+
 watch(
     () => props.visible,
     (val) => {
         appStore.gameCardVisible = val
+        if (!val) {
+            isMinimized.value = false
+        }
     },
     { immediate: true },
 )
 
-const emit = defineEmits(['update:visible'])
-
-const isMobileMaximized = ref(false)
-
 const transitionName = computed(() => {
-    // If window is being closed by replacement, use no-animation transition
     if (appStore.getIsWindowClosedByReplacement && !props.visible) {
         return 'no-animation'
     }
@@ -127,9 +191,8 @@ const transitionName = computed(() => {
 })
 
 const formattedDesktopWidth = computed(() => {
-    // If fullPage, use wider width
     if (props.fullPage) {
-        return 'calc(100vw - 20px)' // Full width minus margins
+        return 'calc(100vw - 20px)'
     }
 
     if (typeof props.desktopWidth === 'number') {
@@ -143,8 +206,6 @@ watch(smAndDown, (newIsSmall, oldIsSmall) => {
         isMobileMaximized.value = false
     }
 })
-
-// Auto-maximize on mobile for fullPage windows
 watch(
     [smAndDown, () => props.visible, () => props.fullPage],
     ([isSmall, visible, fullPage]) => {
@@ -158,13 +219,14 @@ watch(
 const cardClasses = computed(() => {
     const classes = ['card-wrapper']
 
-    if (props.fullscreen) {
+    if (isMinimized.value) {
+        classes.push('card-wrapper--minimized')
+    } else if (props.fullscreen) {
         classes.push('card-wrapper--fullscreen-mode')
     } else if (isMobileMaximized.value) {
         classes.push('card-wrapper--fullscreen')
     }
 
-    // Dodaj klasę centered tylko na dużych ekranach
     if (props.centered && mdAndUp.value) {
         classes.push('card-wrapper--centered')
     }
@@ -176,6 +238,14 @@ const cardStyles = computed(() => {
     const styles = {
         position: 'fixed',
         zIndex: 2000,
+    }
+
+    if (isMinimized.value) {
+        return {
+            ...styles,
+            overflow: 'hidden',
+            zIndex: 2100,
+        }
     }
 
     if (props.fullscreen) {
@@ -192,7 +262,6 @@ const cardStyles = computed(() => {
         }
     }
 
-    // Mobile maximized takes priority
     if (isMobileMaximized.value) {
         return {
             ...styles,
@@ -206,7 +275,6 @@ const cardStyles = computed(() => {
         }
     }
 
-    // Wyśrodkowanie TYLKO na dużych ekranach (desktop)
     if (props.centered && mdAndUp.value) {
         return {
             ...styles,
@@ -222,7 +290,6 @@ const cardStyles = computed(() => {
         }
     }
 
-    // Na mobile lub gdy nie centered - standardowe pozycjonowanie
     return styles
 })
 
@@ -233,6 +300,8 @@ const toggleMaximize = () => {
 const closeCard = () => {
     if (!props.closable) return
     isMobileMaximized.value = false
+    isMinimized.value = false
+    appStore.gameCardVisible = false
     emit('update:visible', false)
 }
 </script>
@@ -240,14 +309,20 @@ const closeCard = () => {
 <style scoped>
 .card-wrapper {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
     border-radius: 0 !important;
+    transform-origin: top center;
+    top: 74px;
+    right: 10px;
+    bottom: 10px;
+    width: v-bind(formattedDesktopWidth);
+    height: calc(100vh - 94px);
+    max-height: calc(100vh - 94px);
 }
 
 .card-wrapper--centered {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18) !important;
     max-height: 90vh !important;
-    /* Wyśrodkowanie tylko na desktopie, na mobile domyślne */
 }
 
 .card-header-with-bg {
@@ -255,6 +330,9 @@ const closeCard = () => {
     overflow: hidden;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
     z-index: 1;
+    height: 64px;
+    min-height: 64px;
+    max-height: 64px;
 }
 
 .header-background {
@@ -311,16 +389,6 @@ const closeCard = () => {
     border-radius: 0 !important;
 }
 
-.card-wrapper {
-    top: 74px;
-    right: 10px;
-    bottom: 10px;
-    width: v-bind(formattedDesktopWidth);
-    height: calc(100vh - 84px);
-    max-height: calc(100vh - 84px);
-}
-
-/* Small screens and down (xs, sm) */
 @media (max-width: 959px) {
     .card-wrapper {
         top: unset !important;
@@ -334,7 +402,6 @@ const closeCard = () => {
     }
 }
 
-/* Medium screens and up (md+) */
 @media (min-width: 960px) {
     .card-wrapper {
         top: 74px !important;
@@ -342,8 +409,8 @@ const closeCard = () => {
         bottom: 10px !important;
         left: unset !important;
         width: v-bind(formattedDesktopWidth) !important;
-        height: calc(100vh - 84px) !important;
-        max-height: calc(100vh - 84px) !important;
+        height: calc(100vh - 94px) !important;
+        max-height: calc(100vh - 94px) !important;
     }
 
     /* Wyśrodkowane okna na desktopie */
@@ -363,8 +430,8 @@ const closeCard = () => {
     border-radius: 0 !important;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
     bottom: 0 !important;
-    height: calc(100vh - 64px) !important;
-    max-height: calc(100vh - 64px) !important;
+    height: calc(100vh - 74px) !important;
+    max-height: calc(100vh - 74px) !important;
     transform-origin: bottom center;
 }
 
@@ -381,24 +448,72 @@ const closeCard = () => {
     bottom: 0 !important;
 }
 
+.card-wrapper--minimized {
+    height: 64px !important;
+    min-height: 64px !important;
+    max-height: 64px !important;
+    overflow: hidden !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
+    z-index: 2100 !important;
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+}
+
+.card-header--minimized {
+    min-height: 64px !important;
+    max-height: 64px !important;
+    height: 64px !important;
+    cursor: pointer;
+    user-select: none;
+    box-shadow: none !important;
+}
+
+@media (max-width: 959px) {
+    .card-wrapper--minimized {
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        top: unset !important;
+        width: 100vw !important;
+        border-radius: 0 !important;
+        box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.18) !important;
+    }
+}
+
+@media (min-width: 960px) {
+    .card-wrapper--minimized {
+        top: 74px !important;
+        right: 10px !important;
+        bottom: unset !important;
+        left: unset !important;
+        width: v-bind(formattedDesktopWidth) !important;
+    }
+
+    .card-wrapper--minimized.card-wrapper--centered {
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        right: unset !important;
+        bottom: unset !important;
+    }
+}
+
 .card-content-scroll {
-    max-height: calc(100vh - 200px);
+    max-height: calc(100vh - 220px);
     overflow-y: auto;
 }
 
-/* Wyśrodkowane okna powinny mieć odpowiednią wysokość */
 .card-wrapper--centered .card-content-scroll {
-    max-height: calc(90vh - 120px);
+    max-height: calc(90vh - 140px);
     min-height: 200px;
 }
 
 @media (max-width: 959px) {
     .card-content-scroll {
-        max-height: calc(50vh - 120px);
+        max-height: calc(50vh - 140px);
     }
 
     .card-wrapper--fullscreen .card-content-scroll {
-        max-height: calc(100vh - 128px) !important;
+        max-height: calc(100vh - 148px) !important;
     }
 }
 
@@ -452,7 +567,6 @@ const closeCard = () => {
     filter: blur(4px);
 }
 
-/* No animation transition for instant closing */
 .no-animation-enter-active,
 .no-animation-leave-active {
     transition: none;
@@ -476,7 +590,6 @@ const closeCard = () => {
         filter: blur(6px);
     }
 
-    /* No animation for mobile too */
     .no-animation-enter-from,
     .no-animation-leave-to {
         opacity: 0;
