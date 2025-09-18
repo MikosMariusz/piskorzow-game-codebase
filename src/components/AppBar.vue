@@ -28,23 +28,12 @@
             elevation="4"
             rounded="sm"
             :title="$t('navigation.backToHome')"
-            @click="$router.push('/')"
+            @click="goBack"
         />
         <v-toolbar-title :class="{ 'text-shadow text-white': appStore.isHomePage }">{{
             $t('gameTitle')
         }}</v-toolbar-title>
         <v-spacer />
-        <v-btn
-            icon="mdi-gamepad-variant"
-            variant="elevated"
-            size="small"
-            elevation="4"
-            rounded="sm"
-            class="mr-2"
-            color="accent"
-            :title="$t('gameCard.openGame')"
-            @click="appStore.toggleGameCard()"
-        />
         <v-btn
             icon="mdi-information-outline"
             variant="elevated"
@@ -78,6 +67,21 @@ const osmGradient =
     '90deg, rgba(182,227,182,0.7) 0%, rgba(120,200,120,0.7) 50%, rgba(163,193,218,0.5) 100%'
 
 const opacity = computed(() => (appStore.isHomePage ? 1 : 0))
+
+const goBack = () => {
+    const currentPath = $router.currentRoute.value.path
+    if (currentPath.startsWith('/game/')) {
+        $router.push('/game')
+    } else if (currentPath === '/game') {
+        $router.push('/')
+    } else if (currentPath.startsWith('/presentation/')) {
+        $router.push('/presentation')
+    } else if (currentPath === '/presentation') {
+        $router.push('/')
+    } else {
+        $router.push('/')
+    }
+}
 </script>
 
 <style scoped>

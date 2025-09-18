@@ -1,46 +1,47 @@
 <template>
-    <app-card
-        v-if="visible"
-        :class="cardClasses"
-        :style="cardStyles"
-        :has-border="true"
-        rounded="0"
-        elevation="6"
+    <transition
+        :name="'fade'"
+        appear
     >
-        <v-card-title
-            class="d-flex align-center justify-space-between pa-4 pt-3 card-header-with-bg"
-            :class="{ 'card-header--minimized': isMinimized }"
-            @click="isMinimized ? toggleMinimize() : null"
-            style="user-select: none; height: 64px; min-height: 64px; max-height: 64px"
+        <app-card
+            v-if="visible"
+            :class="cardClasses"
+            :style="cardStyles"
+            :has-border="true"
+            rounded="0"
+            elevation="6"
         >
-            <div class="header-background"></div>
-            <span class="text-h6 header-title font-weight-light">{{ title }}</span>
-            <div
-                class="d-flex align-center header-controls"
-                v-if="buttonConfigs.length"
-                @click.stop
+            <v-card-title
+                class="d-flex align-center justify-space-between pa-4 pt-3 card-header-with-bg"
+                :class="{ 'card-header--minimized': isMinimized }"
+                @click="isMinimized ? toggleMinimize() : null"
+                style="user-select: none; height: 64px; min-height: 64px; max-height: 64px"
             >
-                <template
-                    v-for="btn in buttonConfigs"
-                    :key="btn.key"
+                <div class="header-background"></div>
+                <span class="text-h6 header-title font-weight-light">{{ title }}</span>
+                <div
+                    class="d-flex align-center header-controls"
+                    v-if="buttonConfigs.length"
+                    @click.stop
                 >
-                    <v-btn
-                        v-if="btn.visible"
-                        :icon="btn.icon"
-                        variant="elevated"
-                        size="small"
-                        @click="btn.action"
-                        :title="t(btn.title)"
-                        class="mr-2 square-btn"
-                        elevation="2"
-                    />
-                </template>
-            </div>
-        </v-card-title>
-        <transition
-            :name="'fade'"
-            appear
-        >
+                    <template
+                        v-for="btn in buttonConfigs"
+                        :key="btn.key"
+                    >
+                        <v-btn
+                            v-if="btn.visible"
+                            :icon="btn.icon"
+                            variant="elevated"
+                            size="small"
+                            @click="btn.action"
+                            :title="t(btn.title)"
+                            class="mr-2 square-btn"
+                            elevation="2"
+                        />
+                    </template>
+                </div>
+            </v-card-title>
+
             <v-card-text
                 v-if="!isMinimized"
                 class="pa-4"
@@ -50,8 +51,8 @@
                     <slot />
                 </div>
             </v-card-text>
-        </transition>
-    </app-card>
+        </app-card>
+    </transition>
 </template>
 
 <script setup>

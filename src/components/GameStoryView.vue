@@ -15,22 +15,21 @@
                 color="primary"
                 size="48"
             />
-            <span class="mt-4">Ładowanie scenariusza...</span>
+            <span class="mt-4">{{ $t('storyView.loadingScenario') }}</span>
         </div>
         <div v-else-if="error">
             <v-alert
                 type="error"
                 class="mb-2"
-                >Błąd ładowania: {{ error }}</v-alert
+                >{{ $t('storyView.loadingError') }} {{ error }}</v-alert
             >
         </div>
         <div v-else-if="config">
             <pre class="text-body-2">{{ config }}</pre>
         </div>
         <div v-else>
-            <span>Nie znaleziono scenariusza.</span>
+            <span>{{ $t('storyView.scenarioNotFound') }}</span>
         </div>
-        {{ t('storyScenarioDescription') }}
     </CardWrapper>
 </template>
 
@@ -74,7 +73,7 @@ async function loadConfig() {
         const conf = await res.json()
         config.value = JSON.stringify(conf, null, 2)
         await loadStoryTranslations(storyId.value)
-        cardTitle.value = t(conf.title || 'scenario')
+        cardTitle.value = t(conf.title || 'storyView.scenario')
     } catch (e) {
         error.value = e.message
     } finally {
