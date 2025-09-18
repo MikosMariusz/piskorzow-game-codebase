@@ -2,9 +2,11 @@
     <v-app>
         <LoadingOverlay />
         <CardWrapper
+            style="z-index: 3000"
             :visible="appStore.isProjectInfoVisible"
             :title="$t('projectInfo.title')"
             :fullPage="true"
+            :minimize="false"
             @update:visible="handleProjectInfoVisibilityChange"
         >
             <ProjectInfoContent />

@@ -1,7 +1,7 @@
 <template>
     <CardWrapper
         :visible="true"
-        :title="cardTitle"
+        :title="t('selectTerrainGame')"
         :desktopWidth="500"
         :closable="false"
     >
@@ -10,7 +10,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 import { useAppStore } from '@/stores/app'
 import { useI18n } from 'vue-i18n'
 import { setInitialViewForPage, animateToMode } from '@/services/olMap'
@@ -19,7 +19,6 @@ import GameStoriesCard from '@/components/GameStoriesCard.vue'
 
 const appStore = useAppStore()
 const { t } = useI18n()
-const cardTitle = ref(t('selectTerrainGame'))
 
 onMounted(() => {
     // Ustaw kartę jako widoczną przy wejściu na stronę prezentacji
