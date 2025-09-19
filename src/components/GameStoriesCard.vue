@@ -1,5 +1,5 @@
 <template>
-    <div class="game-stories-card-wrapper">
+    <div class="game-stories-card-wrapper pa-4">
         <div
             v-if="loading"
             class="d-flex flex-column align-center justify-center"

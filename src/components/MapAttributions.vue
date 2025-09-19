@@ -6,7 +6,7 @@
         rounded="sm"
     >
         <v-card-text class="attribution-bar pa-1">
-            <div class="osm-attribution">
+            <div class="osm-attribution ml-2">
                 ©
                 <a
                     href="https://www.openstreetmap.org/copyright"
@@ -55,7 +55,7 @@
                                         : 'blue-grey-darken-1'
                                 "
                             >
-                                {{ coordinates.lon.toFixed(6) }}°, {{ coordinates.lat.toFixed(6) }}°
+                                {{ coordinates.lon.toFixed(7) }}°, {{ coordinates.lat.toFixed(7) }}°
                             </v-chip>
                             <v-btn
                                 variant="text"
@@ -92,6 +92,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useTheme } from 'vuetify'
+import { getCurrentZoom } from '@/services/olMap'
 
 const theme = useTheme()
 const isExpanded = ref(false)
@@ -104,6 +105,9 @@ const toggleExpanded = () => {
 const updateCoordinates = (lat, lon) => {
     coordinates.value.lat = lat
     coordinates.value.lon = lon
+    console.log(
+        `📍 Updated coordinates and current zoom level: ${lon}, ${lat}, ${getCurrentZoom()}`,
+    )
 }
 
 const clearCoordinates = () => {
@@ -113,7 +117,7 @@ const clearCoordinates = () => {
 
 const copyCoordinates = async () => {
     if (coordinates.value.lat !== null && coordinates.value.lon !== null) {
-        const coordsText = `${coordinates.value.lat.toFixed(6)}, ${coordinates.value.lon.toFixed(6)}`
+        const coordsText = `${coordinates.value.lon.toFixed(7)}, ${coordinates.value.lat.toFixed(7)}`
         try {
             await navigator.clipboard.writeText(coordsText)
         } catch (err) {

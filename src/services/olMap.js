@@ -443,19 +443,17 @@ export const createMap = (targetEl, options = {}) => {
         return _map
     }
 
-    // Warstwa normalna (kolorowa)
     _normalTileLayer = new WebGLTileLayer({
         source: new XYZ({
             url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-            maxZoom: 20,
+            maxZoom: 19,
         }),
     })
 
-    // Warstwa ciemna (wyszarzona z rozjaśnioną jasnością)
     _darkTileLayer = new WebGLTileLayer({
         source: new XYZ({
             url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-            maxZoom: 20,
+            maxZoom: 19,
         }),
         style: {
             color: [
@@ -496,8 +494,6 @@ export const createMap = (targetEl, options = {}) => {
         opacity: 0,
     })
 
-    // Usunięcie niepotrzebnego timeout i funkcji findLayerCanvas
-
     _map = new Map({
         target: targetEl || undefined,
         layers: [_normalTileLayer, _darkTileLayer],
@@ -517,14 +513,12 @@ export const createMap = (targetEl, options = {}) => {
         }
     })
 
-    // Aktualizuj współrzędne również po przesunięciu mapy (np. drag na desktopie i dotyku)
     _map.on('moveend', (event) => {
         if (_moveEndCallback) {
             const center = getMapCenter()
             const zoom = getCurrentZoom()
             _moveEndCallback(center, zoom)
         }
-        // Dla UX: po każdym przesunięciu mapy aktualizuj współrzędne na środku mapy
         if (_clickCallback && _map) {
             const center = _map.getView().getCenter()
             if (center) {
@@ -534,7 +528,6 @@ export const createMap = (targetEl, options = {}) => {
         }
     })
 
-    // Nasłuchiwanie na zakończenie ruchu mapy
     _map.on('moveend', () => {
         if (_moveEndCallback) {
             const center = getMapCenter()

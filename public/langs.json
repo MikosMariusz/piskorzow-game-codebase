@@ -1,5 +1,14 @@
 {
     "pl": {
+        "scenario": "Scenariusz",
+        "testScenario": "Scenariusz testowy",
+        "storyScenarioDescription": "Opis scenariusza testowego",
+        "stepOne": "Kościół św. Jana Nepomucena",
+        "stepOneSubheader": "Zabytkowy kościół św. Jana Nepomucena",
+        "interiorSubheader": "Wnętrze kościoła",
+        "historySubheader": "Historia ",
+        "stepOneParagraphOne": "W Piskorzowie znajduje się zabytkowy kościół św. Jana Nepomucena, należący do piskorzowskiej parafii, zbudowany w XVI w., przebudowywany w 1730 i 1921. Wielkość parafii 1 360 osób. W XVI w. ewangelicy wznieśli kościół piskorzowski. Mimo iż luteranie w Piskorzowie stanowili większość, a tzw. „redukcja” miała obejmować jedynie świątynie wzniesione przez katolików, w 1654 r. kościół został „zredukowany”. Po 75 latach został przez katolików przebudowany, a w 1921 r. rozbudowany. Do 1967 r. był kościołem filialnym parafii św. Jakuba w Pieszycach.",
+        "stepOneParagraphTwo": "Obecnie kościół jest bezstylową budowlą założoną na prostokącie z nieco węższym i niższym prezbiterium, do którego od północy dostawiono zakrystię. Nawę i prezbiterium nakryto ceramicznymi dachami dwuspadowymi, zakrystię przykrywa północna połać dachu prezbiterium. Ściana szczytowa zdobiona ceglanym gzymsem z fryzem arkadkowym i zwieńczona współczesną, murowaną sygnaturką trójarkadową. Wnętrze oświetlają półkoliście zamknięte okna w ceglanych opaskach. Wewnątrz wyposażenie z XVIII-XX w.",
         "save": "Zapisz",
         "cancel": "Anuluj",
         "terrainGame": "Gra terenowa",
@@ -79,10 +88,25 @@
             "loadingScenario": "Ładowanie scenariusza...",
             "loadingError": "Błąd ładowania:",
             "scenarioNotFound": "Nie znaleziono scenariusza.",
-            "scenario": "Scenariusz"
+            "scenario": "Scenariusz",
+            "previousStep": "Poprzedni krok",
+            "nextStep": "Następny krok",
+            "stepCounter": "Krok {current} z {total}"
+        },
+        "stepView": {
+            "noStepAvailable": "Brak dostępnego kroku"
         }
     },
     "en": {
+        "scenario": "Scenario",
+        "testScenario": "Test scenario",
+        "storyScenarioDescription": "Test scenario description",
+        "stepOne": "Church of St. John of Nepomuk",
+        "stepOneSubheader": "Historic Church of St. John of Nepomuk",
+        "interiorSubheader": "Interior of the church",
+        "historySubheader": "History",
+        "stepOneParagraphOne": "In Piskorzów there is a historic church of St. John of Nepomuk, belonging to the Piskorzów parish, built in the 16th century, rebuilt in 1730 and 1921. The parish size is 1,360 people. In the 16th century, Protestants erected the Piskorzów church. Although Lutherans in Piskorzów constituted the majority, and the so-called \"reduction\" was supposed to include only temples erected by Catholics, in 1654 the church was \"reduced\". After 75 years it was rebuilt by Catholics, and in 1921 it was expanded. Until 1967 it was a filial church of the parish of St. James in Pieszyce.",
+        "stepOneParagraphTwo": "Currently, the church is a styleless building based on a rectangle with a slightly narrower and lower presbytery, to which a sacristy was added from the north. The nave and presbytery are covered with ceramic gable roofs, the sacristy is covered by the northern slope of the presbytery roof. The gable wall is decorated with a brick cornice with an arcade frieze and crowned with a contemporary, brick three-arcade signature. The interior is illuminated by semicircularly closed windows in brick frames. Inside, furnishings from the 18th-20th centuries.",
         "save": "Save",
         "cancel": "Cancel",
         "terrainGame": "Village Quest",
@@ -162,7 +186,13 @@
             "loadingScenario": "Loading scenario...",
             "loadingError": "Loading error:",
             "scenarioNotFound": "Scenario not found.",
-            "scenario": "Scenario"
+            "scenario": "Scenario",
+            "previousStep": "Previous step",
+            "nextStep": "Next step",
+            "stepCounter": "Step {current} of {total}"
+        },
+        "stepView": {
+            "noStepAvailable": "No step available"
         }
     },
     "es": {
@@ -245,7 +275,13 @@
             "loadingScenario": "Cargando escenario...",
             "loadingError": "Error de carga:",
             "scenarioNotFound": "Escenario no encontrado.",
-            "scenario": "Escenario"
+            "scenario": "Escenario",
+            "previousStep": "Paso anterior",
+            "nextStep": "Siguiente paso",
+            "stepCounter": "Paso {current} de {total}"
+        },
+        "stepView": {
+            "noStepAvailable": "No hay paso disponible"
         }
     }
 }

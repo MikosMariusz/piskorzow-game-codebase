@@ -43,8 +43,8 @@
             </v-card-title>
 
             <v-card-text
-                v-if="!isMinimized"
-                class="pa-4"
+                :class="{ 'd-none': isMinimized }"
+                class="pa-0"
                 style="overflow-y: auto; height: calc(100% - 64px)"
             >
                 <div style="height: 100%">
