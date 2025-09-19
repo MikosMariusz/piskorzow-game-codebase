@@ -85,6 +85,8 @@ import { useI18n } from 'vue-i18n'
 import CardWrapper from '@/components/CardWrapper.vue'
 import GameStep from '@/components/GameStep.vue'
 
+import { setStoryView } from '@/services/olMap'
+
 const route = useRoute()
 const storyId = ref(route.path.split('/').pop())
 const loading = ref(true)
@@ -92,7 +94,7 @@ const error = ref(null)
 const config = ref(null)
 const cardTitle = ref('scenario')
 const activeIndex = ref(0)
-const { t, messages } = useI18n()
+const { t } = useI18n()
 
 // Computed
 const hasNext = computed(() => {
@@ -107,12 +109,28 @@ const hasPrev = computed(() => {
 const nextStep = () => {
     if (hasNext.value) {
         activeIndex.value++
+        // Ustaw widok mapy dla nowego kroku
+        const step = config.value?.steps?.[activeIndex.value]
+        if (step) {
+            setStoryView({
+                feature: step.feature,
+                view: step.view,
+            })
+        }
     }
 }
 
 const prevStep = () => {
     if (hasPrev.value) {
         activeIndex.value--
+        // Ustaw widok mapy dla nowego kroku
+        const step = config.value?.steps?.[activeIndex.value]
+        if (step) {
+            setStoryView({
+                feature: step.feature,
+                view: step.view,
+            })
+        }
     }
 }
 
@@ -120,7 +138,6 @@ const updateCardTitle = (titleKey) => {
     if (titleKey) {
         cardTitle.value = titleKey
     } else {
-        // Jeśli krok nie ma tytułu, użyj tytułu scenariusza
         cardTitle.value = config.value
             ? t(config.value.title || 'storyView.scenario')
             : 'storyView.scenario'
@@ -142,6 +159,11 @@ async function loadConfig() {
         // Ustaw tytuł dla pierwszego kroku
         if (conf.steps && conf.steps.length > 0 && conf.steps[0].title) {
             cardTitle.value = conf.steps[0].title
+            // Ustaw widok mapy dla pierwszego kroku
+            setStoryView({
+                feature: conf.steps[0].feature,
+                view: conf.steps[0].view,
+            })
         } else {
             cardTitle.value = t(conf.title || 'storyView.scenario')
         }

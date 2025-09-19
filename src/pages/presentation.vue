@@ -2,7 +2,7 @@
     <CardWrapper
         :visible="true"
         :title="t('selectTerrainGame')"
-        :desktopWidth="500"
+        :desktopWidth="400"
         :closable="false"
     >
         <GameStoriesCard />
@@ -13,7 +13,7 @@
 import { onMounted, onUnmounted } from 'vue'
 import { useAppStore } from '@/stores/app'
 import { useI18n } from 'vue-i18n'
-import { setInitialViewForPage, animateToMode } from '@/services/olMap'
+import { setStoryView, animateToMode, getDefaultGeometry } from '@/services/olMap'
 import CardWrapper from '@/components/CardWrapper.vue'
 import GameStoriesCard from '@/components/GameStoriesCard.vue'
 
@@ -21,16 +21,13 @@ const appStore = useAppStore()
 const { t } = useI18n()
 
 onMounted(() => {
-    // Ustaw kartę jako widoczną przy wejściu na stronę prezentacji
-    appStore.gameCardVisible = true
-
-    setInitialViewForPage()
+    const featrure = getDefaultGeometry()
     animateToMode()
-    appStore.openWindow('game')
+    setStoryView({ feature: featrure })
+    appStore.gameCardVisible = true
 })
 
 onUnmounted(() => {
-    // Ukryj kartę przy opuszczeniu strony prezentacji
     appStore.gameCardVisible = false
 })
 </script>

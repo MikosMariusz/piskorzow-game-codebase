@@ -21,6 +21,9 @@ import { useAppStore } from '@/stores/app'
 import { useI18n } from 'vue-i18n'
 import RouterTile from '@/components/RouterTile.vue'
 
+import { loadDefaultGeometry } from '@/services/olMap'
+import { onMounted } from 'vue'
+
 const router = useRouter()
 const appStore = useAppStore()
 const { t } = useI18n()
@@ -43,6 +46,10 @@ const tiles = [
         fallbackText: 'villagePresentation',
     },
 ]
+
+onMounted(() => {
+    loadDefaultGeometry()
+})
 
 function handleTileClick(tileConfig) {
     if (tileConfig.id === 'game' && !appStore.hasGpsAccess) {

@@ -17,108 +17,83 @@ let _isAnimating = false
 let _zoomCallback = null
 let _clickCallback = null
 let _moveEndCallback = null
-
-// Zmienne dla animacji lotu na stronie głównej
 let _flightAnimation = null
 let _isFlying = false
 let _flightPoints = []
 let _currentFlightIndex = 0
 
-const DEFAULT_CENTER = fromLonLat([16.561, 50.733])
+const DEFAULT_CENTER = fromLonLat([16.5658065, 50.736368])
 const DEFAULT_ZOOM = 12
 const OSM_COLOR_ANIMATION_DURATION = 700
 const startView = {
-    mobileCenter: [16.560542, 50.668472],
-    desktopCenter: [16.617904, 50.736058],
+    center: [16.5658065, 50.736368],
     zoom: 12,
+    duration: 1000,
 }
 
-/**
- * Ustawia widok mapy na początkowy dla podstron (game, presentation) z uwzględnieniem rozmiaru ekranu
- * Przerywa animację lotu jeśli aktywna
- */
 export const setInitialViewForPage = () => {
-    if (!_map) return
-    // Przerwij animację lotu jeśli aktywna
-    stopFlightAnimation()
-
-    // Sprawdź rozmiar ekranu (mobile: szerokość < 960px - zgodnie z Vuetify breakpoint)
-    const isMobile = window.innerWidth < 960
-    const center = isMobile ? startView.mobileCenter : startView.desktopCenter
-    const zoom = startView.zoom
-    const view = _map.getView()
-    view.animate({
-        center: fromLonLat(center),
-        zoom,
-        duration: 600,
-    })
+    // if (!_map) return
+    // // Przerwij animację lotu jeśli aktywna
+    // stopFlightAnimation()
+    // // Sprawdź rozmiar ekranu (mobile: szerokość < 960px - zgodnie z Vuetify breakpoint)
+    // const isMobile = window.innerWidth < 960
+    // const center = isMobile ? startView.mobileCenter : startView.desktopCenter
+    // const zoom = startView.zoom
+    // const view = _map.getView()
+    // view.animate({
+    //     center: fromLonLat(center),
+    //     zoom,
+    //     duration: 600,
+    // })
 }
 
 export const getOSMDuration = () => OSM_COLOR_ANIMATION_DURATION
 
-/**
- * Generuje losowe punkty wokół centrum mapy dla animacji lotu
- * @param {Array} center - Współrzędne centrum [lon, lat]
- * @param {number} count - Liczba punktów do wygenerowania
- * @returns {Array} Tablica punktów z współrzędnymi i poziomami zoom
- */
 const generateFlightPoints = (center, count = 10) => {
     const points = []
     const [centerLon, centerLat] = center
 
     for (let i = 0; i < count; i++) {
-        // Losowy kąt w radianach - większe rozłożenie
         const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.8
 
-        // Większy promień dla lotu po regionie (0.03 - 0.12 stopni, około 3-12km)
         const radius = 0.03 + Math.random() * 0.09
 
-        // Oblicz współrzędne punktu
         const lon = centerLon + Math.cos(angle) * radius
         const lat = centerLat + Math.sin(angle) * radius
 
-        // Bardzo minimalny zakres zoom (DEFAULT_ZOOM +-1)
-        const zoomVariation = (Math.random() - 0.5) * 2 // -1 do +1
+        const zoomVariation = (Math.random() - 0.5) * 2
         const zoom = DEFAULT_ZOOM + zoomVariation
 
         points.push({
             coordinates: fromLonLat([lon, lat]),
-            zoom: Math.max(8, Math.min(16, zoom)), // Ograniczenie do sensownego zakresu
-            duration: 4000 + Math.random() * 3000, // 4-7 sekund na punkt dla spokojniejszego lotu
+            zoom: Math.max(8, Math.min(16, zoom)),
+            duration: 4000 + Math.random() * 3000,
         })
     }
 
     return points
 }
 
-/**
- * Uruchamia animację lotu po losowych punktach
- */
 export const startFlightAnimation = () => {
     if (_isFlying || !_map) return
 
     const center = toLonLat(DEFAULT_CENTER)
-    _flightPoints = generateFlightPoints(center, 10) // Więcej punktów dla płynniejszego lotu
+    _flightPoints = generateFlightPoints(center, 10)
     _currentFlightIndex = 0
     _isFlying = true
 
     animateToNextFlightPoint()
 }
 
-/**
- * Zatrzymuje animację lotu
- */
 export const stopFlightAnimation = () => {
     _isFlying = false
+    _map.getView().cancelAnimations()
     if (_flightAnimation) {
         clearTimeout(_flightAnimation)
         _flightAnimation = null
     }
 }
 
-/**
- * Animuje do następnego punktu w sekwencji lotu
- */
 const animateToNextFlightPoint = () => {
     if (!_isFlying || !_map || _flightPoints.length === 0) return
 
@@ -132,11 +107,8 @@ const animateToNextFlightPoint = () => {
             duration: point.duration,
         },
         () => {
-            // Po zakończeniu animacji do tego punktu, przejdź do następnego
             if (_isFlying) {
                 _currentFlightIndex = (_currentFlightIndex + 1) % _flightPoints.length
-
-                // Dłuższa pauza między punktami dla spokojniejszego lotu (2-3 sekundy)
                 _flightAnimation = setTimeout(
                     () => {
                         animateToNextFlightPoint()
@@ -148,44 +120,22 @@ const animateToNextFlightPoint = () => {
     )
 }
 
-/**
- * Rejestruje callback do aktualizacji poziomu zoom
- * @param {Function} callback - Funkcja wywoływana przy zmianie poziomu zoom
- */
 export const setZoomCallback = (callback) => {
     _zoomCallback = callback
 }
 
-/**
- * Usuwa callback zoom
- */
 export const clearZoomCallback = () => {
     _zoomCallback = null
 }
 
-/**
- * Rejestruje callback do obsługi zakończenia ruchu mapy
- * @param {Function} callback - Funkcja wywoływana po zakończeniu ruchu mapy (center, zoom)
- */
 export const setMoveEndCallback = (callback) => {
     _moveEndCallback = callback
 }
 
-/**
- * Usuwa callback ruchu mapy
- */
 export const clearMoveEndCallback = () => {
     _moveEndCallback = null
 }
 
-/**
- * Oblicza dystans między dwoma punktami geograficznymi w metrach (wzór Haversine)
- * @param {number} lat1 - Szerokość geograficzna pierwszego punktu
- * @param {number} lon1 - Długość geograficzna pierwszego punktu
- * @param {number} lat2 - Szerokość geograficzna drugiego punktu
- * @param {number} lon2 - Długość geograficzna drugiego punktu
- * @returns {number} Dystans w metrach
- */
 export const calculateDistance = (lat1, lon1, lat2, lon2) => {
     const R = 6371000 // Promień Ziemi w metrach
     const dLat = ((lat2 - lat1) * Math.PI) / 180
@@ -200,10 +150,6 @@ export const calculateDistance = (lat1, lon1, lat2, lon2) => {
     return R * c
 }
 
-/**
- * Pobiera aktualne centrum mapy w współrzędnych geograficznych
- * @returns {Array|null} [lon, lat] lub null jeśli mapa nie istnieje
- */
 export const getMapCenter = () => {
     if (_map) {
         const center = _map.getView().getCenter()
@@ -212,24 +158,14 @@ export const getMapCenter = () => {
     return null
 }
 
-/**
- * Rejestruje callback do obsługi kliknięć na mapie
- * @param {Function} callback - Funkcja wywoływana przy kliknięciu na mapę
- */
 export const setClickCallback = (callback) => {
     _clickCallback = callback
 }
 
-/**
- * Usuwa callback kliknięć
- */
 export const clearClickCallback = () => {
     _clickCallback = null
 }
 
-/**
- * Przybliża mapę o jeden poziom
- */
 export const zoomIn = () => {
     if (_map) {
         const view = _map.getView()
@@ -238,9 +174,6 @@ export const zoomIn = () => {
     }
 }
 
-/**
- * Oddala mapę o jeden poziom
- */
 export const zoomOut = () => {
     if (_map) {
         const view = _map.getView()
@@ -249,12 +182,6 @@ export const zoomOut = () => {
     }
 }
 
-/**
- * Centruje mapę na podanych współrzędnych z animacją
- * @param {number} lat - Szerokość geograficzna
- * @param {number} lon - Długość geograficzna
- * @param {number} zoom - Poziom przybliżenia (opcjonalny)
- */
 export const centerMapOn = (lat, lon, zoom = null) => {
     if (_map) {
         const view = _map.getView()
@@ -273,10 +200,40 @@ export const centerMapOn = (lat, lon, zoom = null) => {
     }
 }
 
-/**
- * Pobiera aktualny poziom zoom
- * @returns {number|null} Aktualny poziom zoom lub null jeśli mapa nie istnieje
- */
+export const centerMapWithSidebar = ({
+    lat = startView.desktopCenter[1],
+    lon = startView.desktopCenter[0],
+    zoom = null,
+    duration = 1000,
+    sidebarWidthPx = 0,
+}) => {
+    if (!_map) return
+    const view = _map.getView()
+    const isMobile = window.innerWidth < 960
+    const mapSize = _map.getSize()
+    let center = fromLonLat([lon, lat])
+
+    if (!isMobile && mapSize && sidebarWidthPx > 0) {
+        const viewZoom = zoom !== null ? zoom : view.getZoom()
+        const resolution = view.getResolutionForZoom
+            ? view.getResolutionForZoom(viewZoom)
+            : view.getResolution()
+        const shiftMeters = (sidebarWidthPx / 2) * resolution
+        let center3857 = fromLonLat([lon, lat])
+        center3857[0] += shiftMeters
+        center = center3857
+    }
+
+    const animationOptions = {
+        center,
+        duration,
+    }
+    if (zoom !== null) {
+        animationOptions.zoom = zoom
+    }
+    view.animate(animationOptions)
+}
+
 export const getCurrentZoom = () => {
     if (_map) {
         return _map.getView().getZoom()
@@ -284,12 +241,7 @@ export const getCurrentZoom = () => {
     return null
 }
 
-/**
- * Ładuje geometrię z lokalnego pliku GeoJSON
- * @param {string} geojsonPath - Ścieżka do pliku GeoJSON (względem public/)
- * @returns {Promise<Object|null>} GeoJSON feature lub null w przypadku błędu
- */
-export const loadGeometryFromFile = async (geojsonPath) => {
+export const getDefaultGeometry = async (geojsonPath = '/geometries/piskorzow.geojson') => {
     try {
         const response = await fetch(geojsonPath)
         if (!response.ok) {
@@ -320,13 +272,6 @@ export const loadGeometryFromFile = async (geojsonPath) => {
     } catch (error) {
         console.error(`❌ Błąd podczas ładowania geometrii z pliku ${geojsonPath}:`, error)
         return null
-    }
-}
-
-export const clearGeometry = () => {
-    if (_map && _vectorLayer) {
-        _map.removeLayer(_vectorLayer)
-        _vectorLayer = null
     }
 }
 
@@ -394,9 +339,28 @@ export const searchLocationGeometry = async (locationName) => {
 
 const addGeometryToMap = (geometry, locationName, properties = {}) => {
     if (!_map) return
-    if (_vectorLayer) {
-        _map.removeLayer(_vectorLayer)
+
+    if (!_vectorLayer) {
+        const vectorStyle = new Style({
+            stroke: new Stroke({
+                color: '#c48600ff',
+                width: 2,
+            }),
+            fill: new Fill({
+                color: 'rgba(118, 79, 0, 0.36)',
+            }),
+        })
+
+        _vectorLayer = new VectorLayer({
+            source: new VectorSource(),
+            style: vectorStyle,
+        })
+
+        _map.addLayer(_vectorLayer)
     }
+
+    _vectorLayer.getSource().clear()
+
     const feature = {
         type: 'Feature',
         geometry: geometry,
@@ -411,28 +375,11 @@ const addGeometryToMap = (geometry, locationName, properties = {}) => {
         features: [feature],
     }
 
-    const vectorSource = new VectorSource({
-        features: new GeoJSON().readFeatures(geojsonObject, {
-            featureProjection: 'EPSG:3857',
-        }),
+    const newFeatures = new GeoJSON().readFeatures(geojsonObject, {
+        featureProjection: 'EPSG:3857',
     })
 
-    const vectorStyle = new Style({
-        stroke: new Stroke({
-            color: '#c48600ff',
-            width: 2,
-        }),
-        fill: new Fill({
-            color: 'rgba(118, 79, 0, 0.36)',
-        }),
-    })
-
-    _vectorLayer = new VectorLayer({
-        source: vectorSource,
-        style: vectorStyle,
-    })
-
-    _map.addLayer(_vectorLayer)
+    _vectorLayer.getSource().addFeatures(newFeatures)
 }
 
 export const createMap = (targetEl, options = {}) => {
@@ -536,18 +483,15 @@ export const createMap = (targetEl, options = {}) => {
         }
     })
 
-    const geometryFile =
-        options.geometryFile !== undefined ? options.geometryFile : '/geometries/piskorzow.geojson'
-    if (geometryFile) {
-        setTimeout(() => {
-            loadGeometryFromFile(geometryFile)
-        }, 200)
-    }
-
-    // Test method for development - uncomment to test Nominatim search
-    // searchLocationGeometry('Nazwa lokalizacji')
-
     return _map
+}
+
+export const loadDefaultGeometry = async () => {
+    const feature = await getDefaultGeometry()
+    if (feature && feature.geometry && _map) {
+        const displayName = feature.properties?.display_name || feature.properties?.name || 'Obszar'
+        addGeometryToMap(feature.geometry, displayName, feature.properties)
+    }
 }
 
 export const detach = () => {
@@ -571,13 +515,6 @@ export const updateSize = () => {
     }
 }
 
-/**
- * Ustawia filtr mapy (ciemny/normalny), animację lotu i pozycję startową w zależności od parametrów i rozmiaru ekranu.
- * @param {Object} opts
- *   - forceDark: wymuś ciemny filtr (np. /game bez GPS)
- *   - forceFlight: wymuś animację lotu (np. /game bez GPS)
- *   - setStartView: ustaw pozycję startową (domyślnie true)
- */
 export const animateToMode = (opts = {}) => {
     const appStore = useAppStore()
     const duration = OSM_COLOR_ANIMATION_DURATION
@@ -592,19 +529,6 @@ export const animateToMode = (opts = {}) => {
 
     let shouldFlight = isDark
     if (forceFlight !== null) shouldFlight = forceFlight
-    if (setStartView) {
-        const isMobile = typeof window !== 'undefined' && window.innerWidth < 960
-        const center = isMobile ? startView.mobileCenter : startView.desktopCenter
-        const zoom = startView.zoom
-        const view = _map?.getView()
-        if (view) {
-            view.animate({
-                center: fromLonLat(center),
-                zoom,
-                duration: 600,
-            })
-        }
-    }
 
     const currentNormalOpacity = _normalTileLayer.getOpacity()
     const currentDarkOpacity = _darkTileLayer.getOpacity()
@@ -660,4 +584,32 @@ export const animateToMode = (opts = {}) => {
         }
     }
     requestAnimationFrame(animateOpacity)
+}
+
+export const setStoryView = ({ feature, view = startView, sidebarWidthPx = 500 }) => {
+    if (_isFlying) {
+        stopFlightAnimation()
+    }
+    if (!_map) return
+    if (_vectorLayer) {
+        _vectorLayer.getSource().clear()
+    }
+    setTimeout(() => {
+        if (view && view.center) {
+            centerMapWithSidebar({
+                lat: view.center[1],
+                lon: view.center[0],
+                zoom: view.zoom || null,
+                duration: view.duration || null,
+                sidebarWidthPx,
+            })
+        }
+        if (feature && feature.geometry) {
+            addGeometryToMap(
+                feature.geometry,
+                feature.properties?.name || 'Obszar',
+                feature.properties,
+            )
+        }
+    }, 200)
 }

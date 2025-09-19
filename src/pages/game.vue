@@ -3,7 +3,7 @@
         v-if="!hasGpsAccess"
         :visible="true"
         :title="cardTitle"
-        :desktopWidth="600"
+        :desktopWidth="500"
         :centered="true"
         :closable="false"
         :minimize="false"
@@ -14,7 +14,7 @@
         v-else
         :visible="true"
         :title="cardTitle"
-        :desktopWidth="500"
+        :desktopWidth="400"
         :closable="false"
     >
         <GameStoriesCard />
@@ -27,7 +27,7 @@ import { useAppStore } from '@/stores/app'
 import { useI18n } from 'vue-i18n'
 import CardWrapper from '@/components/CardWrapper.vue'
 import GameGpsUnavailableCard from '@/components/GameGpsUnavailableCard.vue'
-import { animateToMode } from '@/services/olMap'
+import { animateToMode, loadDefaultGeometry } from '@/services/olMap'
 
 const appStore = useAppStore()
 const { t } = useI18n()
@@ -35,6 +35,7 @@ const hasGpsAccess = ref(false)
 const cardTitle = ref(t('terrainGameModuleUnavailable'))
 
 onMounted(async () => {
+    loadDefaultGeometry()
     // Ustaw kartę jako widoczną przy wejściu na stronę gry
     appStore.gameCardVisible = true
 

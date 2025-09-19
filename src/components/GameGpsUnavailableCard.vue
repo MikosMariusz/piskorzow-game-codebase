@@ -1,10 +1,10 @@
 <template>
-    <div class="gps-unavailable-center pa-2">
+    <div class="gps-unavailable-center pa-4">
         <v-icon
-            color="error"
+            color="primary"
             size="64"
             class="mb-4"
-            >mdi-map-off</v-icon
+            >mdi-crosshairs-question</v-icon
         >
         <h2 class="mb-2 text-h6">{{ $t('terrainGameModuleUnavailable') }}</h2>
         <div class="mb-4 text-body-1">
