@@ -40,7 +40,13 @@ router.beforeEach((to, from, next) => {
         (to.path === '/game' && !appStore.hasGpsAccess)
     ) {
         appStore.closeWindow()
+    } else if (
+        (to.path.startsWith('/game/') && appStore.hasGpsAccess) ||
+        to.path.startsWith('/presentation/')
+    ) {
+        appStore.setGameCardVisible(true)
     }
+
     next()
 })
 

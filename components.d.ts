@@ -16,9 +16,11 @@ declare module 'vue' {
     CardWrapper: typeof import('./src/components/CardWrapper.vue')['default']
     GameCard: typeof import('./src/components/GameCard.vue')['default']
     GameGpsUnavailableCard: typeof import('./src/components/GameGpsUnavailableCard.vue')['default']
+    GameStaticContent: typeof import('./src/components/GameStaticContent.vue')['default']
     GameStep: typeof import('./src/components/GameStep.vue')['default']
     GameStoriesCard: typeof import('./src/components/GameStoriesCard.vue')['default']
     GameStoryView: typeof import('./src/components/GameStoryView.vue')['default']
+    GameTask: typeof import('./src/components/GameTask.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     HomeTile: typeof import('./src/components/HomeTile.vue')['default']
     LangSwitcher: typeof import('./src/components/LangSwitcher.vue')['default']
@@ -34,5 +36,6 @@ declare module 'vue' {
     RouterTile: typeof import('./src/components/RouterTile.vue')['default']
     RouterTileList: typeof import('./src/components/RouterTileList.vue')['default']
     RouterView: typeof import('vue-router')['RouterView']
+    TaskSection: typeof import('./src/components/TaskSection.vue')['default']
   }
 }

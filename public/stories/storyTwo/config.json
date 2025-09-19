@@ -8,19 +8,16 @@
                 "src": "imageOne.png",
                 "blur": true
             },
+            "header": "stepOneSubheader",
             "spacer": {},
             "content": [
-                {
-                    "type": "h4",
-                    "text": "stepOneSubheader"
-                },
                 {
                     "type": "image",
                     "src": "photoFour.png",
                     "alt": "stepOneImageAlt"
                 },
                 {
-                    "type": "h4",
+                    "type": "subheader",
                     "text": "historySubheader"
                 },
                 {
@@ -49,8 +46,12 @@
                     ]
                 }
             ],
-            "taks": {
+            "task": {
                 "question": "questionOne",
+                "image": {
+                    "src": "taskImageOne.png",
+                    "alt": "taskImageOneAlt"
+                },
                 "answers": [
                     "Jan Nepomucen",
                     "św Jan Nepomucen",

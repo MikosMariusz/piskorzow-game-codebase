@@ -10,7 +10,7 @@
                 color="primary"
                 size="48"
             />
-            <span class="mt-4 text-subtitle-1">Ładowanie gier terenowych...</span>
+            <span class="mt-4 text-subtitle-1">{{ $t('loadingScenarios') }}</span>
         </div>
         <div v-else>
             <div class="pa-2 game-stories-list">
@@ -18,7 +18,7 @@
                     v-if="stories.length === 0"
                     class="text-body-1"
                 >
-                    Brak dostępnych scenariuszy.
+                    {{ $t('noScenariosAvailable') }}
                 </div>
                 <template v-else>
                     <RouterTile
@@ -30,7 +30,7 @@
                             alt: story.title,
                             fallbackText: story.title,
                         }"
-                        :title="story.title"
+                        :title="$t(story.title)"
                         :disabled="story.disabled"
                         @click="handleStoryClick"
                         class="game-story-router-tile"
@@ -96,14 +96,12 @@ onMounted(async () => {
     min-width: 280px;
 }
 
-/* Force RouterTile to respect our sizing */
 .game-story-router-tile :deep(.tile-wrapper) {
     width: 100% !important;
     max-width: 100% !important;
     min-width: 0 !important;
 }
 
-/* Responsywność dla różnych rozmiarów ekranów */
 @media (max-width: 599px) {
     .game-stories-card-wrapper {
         padding: 0 8px;

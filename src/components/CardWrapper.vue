@@ -24,6 +24,7 @@
                     v-if="buttonConfigs.length"
                     @click.stop
                 >
+                    <slot name="header-buttons-left" />
                     <template
                         v-for="btn in buttonConfigs"
                         :key="btn.key"
@@ -33,10 +34,12 @@
                             :icon="btn.icon"
                             variant="elevated"
                             size="small"
+                            rounded="sm"
                             @click="btn.action"
                             :title="t(btn.title)"
-                            class="mr-2 square-btn"
+                            class="mr-2"
                             elevation="2"
+                            color="primary"
                         />
                     </template>
                 </div>
@@ -237,7 +240,6 @@ const closeCard = () => {
     if (!props.closable) return
     isMobileMaximized.value = false
     isMinimized.value = false
-    appStore.gameCardVisible = false
     emit('update:visible', false)
 }
 
@@ -347,19 +349,6 @@ const buttonConfigs = computed(() => [
 .header-controls {
     position: relative;
     z-index: 2;
-}
-
-.header-controls .v-btn {
-    background-color: rgb(var(--v-theme-primary)) !important;
-    color: white !important;
-    border-radius: 0 !important;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
-    min-width: 32px !important;
-    min-height: 32px !important;
-}
-
-.square-btn {
-    border-radius: 0 !important;
 }
 
 @media (max-width: 959px) {

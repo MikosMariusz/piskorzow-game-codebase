@@ -8,16 +8,11 @@
             height: mapHeight,
         }"
     >
-        <!-- Komponent z licencjami i współrzędnymi - ukryj na stronie głównej -->
         <MapAttributions
             v-if="isInteractive && !appStore.isHomePage"
             ref="attributionsRef"
         />
-
-        <!-- Przyciski zoom - ukryj na stronie głównej -->
         <MapZoomControls v-if="isInteractive && !appStore.isHomePage" />
-
-        <!-- Przycisk GPS - ukryj na stronie głównej -->
         <MapGpsControls v-if="isInteractive && !appStore.isHomePage" />
     </div>
 </template>
@@ -25,7 +20,6 @@
 <script setup>
 import { nextTick, onBeforeUnmount, onMounted, ref, watch, computed } from 'vue'
 import { useDisplay } from 'vuetify'
-import { useRoute } from 'vue-router'
 import {
     createMap,
     detach,
@@ -52,62 +46,40 @@ const props = defineProps({
 const appStore = useAppStore()
 const mapEl = ref(null)
 const attributionsRef = ref(null)
-const route = useRoute()
 let ro = null
 
 const { smAndDown } = useDisplay()
 
-// Wysokość karty na mobile (zgodnie z CardWrapper: 50vh)
 const CARD_HEIGHT_VH = 50
 
-// Interaktywność mapy zależna od strony i dostępu do GPS
 const isInteractive = computed(() => {
     if (appStore.isHomePage) return false
-    // Tylko strona /game wymaga GPS - /presentation może działać bez GPS
     if (window.location.pathname.startsWith('/game') && !appStore.hasGpsAccess) return false
     return props.interactive
 })
 
-// Dynamiczna wysokość mapy na mobile, gdy karta jest widoczna
 const mapHeight = computed(() => {
     return smAndDown.value && appStore.gameCardVisible
         ? `calc(100vh - ${CARD_HEIGHT_VH}vh)`
         : '100vh'
 })
 
-// Watch zmiany wysokości mapy i aktualizuj rozmiar OpenLayers
 watch(mapHeight, () => {
     if (mapEl.value) {
         updateSize()
     }
 })
 
-// Watch zmiany breakpoint dla aktualizacji mapy i pozycji
 watch(smAndDown, () => {
     if (mapEl.value) {
         updateSize()
-
-        // Przy zmianie z mobile na desktop lub odwrotnie, dostosuj pozycję
         const path = window.location.pathname
         const isGameOrPresentation = path.startsWith('/game') || path.startsWith('/presentation')
-
         if (isGameOrPresentation && appStore.gameCardVisible) {
             setTimeout(() => setInitialViewForPage(), 100)
         }
     }
 })
-
-// Watch widoczności karty - ustaw flagę aktywności komponentów gry
-watch(
-    () => appStore.gameCardVisible,
-    () => {
-        // Przy zmianie widoczności karty aktualizujemy rozmiar mapy
-        if (mapEl.value) {
-            updateSize()
-        }
-    },
-    { immediate: true },
-)
 
 onMounted(async () => {
     createMap(mapEl.value, {
@@ -116,13 +88,9 @@ onMounted(async () => {
     })
     await nextTick()
     updateSize()
-
-    // Konfiguracja callbacku dla współrzędnych
     ro = new ResizeObserver(() => updateSize())
     ro.observe(mapEl.value)
-
     window.addEventListener('resize', updateSize, { passive: true })
-
     setClickCallback((lat, lon) => {
         if (isInteractive.value && attributionsRef.value) {
             attributionsRef.value.updateCoordinates(lat, lon)
@@ -144,7 +112,6 @@ watch(
         if (el) setTarget(el)
     },
 )
-
 watch(
     () => appStore.isHomePage,
     () => animateToMode(),
@@ -160,6 +127,5 @@ watch(
     bottom: 0;
     width: 100dvw;
     background: transparent;
-    /* height ustawiana inline przez :style - zastępuje bottom gdy karta jest widoczna */
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
     <CardWrapper
         :visible="true"
-        :title="t('selectTerrainGame')"
+        :title="$t('selectTerrainGame')"
         :desktopWidth="400"
         :closable="false"
     >
@@ -10,24 +10,14 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted } from 'vue'
-import { useAppStore } from '@/stores/app'
-import { useI18n } from 'vue-i18n'
+import { onMounted } from 'vue'
 import { setStoryView, animateToMode, getDefaultGeometry } from '@/services/olMap'
 import CardWrapper from '@/components/CardWrapper.vue'
 import GameStoriesCard from '@/components/GameStoriesCard.vue'
 
-const appStore = useAppStore()
-const { t } = useI18n()
-
 onMounted(() => {
-    const featrure = getDefaultGeometry()
+    const feature = getDefaultGeometry()
     animateToMode()
-    setStoryView({ feature: featrure })
-    appStore.gameCardVisible = true
-})
-
-onUnmounted(() => {
-    appStore.gameCardVisible = false
+    setStoryView({ feature })
 })
 </script>

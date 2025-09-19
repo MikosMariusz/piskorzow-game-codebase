@@ -5,6 +5,19 @@
         :desktopWidth="600"
         :closable="false"
     >
+        <template #header-buttons-left>
+            <v-btn
+                icon="mdi-map-marker"
+                variant="elevated"
+                size="small"
+                class="mr-2"
+                elevation="2"
+                rounded="sm"
+                color="primary"
+                :title="$t('storyView.focusStepOnMap')"
+                @click="focusStepOnMap"
+            />
+        </template>
         <div
             v-if="loading"
             class="d-flex flex-column align-center justify-center"
@@ -24,12 +37,10 @@
                 >{{ $t('storyView.loadingError') }} {{ error }}</v-alert
             >
         </div>
-
         <div
             v-if="config"
             class="story-container"
         >
-            <!-- Przyciski nawigacji - zawieszone nad zawartością -->
             <div
                 class="navigation-buttons"
                 v-if="config.steps && config.steps.length > 1"
@@ -53,7 +64,6 @@
                         })
                     }}
                 </span>
-
                 <v-btn
                     :disabled="!hasNext"
                     @click="nextStep"
@@ -79,7 +89,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, computed } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import CardWrapper from '@/components/CardWrapper.vue'
@@ -96,20 +106,16 @@ const cardTitle = ref('scenario')
 const activeIndex = ref(0)
 const { t } = useI18n()
 
-// Computed
 const hasNext = computed(() => {
     return config.value && config.value.steps && activeIndex.value < config.value.steps.length - 1
 })
-
 const hasPrev = computed(() => {
     return activeIndex.value > 0
 })
 
-// Functions
 const nextStep = () => {
     if (hasNext.value) {
         activeIndex.value++
-        // Ustaw widok mapy dla nowego kroku
         const step = config.value?.steps?.[activeIndex.value]
         if (step) {
             setStoryView({
@@ -123,7 +129,6 @@ const nextStep = () => {
 const prevStep = () => {
     if (hasPrev.value) {
         activeIndex.value--
-        // Ustaw widok mapy dla nowego kroku
         const step = config.value?.steps?.[activeIndex.value]
         if (step) {
             setStoryView({
@@ -154,12 +159,10 @@ async function loadConfig() {
         if (!res.ok) throw new Error('Nie można pobrać configu scenariusza')
         const conf = await res.json()
         config.value = conf
-        activeIndex.value = 0 // Reset do pierwszego kroku
+        activeIndex.value = 0
 
-        // Ustaw tytuł dla pierwszego kroku
         if (conf.steps && conf.steps.length > 0 && conf.steps[0].title) {
             cardTitle.value = conf.steps[0].title
-            // Ustaw widok mapy dla pierwszego kroku
             setStoryView({
                 feature: conf.steps[0].feature,
                 view: conf.steps[0].view,
@@ -174,14 +177,19 @@ async function loadConfig() {
     }
 }
 
-onMounted(loadConfig)
-watch(
-    () => route.params.id,
-    (newId) => {
-        storyId.value = newId
-        loadConfig()
-    },
-)
+const focusStepOnMap = () => {
+    const step = config.value?.steps?.[activeIndex.value]
+    if (step) {
+        setStoryView({
+            feature: step.feature,
+            view: step.view,
+        })
+    }
+}
+
+onMounted(() => {
+    loadConfig()
+})
 </script>
 
 <style scoped>

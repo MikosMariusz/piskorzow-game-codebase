@@ -137,7 +137,7 @@ export const clearMoveEndCallback = () => {
 }
 
 export const calculateDistance = (lat1, lon1, lat2, lon2) => {
-    const R = 6371000 // Promień Ziemi w metrach
+    const R = 6371000
     const dLat = ((lat2 - lat1) * Math.PI) / 180
     const dLon = ((lon2 - lon1) * Math.PI) / 180
     const a =
@@ -290,7 +290,6 @@ export const searchLocationGeometry = async (locationName) => {
             return null
         }
 
-        // Filtruj tylko poligony
         const polygonFeatures = data.features.filter((feature) => {
             const geometry = feature.geometry
             return geometry.type === 'Polygon' || geometry.type === 'MultiPolygon'
@@ -301,7 +300,6 @@ export const searchLocationGeometry = async (locationName) => {
             return null
         }
 
-        // Preferuj poligony administracyjne
         const administrativePolygons = polygonFeatures.filter((feature) => {
             const props = feature.properties
             return (

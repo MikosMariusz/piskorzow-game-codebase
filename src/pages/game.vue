@@ -22,7 +22,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useAppStore } from '@/stores/app'
 import { useI18n } from 'vue-i18n'
 import CardWrapper from '@/components/CardWrapper.vue'
@@ -35,24 +35,18 @@ const hasGpsAccess = ref(false)
 const cardTitle = ref(t('terrainGameModuleUnavailable'))
 
 onMounted(async () => {
-    loadDefaultGeometry()
-    // Ustaw kartę jako widoczną przy wejściu na stronę gry
-    appStore.gameCardVisible = true
-
     const gpsResult = await appStore.checkGpsAccess()
     if (!gpsResult.access) {
         hasGpsAccess.value = false
         cardTitle.value = t('terrainGameModuleUnavailable')
         animateToMode({ forceDark: true, forceFlight: true, setStartView: true })
+        loadDefaultGeometry()
     } else {
         hasGpsAccess.value = true
         cardTitle.value = t('selectTerrainGame')
-        animateToMode({ forceDark: false, forceFlight: false, setStartView: true, zoom: 14 })
+        const feature = getDefaultGeometry()
+        animateToMode()
+        setStoryView({ feature })
     }
-})
-
-onUnmounted(() => {
-    // Ukryj kartę przy opuszczeniu strony gry
-    appStore.gameCardVisible = false
 })
 </script>

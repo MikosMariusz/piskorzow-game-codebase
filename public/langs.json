@@ -1,5 +1,9 @@
 {
     "pl": {
+        "noScenariosAvailable": "Brak dostępnych scenariuszy",
+        "loadingScenarios": "Ładowanie scenariuszy...",
+        "storyOneTitle": "Mieszkańcy kiedyś i dzisiaj",
+        "storyTwoTitle": "Scenariusz testowy",
         "scenario": "Scenariusz",
         "testScenario": "Scenariusz testowy",
         "storyScenarioDescription": "Opis scenariusza testowego",
@@ -94,10 +98,16 @@
             "stepCounter": "Krok {current} z {total}"
         },
         "stepView": {
-            "noStepAvailable": "Brak dostępnego kroku"
+            "noStepAvailable": "Brak dostępnego kroku",
+            "sectionContent": "Opis",
+            "sectionTask": "Wyzwanie"
         }
     },
     "en": {
+        "noScenariosAvailable": "No scenarios available",
+        "loadingScenarios": "Loading scenarios...",
+        "storyOneTitle": "Village then and now",
+        "storyTwoTitle": "Test scenario",
         "scenario": "Scenario",
         "testScenario": "Test scenario",
         "storyScenarioDescription": "Test scenario description",
@@ -192,7 +202,9 @@
             "stepCounter": "Step {current} of {total}"
         },
         "stepView": {
-            "noStepAvailable": "No step available"
+            "noStepAvailable": "No step available",
+            "sectionContent": "Description",
+            "sectionTask": "Challenge"
         }
     },
     "es": {
@@ -278,7 +290,9 @@
             "scenario": "Escenario",
             "previousStep": "Paso anterior",
             "nextStep": "Siguiente paso",
-            "stepCounter": "Paso {current} de {total}"
+            "stepCounter": "Paso {current} de {total}",
+            "sectionContent": "Descripción",
+            "sectionTask": "Desafío"
         },
         "stepView": {
             "noStepAvailable": "No hay paso disponible"

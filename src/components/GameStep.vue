@@ -30,52 +30,55 @@
             <!-- Zawartość owinięta w v-sheet -->
             <v-sheet
                 v-if="contentItems.length > 0"
-                class="content-sheet"
+                class="content-sheet pa-2"
                 elevation="4"
                 rounded="lg"
             >
-                <div
-                    v-for="(item, index) in contentItems"
-                    :key="index"
-                    class="mb-4"
+                <v-card-title
+                    v-if="header"
+                    class="text-h6 font-weight-medium pa-2 mb-4"
                 >
-                    <v-img
-                        v-if="item.type === 'image'"
-                        :src="`/stories/${storyId}/${item.src}`"
-                        :alt="item.alt || 'Obraz'"
-                        class="rounded-sm elevation-4"
-                        :style="item.blur ? 'filter: blur(3px);' : ''"
-                        contain
-                    />
-                    <v-card-text
-                        v-else-if="item.type === 'text' || item.type === 'p'"
-                        class="text-body-1 pa-0"
-                    >
-                        {{ $t(item.text) }}
-                    </v-card-text>
-                    <v-card-title
-                        v-else-if="item.type === 'header' || item.type === 'h4'"
-                        class="text-h6 pa-0"
-                    >
-                        {{ $t(item.text) }}
-                    </v-card-title>
-                    <v-carousel
-                        v-else-if="item.type === 'images' && item.list && item.list.length > 0"
-                        class="rounded-sm elevation-4"
-                        height="400"
-                        hide-delimiter-background
-                        crossfade
-                        show-arrows="hover"
-                    >
-                        <v-carousel-item
-                            v-for="(image, imageIndex) in item.list"
-                            :key="imageIndex"
-                            :src="`/stories/${storyId}/${image.src}`"
-                            :alt="image.alt || 'Obraz'"
-                            cover
-                        ></v-carousel-item>
-                    </v-carousel>
-                </div>
+                    {{ $t(header) }}
+                </v-card-title>
+                <v-expansion-panels
+                    v-if="isGame"
+                    v-model="expansionPanels"
+                >
+                    <v-expansion-panel>
+                        <v-expansion-panel-title>{{
+                            $t('stepView.sectionTask')
+                        }}</v-expansion-panel-title>
+                        <v-expansion-panel-text>
+                            <GameTask
+                                v-if="currentStep && currentStep.task"
+                                :task="currentStep.task"
+                                @next-step="goToNextStep"
+                            />
+                        </v-expansion-panel-text>
+                    </v-expansion-panel>
+                    <v-expansion-panel>
+                        <v-expansion-panel-title>{{
+                            $t('stepView.sectionContent')
+                        }}</v-expansion-panel-title>
+                        <v-expansion-panel-text>
+                            <GameStaticContent
+                                :content-items="contentItems"
+                                :header="header"
+                                :story-id="props.storyId"
+                                :scroll-offset="scrollOffset"
+                                :scroll-to-top="scrollToTop"
+                            />
+                        </v-expansion-panel-text>
+                    </v-expansion-panel>
+                </v-expansion-panels>
+                <GameStaticContent
+                    v-else
+                    :content-items="contentItems"
+                    :header="header"
+                    :story-id="props.storyId"
+                    :scroll-offset="scrollOffset"
+                    :scroll-to-top="scrollToTop"
+                />
 
                 <v-btn
                     :icon="
@@ -104,7 +107,15 @@
 
 <script setup>
 import { computed, watch, ref } from 'vue'
+import GameTask from './GameTask.vue'
+const expansionPanels = ref([0])
 import { useGoTo } from 'vuetify'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+const isGame = computed(() => {
+    return !route.path.startsWith('/game')
+})
 
 const props = defineProps({
     steps: {
@@ -121,7 +132,7 @@ const props = defineProps({
     },
 })
 
-const emit = defineEmits(['update-title'])
+const emit = defineEmits(['update-title', 'next-step'])
 const goTo = useGoTo()
 
 const scrollOffset = ref(0)
@@ -136,6 +147,9 @@ const bgImage = computed(() => {
 })
 const spacer = computed(() => {
     return currentStep.value?.spacer || null
+})
+const header = computed(() => {
+    return currentStep.value?.header || null
 })
 const contentItems = computed(() => {
     return currentStep.value?.content || []
@@ -153,7 +167,7 @@ watch(
 )
 
 const scrollToTop = () => {
-    let number = scrollOffset.value === 0 ? 100 : 0
+    let number = scrollOffset.value === 0 ? 150 : 0
     goTo(number, {
         duration: 300,
         easing: 'easeInOutCubic',
@@ -168,6 +182,10 @@ const resetScrollOffset = (event) => {
     } else {
         scrollOffset.value = 100
     }
+}
+
+function goToNextStep() {
+    emit('next-step')
 }
 </script>
 
@@ -213,7 +231,6 @@ const resetScrollOffset = (event) => {
 
 .content-sheet {
     position: relative;
-    padding: 20px;
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(2px);
 }
