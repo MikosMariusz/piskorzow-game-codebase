@@ -1,5 +1,14 @@
 {
     "pl": {
+        "storyTwo": {
+            "intro": "Scenariusz testowy - Wielka Próba",
+            "introHeader": "Skupcie się!",
+            "introParagraphOne": "Nie traktujcie tego scenariusza jak drobiazg. To nie rurki z kremem. Właśnie zostaliście poważnymi testerami i macie ważne zadanie!",
+            "introParagraphTwo": "Miejscie oczy szeroko otwarte i bądźcie czujni! Zwracajcie uwagę na każdy szczegół działania aplikacji, jeżeli jakiś błąd umknie waszej uwadze dzisiaj, w przyszłości może uniemożliwić zabawę prawdziwym turystom!",
+            "questionOne": "Jak nazywa się patron parafii w Piskorzowie?",
+            "incorrectMessageOne": "Niestety, to nie jest poprawna odpowiedź. Spróbuj ponownie.",
+            "tipOne": "Podpowiedź: Przeczytaj opis poniżej."
+        },
         "noScenariosAvailable": "Brak dostępnych scenariuszy",
         "loadingScenarios": "Ładowanie scenariuszy...",
         "storyOneTitle": "Mieszkańcy kiedyś i dzisiaj",
@@ -64,6 +73,7 @@
             "close": "Zamknij",
             "maximize": "Maksymalizuj",
             "minimize": "Minimalizuj",
+            "restore": "Przywróć",
             "welcome": "Witaj w grze terenowej!",
             "instructions": "Eksploruj wieś Piskorzów i odkrywaj jej tajemnice. Używaj mapy, aby znaleźć punkty zainteresowania i wykonuj zadania.",
             "locations": {
@@ -95,15 +105,35 @@
             "scenario": "Scenariusz",
             "previousStep": "Poprzedni krok",
             "nextStep": "Następny krok",
-            "stepCounter": "Krok {current} z {total}"
+            "stepCounter": "Krok {current} z {total}",
+            "focusStepOnMap": "Pokaż krok na mapie"
         },
         "stepView": {
             "noStepAvailable": "Brak dostępnego kroku",
             "sectionContent": "Opis",
-            "sectionTask": "Wyzwanie"
+            "sectionTask": "Wyzwanie",
+            "nextStep": "Następny krok"
+        },
+        "task": {
+            "yourAnswer": "Twoja odpowiedź",
+            "submit": "Zatwierdź",
+            "correct": "Poprawna odpowiedź!",
+            "incorrect": "Niepoprawna odpowiedź. Spróbuj ponownie.",
+            "showTip": "Pokaż wskazówkę",
+            "hideTip": "Ukryj wskazówkę",
+            "tip": "Wskazówka"
         }
     },
     "en": {
+        "storyTwo": {
+            "intro": "Test Scenario - The Great Trial",
+            "introHeader": "Focus!",
+            "introParagraphOne": "Don't treat this scenario as a trifle. This is not a piece of cake. I could just as well have written something in Latin and you would be testing it along with the translator!",
+            "introParagraphTwo": "Keep your eyes wide open and be vigilant! Pay attention to every detail, if some error escapes your attention today, in the future it may prevent real tourists from having fun!",
+            "questionOne": "What is the name of the patron of the parish in Piskorzów?",
+            "incorrectMessageOne": "Unfortunately, this is not the correct answer. Try again.",
+            "tipOne": "Hint: Read the description below."
+        },
         "noScenariosAvailable": "No scenarios available",
         "loadingScenarios": "Loading scenarios...",
         "storyOneTitle": "Village then and now",
@@ -168,6 +198,7 @@
             "close": "Close",
             "maximize": "Maximize",
             "minimize": "Minimize",
+            "restore": "Restore",
             "welcome": "Welcome to the village quest!",
             "instructions": "Explore Piskorzów village and discover its secrets. Use the map to find points of interest and complete tasks.",
             "locations": {
@@ -199,103 +230,23 @@
             "scenario": "Scenario",
             "previousStep": "Previous step",
             "nextStep": "Next step",
-            "stepCounter": "Step {current} of {total}"
+            "stepCounter": "Step {current} of {total}",
+            "focusStepOnMap": "Show step on map"
         },
         "stepView": {
             "noStepAvailable": "No step available",
             "sectionContent": "Description",
-            "sectionTask": "Challenge"
-        }
-    },
-    "es": {
-        "save": "Guardar",
-        "cancel": "Cancelar",
-        "terrainGame": "Búsqueda de la Aldea",
-        "terrainGameUnavailable": "Juego de terreno no disponible en dispositivo sin módulo GPS",
-        "terrainGameModuleUnavailable": "Módulo de juego de terreno no disponible",
-        "selectTerrainGame": "Seleccionar juego de terreno",
-        "terrainGameUnavailableDescription": "Desafortunadamente, el juego de terreno no se puede iniciar en tu dispositivo. Puedes cambiar al modo de presentación.",
-        "goToPresentation": "Ir a presentación",
-        "villagePresentation": "Presentación Interactiva de la Aldea",
-        "gameTitle": "Piskorzów Interactivamente",
-        "navigation": {
-            "backToHome": "Volver al inicio"
+            "sectionTask": "Challenge",
+            "nextStep": "Next step"
         },
-        "loading": {
-            "initializing": "Inicializando aplicación...",
-            "gpsInfo": "Verificando acceso a ubicación GPS...",
-            "status": {
-                "loading": "Cargando aplicación...",
-                "components": "Inicializando componentes...",
-                "gps": "Verificando permisos GPS...",
-                "map": "Configurando mapa...",
-                "game": "Preparando juego de terreno..."
-            }
-        },
-        "projectInfo": {
-            "title": "Piskorzów Interactivamente",
-            "subtitle": "Descubre la historia y cultura de la aldea de Piskorzów",
-            "showInfo": "Mostrar información del proyecto",
-            "aboutTitle": "Acerca del proyecto",
-            "description1": "¡Bienvenido a la presentación interactiva de la aldea de Piskorzów! Este proyecto fue creado como parte de un programa financiado por la Unión Europea, destinado a promover el patrimonio cultural e histórico local.",
-            "description2": "Nuestra aplicación ofrece un viaje virtual por la aldea, donde puedes aprender sobre su rica historia, tradiciones y vida contemporánea de los residentes. Gracias al mapa interactivo y al juego de campo, el aprendizaje se vuelve divertido.",
-            "description3": "El proyecto no solo busca educar, sino también preservar y transmitir a las futuras generaciones el patrimonio cultural único de la región.",
-            "fundingTitle": "Información de financiación",
-            "euFunding": "Proyecto cofinanciado por la Unión Europea",
-            "projectPeriod": "Período de implementación: 2024-2025",
-            "location": "Ubicación: Piskorzów, Polonia",
-            "objectivesTitle": "Objetivos del proyecto",
-            "objective1": "Promoción del patrimonio cultural de la aldea de Piskorzów",
-            "objective2": "Creación de herramientas educativas interactivas",
-            "objective3": "Preservación de tradiciones locales para futuras generaciones",
-            "objective4": "Aumento de la conciencia sobre la importancia de la cultura local",
-            "dontShowAgain": "No mostrar de nuevo",
-            "close": "Cerrar",
-            "startExploring": "Comenzar exploración"
-        },
-        "gameCard": {
-            "title": "Búsqueda de la Aldea de Piskorzów",
-            "openGame": "Abrir búsqueda de la aldea",
-            "close": "Cerrar",
-            "maximize": "Maximizar",
-            "minimize": "Minimizar",
-            "welcome": "¡Bienvenido a la búsqueda de la aldea!",
-            "instructions": "Explora la aldea de Piskorzów y descubre sus secretos. Usa el mapa para encontrar puntos de interés y completar tareas.",
-            "locations": {
-                "title": "Ubicaciones para descubrir",
-                "content": "Varios lugares te esperan en el juego: edificios históricos, monumentos, puntos de vista y tesoros ocultos. Cada ubicación tiene su historia única."
-            },
-            "challenges": {
-                "title": "Desafíos y tareas",
-                "content": "Completa tareas interesantes, resuelve acertijos y recolecta puntos. Cuanto más descubras, más aprenderás sobre la historia de Piskorzów."
-            },
-            "team": {
-                "title": "Juego en equipo",
-                "content": "Puedes jugar solo o en equipo. Colabora para resolver acertijos más difíciles y descubrir todos los secretos de la aldea."
-            },
-            "rules": {
-                "title": "Reglas del juego",
-                "rule": "Regla",
-                "description": "Descripción de la regla"
-            },
-            "tips": {
-                "title": "Consejos útiles",
-                "tip": "Consejo"
-            }
-        },
-        "storyView": {
-            "loadingScenario": "Cargando escenario...",
-            "loadingError": "Error de carga:",
-            "scenarioNotFound": "Escenario no encontrado.",
-            "scenario": "Escenario",
-            "previousStep": "Paso anterior",
-            "nextStep": "Siguiente paso",
-            "stepCounter": "Paso {current} de {total}",
-            "sectionContent": "Descripción",
-            "sectionTask": "Desafío"
-        },
-        "stepView": {
-            "noStepAvailable": "No hay paso disponible"
+        "task": {
+            "yourAnswer": "Your answer",
+            "submit": "Submit",
+            "correct": "Correct answer!",
+            "incorrect": "Incorrect answer. Try again.",
+            "showTip": "Show tip",
+            "hideTip": "Hide tip",
+            "tip": "Tip"
         }
     }
 }

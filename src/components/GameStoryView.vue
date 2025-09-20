@@ -1,7 +1,7 @@
 <template>
     <CardWrapper
         :visible="true"
-        :title="t(cardTitle)"
+        :title="computedTitle"
         :desktopWidth="600"
         :closable="false"
     >
@@ -43,7 +43,7 @@
         >
             <div
                 class="navigation-buttons"
-                v-if="config.steps && config.steps.length > 1"
+                v-if="config.steps && config.steps.length > 1 && !isGame"
             >
                 <v-btn
                     :disabled="!hasPrev"
@@ -80,6 +80,7 @@
                 :active-index="activeIndex"
                 :story-id="storyId"
                 @update-title="updateCardTitle"
+                @next-step="nextStep"
             />
         </div>
         <div v-else>
@@ -112,6 +113,21 @@ const hasNext = computed(() => {
 const hasPrev = computed(() => {
     return activeIndex.value > 0
 })
+const isGame = computed(() => {
+    return !route.path.startsWith('/game')
+})
+
+const computedTitle = computed(() => {
+    const baseTitle = t(cardTitle.value)
+
+    // Dodaj licznik kroków jeśli jesteśmy w grze
+    if (isGame.value && config.value?.steps) {
+        const stepCounter = `(${activeIndex.value + 1}/${config.value.steps.length})`
+        return `${stepCounter} ${baseTitle}`
+    }
+
+    return baseTitle
+})
 
 const nextStep = () => {
     if (hasNext.value) {
@@ -143,9 +159,7 @@ const updateCardTitle = (titleKey) => {
     if (titleKey) {
         cardTitle.value = titleKey
     } else {
-        cardTitle.value = config.value
-            ? t(config.value.title || 'storyView.scenario')
-            : 'storyView.scenario'
+        cardTitle.value = config.value?.title || 'storyView.scenario'
     }
 }
 
@@ -162,13 +176,13 @@ async function loadConfig() {
         activeIndex.value = 0
 
         if (conf.steps && conf.steps.length > 0 && conf.steps[0].title) {
-            cardTitle.value = conf.steps[0].title
+            updateCardTitle(conf.steps[0].title)
             setStoryView({
                 feature: conf.steps[0].feature,
                 view: conf.steps[0].view,
             })
         } else {
-            cardTitle.value = t(conf.title || 'storyView.scenario')
+            updateCardTitle(null)
         }
     } catch (e) {
         error.value = e.message

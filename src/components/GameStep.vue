@@ -41,7 +41,8 @@
                     {{ $t(header) }}
                 </v-card-title>
                 <v-expansion-panels
-                    v-if="isGame"
+                    v-if="isGame && hasTask"
+                    multiple
                     v-model="expansionPanels"
                 >
                     <v-expansion-panel>
@@ -50,9 +51,9 @@
                         }}</v-expansion-panel-title>
                         <v-expansion-panel-text>
                             <GameTask
-                                v-if="currentStep && currentStep.task"
+                                v-if="hasTask"
                                 :task="currentStep.task"
-                                @next-step="goToNextStep"
+                                @task-completed="onTaskCompleted"
                             />
                         </v-expansion-panel-text>
                     </v-expansion-panel>
@@ -66,19 +67,43 @@
                                 :header="header"
                                 :story-id="props.storyId"
                                 :scroll-offset="scrollOffset"
-                                :scroll-to-top="scrollToTop"
+                                :scroll-to-top="() => scrollToTop()"
                             />
                         </v-expansion-panel-text>
                     </v-expansion-panel>
                 </v-expansion-panels>
-                <GameStaticContent
+                <div
                     v-else
-                    :content-items="contentItems"
-                    :header="header"
-                    :story-id="props.storyId"
-                    :scroll-offset="scrollOffset"
-                    :scroll-to-top="scrollToTop"
-                />
+                    class="mx-2 my-0 pa-0"
+                >
+                    <GameStaticContent
+                        :content-items="contentItems"
+                        :header="header"
+                        :story-id="props.storyId"
+                        :scroll-offset="scrollOffset"
+                        :scroll-to-top="() => scrollToTop()"
+                    />
+                </div>
+                <v-fade-transition
+                    :duration="2000"
+                    hide-on-leave
+                >
+                    <div
+                        v-if="(isGame && !hasTask) || (isGame && isTaskCompleted)"
+                        class="mt-3 mb-2 px-0"
+                    >
+                        <v-btn
+                            color="primary"
+                            @click="goToNextStep"
+                            rounded="sm"
+                            elevation="2"
+                            :disabled="!nextStepActive"
+                            block
+                        >
+                            {{ $t('stepView.nextStep') }}
+                        </v-btn>
+                    </div>
+                </v-fade-transition>
 
                 <v-btn
                     :icon="
@@ -92,7 +117,7 @@
                     rounded="sm"
                     color="primary"
                     class="scroll-top-btn"
-                    @click="scrollToTop"
+                    @click="() => scrollToTop()"
                 />
             </v-sheet>
         </div>
@@ -106,12 +131,12 @@
 </template>
 
 <script setup>
-import { computed, watch, ref } from 'vue'
+import { computed, watch, ref, onMounted } from 'vue'
 import GameTask from './GameTask.vue'
-const expansionPanels = ref([0])
 import { useGoTo } from 'vuetify'
 import { useRoute } from 'vue-router'
 
+const expansionPanels = ref([0])
 const route = useRoute()
 const isGame = computed(() => {
     return !route.path.startsWith('/game')
@@ -136,11 +161,18 @@ const emit = defineEmits(['update-title', 'next-step'])
 const goTo = useGoTo()
 
 const scrollOffset = ref(0)
+const isTaskCompleted = ref(false)
+const nextStepActive = ref(false)
+
 const currentStep = computed(() => {
     if (props.steps && props.steps.length > props.activeIndex) {
         return props.steps[props.activeIndex]
     }
     return null
+})
+
+const hasTask = computed(() => {
+    return !!(currentStep.value && currentStep.value.task)
 })
 const bgImage = computed(() => {
     return currentStep.value?.bgImage || null
@@ -166,14 +198,34 @@ watch(
     { immediate: true },
 )
 
-const scrollToTop = () => {
-    let number = scrollOffset.value === 0 ? 150 : 0
-    goTo(number, {
+const scrollToTop = (toEnd) => {
+    const contentSheet = document.getElementById('contentSheet')
+    if (!contentSheet) return
+
+    const parentElement = contentSheet.parentElement
+    if (!parentElement) return
+
+    const parentHeight = parentElement.clientHeight || 200
+    const scrollHeight = contentSheet.scrollHeight
+
+    let targetPosition
+    if (toEnd !== undefined) {
+        // Jeśli przekazano toEnd, użyj go ale ogranicz do dostępnego zakresu
+        targetPosition = scrollHeight - parentHeight - 10
+    } else {
+        // Standardowe przełączanie między górą a wysokością rodzica
+        targetPosition = scrollOffset.value === 0 ? parentHeight : 0
+    }
+
+    // Upewnij się, że pozycja nie jest ujemna
+    targetPosition = Math.max(0, targetPosition)
+
+    goTo(targetPosition, {
         duration: 300,
         easing: 'easeInOutCubic',
         container: '#contentSheet',
     })
-    scrollOffset.value = number
+    scrollOffset.value = targetPosition > 0 ? 100 : 0
 }
 
 const resetScrollOffset = (event) => {
@@ -184,9 +236,44 @@ const resetScrollOffset = (event) => {
     }
 }
 
-function goToNextStep() {
+const goToNextStep = () => {
     emit('next-step')
+    isTaskCompleted.value = false
+    expansionPanels.value = [0]
 }
+
+const onTaskCompleted = () => {
+    expansionPanels.value = []
+    setTimeout(() => {
+        const contentSheet = document.getElementById('contentSheet')
+        if (contentSheet) {
+            scrollToTop(true)
+        }
+    }, 100)
+    isTaskCompleted.value = true
+}
+
+const setNextStepActive = () => {
+    if (currentStep.value?.view?.duration) {
+        setTimeout(() => {
+            nextStepActive.value = true
+        }, currentStep.value.view.duration)
+    } else {
+        nextStepActive.value = true
+    }
+}
+
+onMounted(() => {
+    setNextStepActive()
+})
+
+watch(
+    () => props.activeIndex,
+    () => {
+        isTaskCompleted.value = false
+        setNextStepActive()
+    },
+)
 </script>
 
 <style scoped>

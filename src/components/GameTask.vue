@@ -1,16 +1,21 @@
 <template>
     <div class="game-task">
         <div class="task-text mb-3">
-            {{ task.text }}
+            {{ $t(task.question) }}
         </div>
         <v-text-field
             v-model="answer"
-            :label="$t('stepView.yourAnswer')"
+            :label="$t('task.yourAnswer')"
+            density="compact"
             variant="outlined"
             class="mb-2"
+            :class="{ 'success-field': isCorrect }"
             @focus="showTipLink = true"
             :error="answer.length > 0 && !isCorrect"
             :success="isCorrect"
+            :rules="validationRules"
+            :prepend-inner-icon="isCorrect ? 'mdi-thumb-up-outline' : undefined"
+            :readonly="fieldReadOnly"
         />
         <div
             v-if="task.tip"
@@ -20,40 +25,34 @@
                 v-if="!showTip"
                 href="#"
                 @click.prevent="showTip = true"
-                >{{ $t('stepView.showTip') }}</a
+                >{{ $t('task.showTip') }}</a
             >
         </div>
-        <div
-            v-if="showTip && task.tip"
-            class="tip-text text-caption text-grey-darken-1"
+        <v-alert
+            v-if="showTip && task.tip && !fieldReadOnly"
+            type="info"
+            variant="tonal"
         >
-            {{ task.tip }}
-        </div>
-        <v-btn
-            v-if="isCorrect"
-            color="primary"
-            class="mt-3"
-            @click="emit('next-step')"
-            rounded="sm"
-            elevation="2"
-        >
-            {{ $t('stepView.nextStep') }}
-        </v-btn>
+            {{ $t(task.tip) }}
+        </v-alert>
     </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 const props = defineProps({
     task: {
         type: Object,
         required: true,
     },
 })
-const emit = defineEmits(['next-step'])
+const emit = defineEmits(['task-completed', 'answer-correct'])
 const answer = ref('')
 const showTip = ref(false)
 const showTipLink = ref(false)
+const fieldReadOnly = ref(false)
 const isCorrect = computed(() => {
     if (!props.task || !props.task.answers || !Array.isArray(props.task.answers)) return false
     return props.task.answers.some(
@@ -62,6 +61,42 @@ const isCorrect = computed(() => {
             answer.value.trim().toLowerCase() === ans.trim().toLowerCase(),
     )
 })
+
+const validationRules = computed(() => {
+    return [
+        (value) => {
+            if (!value || value.trim() === '') return true // Nie waliduj pustych pól
+
+            // Sprawdź czy odpowiedź jest poprawna
+            const correct = props.task.answers?.some(
+                (ans) =>
+                    typeof ans === 'string' &&
+                    value.trim().toLowerCase() === ans.trim().toLowerCase(),
+            )
+
+            // Jeśli niepoprawna, zwróć komunikat błędu
+            if (!correct && props.task.incorrectMessage) {
+                return t(props.task.incorrectMessage)
+            }
+
+            return true // Poprawna odpowiedź
+        },
+    ]
+})
+
+watch(
+    isCorrect,
+    (newValue) => {
+        if (newValue === true) {
+            if (navigator.vibrate) {
+                navigator.vibrate(100)
+            }
+            fieldReadOnly.value = true
+            emit('task-completed', newValue)
+        }
+    },
+    { immediate: true },
+)
 </script>
 
 <style scoped>
@@ -80,5 +115,36 @@ const isCorrect = computed(() => {
 .tip-text {
     margin-top: 4px;
     color: #757575;
+}
+
+/* Stylowanie pola przy poprawnej odpowiedzi */
+.success-field :deep(.v-field) {
+    background-color: rgba(76, 175, 80, 0.08);
+    border-color: #4caf50 !important;
+}
+
+.success-field :deep(.v-field--focused) {
+    border-color: #4caf50 !important;
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+}
+
+.success-field :deep(.v-field__prepend-inner .v-icon) {
+    color: #4caf50;
+    animation: thumbUp 0.5s ease-in-out;
+}
+
+@keyframes thumbUp {
+    0% {
+        transform: scale(0) rotate(-10deg);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2) rotate(5deg);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
 }
 </style>

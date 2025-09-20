@@ -3,10 +3,113 @@
     "description": "storyScenarioDescription",
     "steps": [
         {
+            "title": "storyTwo.intro",
+            "bgImage": {
+                "src": "taskImageOne.png"
+            },
+            "header": "storyTwo.introHeader",
+            "spacer": {},
+            "content": [
+                {
+                    "type": "p",
+                    "text": "storyTwo.introParagraphOne"
+                },
+                {
+                    "type": "p",
+                    "text": "storyTwo.introParagraphTwo"
+                }
+            ],
+            "view": {
+                "center": [16.5639963, 50.7323179],
+                "zoom": 17,
+                "duration": 2000
+            }
+        },
+        {
             "title": "stepOne",
             "bgImage": {
-                "src": "imageOne.png",
-                "blur": true
+                "src": "imageOne.png"
+            },
+            "header": "stepOneSubheader",
+            "spacer": {},
+            "content": [
+                {
+                    "type": "image",
+                    "src": "photoFour.png",
+                    "alt": "stepOneImageAlt"
+                },
+                {
+                    "type": "subheader",
+                    "text": "historySubheader"
+                },
+                {
+                    "type": "p",
+                    "text": "stepOneParagraphOne"
+                },
+                {
+                    "type": "p",
+                    "text": "stepOneParagraphTwo"
+                },
+                {
+                    "type": "images",
+                    "list": [
+                        {
+                            "src": "photoOne.png",
+                            "alt": "stepOnePhotoAlt"
+                        },
+                        {
+                            "src": "photoTwo.png",
+                            "alt": "stepOnePhotoAlt"
+                        },
+                        {
+                            "src": "photoThree.png",
+                            "alt": "stepOnePhotoAlt"
+                        }
+                    ]
+                }
+            ],
+            "task": {
+                "question": "storyTwo.questionOne",
+                "answers": [
+                    "Jan Nepomucen",
+                    "św. Jan Nepomucen",
+                    "św Jan Nepomucen",
+                    "św. Nepomucen",
+                    "św Nepomucen"
+                ],
+                "incorrectMessage": "storyTwo.incorrectMessageOne",
+                "tip": "storyTwo.tipOne"
+            },
+            "feature": {
+                "type": "Feature",
+                "geometry": {
+                    "type": "LineString",
+                    "coordinates": [
+                        [
+                            [16.5613954, 50.7334371],
+                            [16.5616315, 50.7334937],
+                            [16.561619, 50.7335197],
+                            [16.5617446, 50.7335504],
+                            [16.5618023, 50.7334537],
+                            [16.56171, 50.733432],
+                            [16.5617149, 50.7334236],
+                            [16.5614417, 50.7333579],
+                            [16.5613954, 50.7334371]
+                        ]
+                    ]
+                },
+                "properties": {}
+            },
+            "view": {
+                "center": [16.5615568, 50.7334326],
+                "zoom": 18,
+                "duration": 2000
+            }
+        },
+        {
+            "title": "stepOne",
+            "bgImage": {
+                "src": "imageOne.png"
             },
             "header": "stepOneSubheader",
             "spacer": {},
@@ -69,7 +172,11 @@
                     "coordinates": [
                         [
                             [16.5613954, 50.7334371],
-                            [16.5616677, 50.7335023],
+                            [16.5616315, 50.7334937],
+                            [16.561619, 50.7335197],
+                            [16.5617446, 50.7335504],
+                            [16.5618023, 50.7334537],
+                            [16.56171, 50.733432],
                             [16.5617149, 50.7334236],
                             [16.5614417, 50.7333579],
                             [16.5613954, 50.7334371]
@@ -80,7 +187,7 @@
             },
             "view": {
                 "center": [16.5615568, 50.7334326],
-                "zoom": 20,
+                "zoom": 18,
                 "duration": 2000
             }
         }

@@ -18,6 +18,6 @@ import GameStoriesCard from '@/components/GameStoriesCard.vue'
 onMounted(() => {
     const feature = getDefaultGeometry()
     animateToMode()
-    setStoryView({ feature })
+    setStoryView({ feature, sidebarWidthPx: 400 })
 })
 </script>

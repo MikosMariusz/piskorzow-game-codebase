@@ -18,7 +18,11 @@
                 style="user-select: none; height: 64px; min-height: 64px; max-height: 64px"
             >
                 <div class="header-background"></div>
-                <span class="text-h6 header-title font-weight-light">{{ title }}</span>
+                <span
+                    class="text-h6 header-title font-weight-light text-truncate"
+                    style="max-width: 300px"
+                    >{{ title }}</span
+                >
                 <div
                     class="d-flex align-center header-controls"
                     v-if="buttonConfigs.length"
@@ -296,6 +300,14 @@ const buttonConfigs = computed(() => [
     max-height: calc(100vh - 85px);
 }
 
+/* Fallback dla mobilnych przeglądarek z problemami vh */
+@supports (height: 100dvh) {
+    .card-wrapper {
+        height: calc(100dvh - 85px);
+        max-height: calc(100dvh - 85px);
+    }
+}
+
 .card-wrapper--centered {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18) !important;
 }
@@ -362,6 +374,20 @@ const buttonConfigs = computed(() => [
         max-height: 50vh !important;
         border-radius: 0 !important;
     }
+
+    /* Fallback dla starszych przeglądarek */
+    .card-wrapper--fullscreen {
+        height: calc(100vh - 64px) !important;
+        max-height: calc(100vh - 64px) !important;
+    }
+
+    /* Nowoczesne przeglądarki z obsługą dvh */
+    @supports (height: 100dvh) {
+        .card-wrapper--fullscreen {
+            height: calc(100dvh - 64px) !important;
+            max-height: calc(100dvh - 64px) !important;
+        }
+    }
 }
 
 @media (min-width: 960px) {
@@ -388,8 +414,8 @@ const buttonConfigs = computed(() => [
     border-radius: 0 !important;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
     bottom: 0 !important;
-    height: calc(100vh - 64px) !important;
-    max-height: calc(100vh - 64px) !important;
+    height: calc(100dvh - 64px) !important;
+    max-height: calc(100dvh - 64px) !important;
     transform-origin: bottom center;
 }
 
