@@ -53,6 +53,8 @@
                             <GameTask
                                 v-if="hasTask"
                                 :task="currentStep.task"
+                                :accuracy="currentStep.accuracy"
+                                :feature="currentStep.feature"
                                 @task-completed="onTaskCompleted"
                             />
                         </v-expansion-panel-text>
@@ -139,7 +141,7 @@ import { useRoute } from 'vue-router'
 const expansionPanels = ref([0])
 const route = useRoute()
 const isGame = computed(() => {
-    return !route.path.startsWith('/game')
+    return route.path.startsWith('/game')
 })
 
 const props = defineProps({

@@ -41,6 +41,43 @@
             v-if="config"
             class="story-container"
         >
+            <!-- Alert GPS - pozycjonowany absolutnie na górze -->
+            <div
+                v-if="gpsError"
+                class="gps-alert-container"
+            >
+                <v-alert
+                    type="warning"
+                    dismissible
+                    elevation="4"
+                    @input="gpsError = null"
+                    class="gps-alert"
+                >
+                    <div class="font-weight-medium">{{ $t('storyView.gpsAccessRequired') }}</div>
+                    <div class="mt-1">{{ gpsError }}</div>
+                    <v-row
+                        no-gutters
+                        class="d-flex mt-2"
+                        style="gap: 8px"
+                    >
+                        <v-btn
+                            size="small"
+                            variant="elevated"
+                            @click="retryGpsAccess"
+                        >
+                            {{ $t('storyView.retryGps') }}
+                        </v-btn>
+                        <v-btn
+                            size="small"
+                            variant="elevated"
+                            elevation="2"
+                            @click="goToPresentation"
+                        >
+                            {{ $t('goToPresentation') }}
+                        </v-btn>
+                    </v-row>
+                </v-alert>
+            </div>
             <div
                 class="navigation-buttons"
                 v-if="config.steps && config.steps.length > 1 && !isGame"
@@ -90,22 +127,34 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, onMounted, computed, onBeforeUnmount } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import CardWrapper from '@/components/CardWrapper.vue'
 import GameStep from '@/components/GameStep.vue'
 
-import { setStoryView } from '@/services/olMap'
+import { setStoryView, createMap } from '@/services/olMap'
+import {
+    startGpsTracking,
+    stopGpsTracking,
+    checkGpsAccessAndAccuracy,
+    setPositionUpdateCallback,
+} from '@/services/gps'
+import { useAppStore } from '@/stores/app'
 
 const route = useRoute()
+const router = useRouter()
 const storyId = ref(route.path.split('/').pop())
 const loading = ref(true)
 const error = ref(null)
+const gpsError = ref(null)
 const config = ref(null)
 const cardTitle = ref('scenario')
 const activeIndex = ref(0)
 const { t } = useI18n()
+const appStore = useAppStore()
+
+let gpsStarted = false
 
 const hasNext = computed(() => {
     return config.value && config.value.steps && activeIndex.value < config.value.steps.length - 1
@@ -114,7 +163,7 @@ const hasPrev = computed(() => {
     return activeIndex.value > 0
 })
 const isGame = computed(() => {
-    return !route.path.startsWith('/game')
+    return route.path.startsWith('/game')
 })
 
 const computedTitle = computed(() => {
@@ -201,8 +250,104 @@ const focusStepOnMap = () => {
     }
 }
 
+/**
+ * Automatycznie włącza GPS w trybie ENABLED (pokazuje pozycję bez centrowania)
+ */
+const initializeGps = async () => {
+    try {
+        // Sprawdź dostęp do GPS
+        const gpsResult = await checkGpsAccessAndAccuracy()
+
+        if (!gpsResult.access) {
+            // Ustaw komunikat błędu w zależności od przyczyny
+            if (gpsResult.error === 1) {
+                // PERMISSION_DENIED
+                gpsError.value = t('storyView.gpsPermissionDenied')
+            } else if (gpsResult.error === 2) {
+                // POSITION_UNAVAILABLE
+                gpsError.value = t('storyView.gpsUnavailable')
+            } else if (gpsResult.error === 3) {
+                // TIMEOUT
+                gpsError.value = t('storyView.gpsTimeout')
+            } else if (gpsResult.reason?.includes('Accuracy')) {
+                if (import.meta.env.DEV) {
+                    // W trybie deweloperskim ignoruj niską dokładność dla celów testowych
+                    const map = createMap()
+
+                    // Zarejestruj callback dla aktualizacji pozycji w store
+                    setPositionUpdateCallback((position) => {
+                        console.log('Aktualizacja pozycji GPS:', position)
+                        appStore.setGpsPosition(position)
+                    })
+
+                    const success = await startGpsTracking(map)
+                    if (success) {
+                        gpsStarted = true
+                        gpsError.value = null
+                        appStore.enableGps()
+                    } else {
+                        gpsError.value = t('storyView.gpsStartError')
+                    }
+                } else {
+                    gpsError.value = t('storyView.gpsLowAccuracy', { accuracy: gpsResult.accuracy })
+                }
+            } else {
+                gpsError.value = gpsResult.reason || t('storyView.gpsGenericError')
+            }
+            return
+        }
+
+        // GPS dostępny - włącz w trybie ENABLED (pokazuj pozycję, nie centruj)
+        const map = createMap()
+
+        // Zarejestruj callback dla aktualizacji pozycji w store
+        setPositionUpdateCallback((position) => {
+            console.log('Aktualizacja pozycji GPS:', position)
+            appStore.setGpsPosition(position)
+        })
+
+        const success = await startGpsTracking(map)
+
+        if (success) {
+            gpsStarted = true
+            gpsError.value = null
+            // Ustaw globalny stan GPS na ENABLED
+            appStore.enableGps()
+        } else {
+            gpsError.value = t('storyView.gpsStartError')
+        }
+    } catch (err) {
+        gpsError.value = t('storyView.gpsGenericError')
+        console.error('GPS initialization error:', err)
+    }
+}
+
+/**
+ * Ponowna próba dostępu do GPS
+ */
+const retryGpsAccess = () => {
+    gpsError.value = null
+    initializeGps()
+}
+
+const goToPresentation = () => {
+    router.push('/presentation')
+}
+
 onMounted(() => {
     loadConfig()
+    // Automatycznie włącz GPS przy wejściu w grę terenową
+    initializeGps()
+})
+
+onBeforeUnmount(() => {
+    // Zatrzymaj GPS przy wyjściu z gry tylko jeśli był uruchomiony przez ten komponent
+    if (gpsStarted) {
+        const map = createMap()
+        stopGpsTracking(map)
+        appStore.disableGps()
+        gpsStarted = false
+    }
 })
 </script>
 
@@ -237,5 +382,15 @@ onMounted(() => {
     font-weight: 500;
     color: rgba(0, 0, 0, 0.8);
     white-space: nowrap;
+}
+
+.gps-alert-container {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    width: 90%;
+    max-width: 500px;
 }
 </style>

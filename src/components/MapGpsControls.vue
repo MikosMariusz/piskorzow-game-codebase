@@ -20,7 +20,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { computed, onMounted, onBeforeUnmount } from 'vue'
 import {
     centerMapOn,
     setMoveEndCallback,
@@ -35,15 +35,9 @@ import {
     clearGpsPositionCallback,
     getCurrentPosition,
 } from '@/services/gps'
+import { useAppStore } from '@/stores/app'
 
-// GPS states
-const GPS_STATE = {
-    DISABLED: 0, // GPS wyłączony
-    ENABLED: 1, // GPS włączony - pokazuje pozycję
-    TRACKING: 2, // GPS śledzony - centruje mapę na pozycji
-}
-
-const gpsState = ref(GPS_STATE.DISABLED)
+const appStore = useAppStore()
 
 // Próg dystansu w metrach - jeśli użytkownik oddali się o więcej niż 100m od pozycji GPS
 const DISTANCE_THRESHOLD = 100
@@ -52,7 +46,7 @@ const DISTANCE_THRESHOLD = 100
  * Sprawdza czy użytkownik oddalił się od pozycji GPS i zmienia stan z TRACKING na ENABLED
  */
 const checkDistanceFromGps = () => {
-    if (gpsState.value !== GPS_STATE.TRACKING) return
+    if (appStore.getGpsState !== appStore.GPS_STATE.TRACKING) return
 
     const currentPos = getCurrentPosition()
     const mapCenter = getMapCenter()
@@ -64,17 +58,17 @@ const checkDistanceFromGps = () => {
 
     // Jeśli użytkownik oddalił się od pozycji GPS, zmień stan na ENABLED
     if (distance > DISTANCE_THRESHOLD) {
-        gpsState.value = GPS_STATE.ENABLED
+        appStore.enableGps()
     }
 }
 
 const gpsIcon = computed(() => {
-    switch (gpsState.value) {
-        case GPS_STATE.DISABLED:
+    switch (appStore.getGpsState) {
+        case appStore.GPS_STATE.DISABLED:
             return 'mdi-crosshairs-off'
-        case GPS_STATE.ENABLED:
+        case appStore.GPS_STATE.ENABLED:
             return 'mdi-crosshairs' // Zamienione z TRACKING
-        case GPS_STATE.TRACKING:
+        case appStore.GPS_STATE.TRACKING:
             return 'mdi-crosshairs-gps' // Zamienione z ENABLED
         default:
             return 'mdi-crosshairs-off'
@@ -82,12 +76,12 @@ const gpsIcon = computed(() => {
 })
 
 const gpsAriaLabel = computed(() => {
-    switch (gpsState.value) {
-        case GPS_STATE.DISABLED:
+    switch (appStore.getGpsState) {
+        case appStore.GPS_STATE.DISABLED:
             return 'Włącz GPS'
-        case GPS_STATE.ENABLED:
+        case appStore.GPS_STATE.ENABLED:
             return 'Włącz śledzenie GPS'
-        case GPS_STATE.TRACKING:
+        case appStore.GPS_STATE.TRACKING:
             return 'Wyłącz GPS'
         default:
             return 'GPS'
@@ -95,10 +89,10 @@ const gpsAriaLabel = computed(() => {
 })
 
 const gpsButtonClass = computed(() => {
-    switch (gpsState.value) {
-        case GPS_STATE.ENABLED:
+    switch (appStore.getGpsState) {
+        case appStore.GPS_STATE.ENABLED:
             return 'gps-enabled'
-        case GPS_STATE.TRACKING:
+        case appStore.GPS_STATE.TRACKING:
             return 'gps-tracking'
         default:
             return ''
@@ -110,26 +104,26 @@ const handleGpsToggle = async () => {
     const { createMap } = await import('@/services/olMap')
     const map = createMap() // Funkcja zwraca istniejącą mapę lub tworzy nową jeśli nie istnieje
 
-    switch (gpsState.value) {
-        case GPS_STATE.DISABLED:
+    switch (appStore.getGpsState) {
+        case appStore.GPS_STATE.DISABLED:
             // Przejdź do stanu ENABLED - pokaż pozycję GPS
             const success = await startGpsTracking(map)
             if (success) {
-                gpsState.value = GPS_STATE.ENABLED
+                appStore.enableGps()
             }
             break
-        case GPS_STATE.ENABLED:
+        case appStore.GPS_STATE.ENABLED:
             // Przejdź do stanu TRACKING - śledź pozycję GPS
-            gpsState.value = GPS_STATE.TRACKING
+            appStore.startGpsTracking()
             // Jeśli mamy aktualną pozycję, wycentruj mapę
             const currentPos = getCurrentPosition()
             if (currentPos) {
                 centerMapOn(currentPos.lat, currentPos.lon, 16) // Duże ale rozsądne przybliżenie
             }
             break
-        case GPS_STATE.TRACKING:
+        case appStore.GPS_STATE.TRACKING:
             // Przejdź do stanu DISABLED - wyłącz GPS
-            gpsState.value = GPS_STATE.DISABLED
+            appStore.disableGps()
             stopGpsTracking(map)
             break
     }
@@ -138,7 +132,7 @@ const handleGpsToggle = async () => {
 onMounted(() => {
     // Rejestracja callback'a dla pozycji GPS w trybie TRACKING
     setGpsPositionCallback((lat, lon, accuracy) => {
-        if (gpsState.value === GPS_STATE.TRACKING) {
+        if (appStore.getGpsState === appStore.GPS_STATE.TRACKING) {
             // Automatycznie centruj mapę na pozycji GPS w trybie śledzenia
             centerMapOn(lat, lon, 16)
         }
@@ -155,11 +149,12 @@ onBeforeUnmount(() => {
     clearMoveEndCallback()
 
     // Zatrzymaj śledzenie GPS przy odmontowaniu komponentu
-    if (gpsState.value !== GPS_STATE.DISABLED) {
+    if (appStore.getGpsState !== appStore.GPS_STATE.DISABLED) {
         import('@/services/olMap').then(({ createMap }) => {
             const map = createMap()
             stopGpsTracking(map)
         })
+        appStore.disableGps()
     }
 })
 </script>

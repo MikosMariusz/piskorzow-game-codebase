@@ -8,6 +8,15 @@ export const useAppStore = defineStore('app', () => {
     const gpsAccess = ref(null)
     const isLoading = ref(true)
     const gameCardVisible = ref(false)
+    const userGpsPosition = ref(null)
+
+    // GPS States - globalne stany GPS dla synchronizacji między komponentami
+    const GPS_STATE = {
+        DISABLED: 0, // GPS wyłączony
+        ENABLED: 1, // GPS włączony - pokazuje pozycję
+        TRACKING: 2, // GPS śledzony - centruje mapę na pozycji
+    }
+    const gpsState = ref(GPS_STATE.DISABLED)
 
     const activeWindow = ref(null)
     const projectInfoDismissed = ref(localStorage.getItem('projectInfoDialogDismissed') === 'true')
@@ -27,9 +36,21 @@ export const useAppStore = defineStore('app', () => {
     )
     const getIsWindowClosedByReplacement = computed(() => isWindowClosedByReplacement.value)
 
+    // GPS getters
+    const getGpsState = computed(() => gpsState.value)
+    const getUserGpsPosition = computed(() => userGpsPosition.value)
+    const isGpsEnabled = computed(
+        () => gpsState.value === GPS_STATE.ENABLED || gpsState.value === GPS_STATE.TRACKING,
+    )
+    const isGpsTracking = computed(() => gpsState.value === GPS_STATE.TRACKING)
+
     // Actions
     const setHomePage = (value) => {
         homePageActive.value = value
+    }
+    const setGpsPosition = (position) => {
+        userGpsPosition.value = position
+        console.log('Aktualna pozycja GPS ustawiona na:', userGpsPosition.value)
     }
 
     const updateHomePageFromRoute = (routePath) => {
@@ -140,6 +161,25 @@ export const useAppStore = defineStore('app', () => {
         return false
     }
 
+    // GPS Actions
+    const setGpsState = (newState) => {
+        if (Object.values(GPS_STATE).includes(newState)) {
+            gpsState.value = newState
+        }
+    }
+
+    const enableGps = () => {
+        gpsState.value = GPS_STATE.ENABLED
+    }
+
+    const startGpsTracking = () => {
+        gpsState.value = GPS_STATE.TRACKING
+    }
+
+    const disableGps = () => {
+        gpsState.value = GPS_STATE.DISABLED
+    }
+
     return {
         // state
         homePageActive,
@@ -149,6 +189,8 @@ export const useAppStore = defineStore('app', () => {
         activeWindow,
         projectInfoDismissed,
         isWindowClosedByReplacement,
+        GPS_STATE,
+        gpsState,
         // getters
         isHomePage,
         hasGpsAccess,
@@ -158,6 +200,10 @@ export const useAppStore = defineStore('app', () => {
         isProjectInfoDismissed,
         shouldShowProjectInfo,
         getIsWindowClosedByReplacement,
+        getGpsState,
+        isGpsEnabled,
+        isGpsTracking,
+        getUserGpsPosition,
         // actions
         setHomePage,
         updateHomePageFromRoute,
@@ -172,5 +218,10 @@ export const useAppStore = defineStore('app', () => {
         dismissProjectInfo,
         resetProjectInfoDismissal,
         checkAndShowProjectInfo,
+        setGpsState,
+        enableGps,
+        startGpsTracking,
+        disableGps,
+        setGpsPosition,
     }
 })

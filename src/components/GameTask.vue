@@ -1,51 +1,102 @@
 <template>
     <div class="game-task">
-        <div class="task-text mb-3">
-            {{ $t(task.question) }}
-        </div>
-        <v-text-field
-            v-model="answer"
-            :label="$t('task.yourAnswer')"
-            density="compact"
-            variant="outlined"
-            class="mb-2"
-            :class="{ 'success-field': isCorrect }"
-            @focus="showTipLink = true"
-            :error="answer.length > 0 && !isCorrect"
-            :success="isCorrect"
-            :rules="validationRules"
-            :prepend-inner-icon="isCorrect ? 'mdi-thumb-up-outline' : undefined"
-            :readonly="fieldReadOnly"
-        />
-        <div
-            v-if="task.tip"
-            class="tip-link mb-1"
+        <transition
+            name="task-transition"
+            mode="out-in"
         >
-            <a
-                v-if="!showTip"
-                href="#"
-                @click.prevent="showTip = true"
-                >{{ $t('task.showTip') }}</a
+            <div
+                v-if="!showAccuracyMessage"
+                key="task"
             >
-        </div>
-        <v-alert
-            v-if="showTip && task.tip && !fieldReadOnly"
-            type="info"
-            variant="tonal"
-        >
-            {{ $t(task.tip) }}
-        </v-alert>
+                <div class="task-text mb-3">
+                    {{ $t(task.question) }}
+                </div>
+                <v-text-field
+                    v-model="answer"
+                    :label="$t('task.yourAnswer')"
+                    density="compact"
+                    variant="outlined"
+                    class="mb-2"
+                    :class="{ 'success-field': isCorrect }"
+                    @focus="showTipLink = true"
+                    :error="answer.length > 0 && !isCorrect"
+                    :success="isCorrect"
+                    :rules="validationRules"
+                    :prepend-inner-icon="isCorrect ? 'mdi-thumb-up-outline' : undefined"
+                    :readonly="fieldReadOnly"
+                />
+                <div
+                    v-if="task.tip"
+                    class="tip-link mb-1"
+                >
+                    <a
+                        v-if="!showTip"
+                        href="#"
+                        @click.prevent="showTip = true"
+                        >{{ $t('task.showTip') }}</a
+                    >
+                </div>
+                <v-alert
+                    v-if="showTip && task.tip && !fieldReadOnly"
+                    type="info"
+                    variant="tonal"
+                >
+                    {{ $t(task.tip) }}
+                </v-alert>
+            </div>
+            <div
+                v-else
+                key="message"
+                class="accuracy-message"
+            >
+                <v-alert
+                    color="warning"
+                    variant="tonal"
+                    class="mb-3"
+                >
+                    <div class="text-center">
+                        <v-icon
+                            size="48"
+                            class="mb-2"
+                            >mdi-map-marker-distance</v-icon
+                        >
+                        <div class="text-h6 mb-2">{{ $t('task.approachTarget') }}</div>
+                        <div class="text-h4 font-weight-bold">
+                            {{ remainingDistance }} {{ $t('task.meters') }}
+                        </div>
+                    </div>
+                </v-alert>
+            </div>
+        </transition>
     </div>
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useAppStore } from '@/stores/app'
+import { getDistance } from 'ol/sphere'
+const appStore = useAppStore()
 const { t } = useI18n()
+
+onMounted(() => {
+    console.log('Komponent GameTask został zamontowany', appStore.getUserGpsPosition)
+})
+
 const props = defineProps({
     task: {
         type: Object,
         required: true,
+    },
+    accuracy: {
+        type: Number,
+        required: false,
+        default: null,
+    },
+    feature: {
+        type: Object,
+        required: false,
+        default: null,
     },
 })
 const emit = defineEmits(['task-completed', 'answer-correct'])
@@ -53,6 +104,8 @@ const answer = ref('')
 const showTip = ref(false)
 const showTipLink = ref(false)
 const fieldReadOnly = ref(false)
+const showAccuracyMessage = ref(false)
+const remainingDistance = ref(0)
 const isCorrect = computed(() => {
     if (!props.task || !props.task.answers || !Array.isArray(props.task.answers)) return false
     return props.task.answers.some(
@@ -84,6 +137,42 @@ const validationRules = computed(() => {
     ]
 })
 
+const computeDistance = () => {
+    if (!props.feature || !props.accuracy || !appStore.getUserGpsPosition) {
+        showAccuracyMessage.value = false
+        return
+    }
+
+    const geom = props.feature.geometry
+    let points = []
+
+    if (geom.type === 'Polygon') {
+        points = geom.coordinates[0]
+    } else if (geom.type === 'LineString') {
+        points = geom.coordinates
+    } else {
+        showAccuracyMessage.value = false
+        return
+    }
+
+    const userCoord = [appStore.getUserGpsPosition.lon, appStore.getUserGpsPosition.lat]
+    // const gpsAccuracy = appStore.getUserGpsPosition.accuracy || 0
+    const gpsAccuracy = 20
+    let minDistance = Infinity
+
+    for (const point of points) {
+        const distance = getDistance(userCoord, point)
+        if (distance < minDistance) {
+            minDistance = distance
+        }
+    }
+
+    const effectiveDistance = Math.max(0, minDistance - gpsAccuracy)
+    const hasAccuracy = effectiveDistance < props.accuracy
+    showAccuracyMessage.value = !hasAccuracy
+    remainingDistance.value = hasAccuracy ? 0 : Math.ceil(effectiveDistance - props.accuracy)
+}
+
 watch(
     isCorrect,
     (newValue) => {
@@ -97,12 +186,44 @@ watch(
     },
     { immediate: true },
 )
+
+watch(
+    () => appStore.getUserGpsPosition,
+    () => {
+        computeDistance()
+    },
+    { immediate: true },
+)
 </script>
 
 <style scoped>
-.game-task {
+.accuracy-message {
     display: flex;
-    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+}
+
+/* Animacje przełączania */
+.task-transition-enter-active,
+.task-transition-leave-active {
+    transition: all 0.5s ease;
+}
+
+.task-transition-enter-from {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.task-transition-leave-to {
+    opacity: 0;
+    transform: translateY(-20px);
+}
+
+.task-transition-enter-to,
+.task-transition-leave-from {
+    opacity: 1;
+    transform: translateY(0);
 }
 .tip-link {
     font-size: 0.9em;

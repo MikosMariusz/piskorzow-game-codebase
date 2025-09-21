@@ -106,7 +106,15 @@
             "previousStep": "Poprzedni krok",
             "nextStep": "Następny krok",
             "stepCounter": "Krok {current} z {total}",
-            "focusStepOnMap": "Pokaż krok na mapie"
+            "focusStepOnMap": "Pokaż krok na mapie",
+            "gpsAccessRequired": "Gra terenowa wymaga dostępu do lokalizacji GPS",
+            "gpsPermissionDenied": "Brak uprawnień do lokalizacji. Proszę zezwolić na dostęp do lokalizacji w ustawieniach przeglądarki.",
+            "gpsUnavailable": "Lokalizacja GPS jest niedostępna. Sprawdź czy GPS jest włączony na urządzeniu.",
+            "gpsTimeout": "Przekroczono czas oczekiwania na sygnał GPS. Spróbuj ponownie.",
+            "gpsLowAccuracy": "Zbyt niska dokładność GPS ({accuracy}m). Spróbuj przenieść się w miejsce z lepszym sygnałem.",
+            "gpsGenericError": "Wystąpił błąd podczas włączania GPS. Spróbuj ponownie.",
+            "gpsStartError": "Nie udało się uruchomić śledzenia GPS.",
+            "retryGps": "Spróbuj ponownie"
         },
         "stepView": {
             "noStepAvailable": "Brak dostępnego kroku",
@@ -121,7 +129,11 @@
             "incorrect": "Niepoprawna odpowiedź. Spróbuj ponownie.",
             "showTip": "Pokaż wskazówkę",
             "hideTip": "Ukryj wskazówkę",
-            "tip": "Wskazówka"
+            "tip": "Wskazówka",
+            "tooFarTitle": "Za daleko od miejsca",
+            "tooFarMessage": "Musisz podejść bliżej do miejsca (odległość: {distance}m)",
+            "approachTarget": "Podejdź bliżej celu! Brakuje jeszcze",
+            "meters": "metrów."
         }
     },
     "en": {
@@ -231,7 +243,15 @@
             "previousStep": "Previous step",
             "nextStep": "Next step",
             "stepCounter": "Step {current} of {total}",
-            "focusStepOnMap": "Show step on map"
+            "focusStepOnMap": "Show step on map",
+            "gpsAccessRequired": "Terrain game requires GPS location access",
+            "gpsPermissionDenied": "Location permission denied. Please allow location access in browser settings.",
+            "gpsUnavailable": "GPS location is unavailable. Check if GPS is enabled on your device.",
+            "gpsTimeout": "GPS signal timeout. Please try again.",
+            "gpsLowAccuracy": "GPS accuracy too low ({accuracy}m). Try moving to a location with better signal.",
+            "gpsGenericError": "An error occurred while enabling GPS. Please try again.",
+            "gpsStartError": "Failed to start GPS tracking.",
+            "retryGps": "Try again"
         },
         "stepView": {
             "noStepAvailable": "No step available",
@@ -246,7 +266,11 @@
             "incorrect": "Incorrect answer. Try again.",
             "showTip": "Show tip",
             "hideTip": "Hide tip",
-            "tip": "Tip"
+            "tip": "Tip",
+            "tooFarTitle": "Too far from location",
+            "tooFarMessage": "You need to get closer to the location (distance: {distance}m)",
+            "approachTarget": "Get closer to the target! You still need",
+            "meters": "meters."
         }
     }
 }

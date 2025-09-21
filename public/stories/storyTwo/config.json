@@ -83,7 +83,7 @@
             "feature": {
                 "type": "Feature",
                 "geometry": {
-                    "type": "LineString",
+                    "type": "Polygon",
                     "coordinates": [
                         [
                             [16.5613954, 50.7334371],
@@ -104,7 +104,8 @@
                 "center": [16.5615568, 50.7334326],
                 "zoom": 18,
                 "duration": 2000
-            }
+            },
+            "accuracy": 2000
         },
         {
             "title": "stepOne",
