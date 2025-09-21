@@ -26,38 +26,6 @@
             }
         },
         {
-            "title": "storyTwo.taskFour",
-            "bgImage": {
-                "src": "taskImageOne.png"
-            },
-            "header": "storyTwo.taskFourHeader",
-            "spacer": {},
-            "content": [
-                {
-                    "type": "p",
-                    "text": "storyTwo.taskThreeParagraphOne"
-                }
-            ],
-            "task": {
-                "question": "storyTwo.taskFourQuestion",
-                "answers": [
-                    "Dożynki Piskorzów",
-                    "dożynki piskorzów",
-                    "dozynki piskorzow",
-                    "dozynki Piskorzow",
-                    "Dożynki piskorzow",
-                    "dożynki Piskorzów"
-                ],
-                "image": {
-                    "src": "imageFive.png",
-                    "alt": "storyTwo.taskFourImageAlt"
-                },
-                "tip": "storyTwo.taskFourTip"
-            },
-            "hiddenPosition": [16.5637337, 50.7328456],
-            "accuracy": 20
-        },
-        {
             "title": "storyTwo.taskOne",
             "bgImage": {
                 "src": "taskOneImage.png",
@@ -154,7 +122,39 @@
                 "tip": "storyTwo.taskThreeTip"
             },
             "hiddenPosition": [16.5632315, 50.7318578],
-            "accuracy": 5000
+            "accuracy": 20
+        },
+        {
+            "title": "storyTwo.taskFour",
+            "bgImage": {
+                "src": "taskImageOne.png"
+            },
+            "header": "storyTwo.taskFourHeader",
+            "spacer": {},
+            "content": [
+                {
+                    "type": "p",
+                    "text": "storyTwo.taskThreeParagraphOne"
+                }
+            ],
+            "task": {
+                "question": "storyTwo.taskFourQuestion",
+                "answers": [
+                    "Dożynki Piskorzów",
+                    "dożynki piskorzów",
+                    "dozynki piskorzow",
+                    "dozynki Piskorzow",
+                    "Dożynki piskorzow",
+                    "dożynki Piskorzów"
+                ],
+                "image": {
+                    "src": "imageFive.png",
+                    "alt": "storyTwo.taskFourImageAlt"
+                },
+                "tip": "storyTwo.taskFourTip"
+            },
+            "hiddenPosition": [16.5637337, 50.7328456],
+            "accuracy": 20
         },
         {
             "title": "storyTwo.ending",
@@ -167,6 +167,10 @@
                 {
                     "type": "p",
                     "text": "storyTwo.endingParagraphOne"
+                },
+                {
+                    "type": "image",
+                    "src": "imageThree.png"
                 }
             ]
         }
