@@ -11,7 +11,7 @@
                 :src="`/stories/${storyId}/${bgImage.src}`"
                 :alt="bgImage.alt || 'Obraz tła'"
                 class="bg-image"
-                :style="bgImage.blur ? 'filter: blur(3px);' : ''"
+                :style="{ filter: bgImage.blur ? 'blur(3px)' : 'none' }"
                 cover
             />
         </div>
@@ -52,9 +52,11 @@
                         <v-expansion-panel-text>
                             <GameTask
                                 v-if="hasTask"
+                                :story-id="props.storyId"
                                 :task="currentStep.task"
                                 :accuracy="currentStep.accuracy"
                                 :feature="currentStep.feature"
+                                :hiddenPosition="currentStep.hiddenPosition"
                                 @task-completed="onTaskCompleted"
                             />
                         </v-expansion-panel-text>
@@ -95,6 +97,7 @@
                         class="mt-3 mb-2 px-0"
                     >
                         <v-btn
+                            v-if="!isLastStep"
                             color="primary"
                             @click="goToNextStep"
                             rounded="sm"
@@ -103,6 +106,16 @@
                             block
                         >
                             {{ $t('stepView.nextStep') }}
+                        </v-btn>
+                        <v-btn
+                            v-else
+                            color="primary"
+                            @click="goToPresentation"
+                            rounded="sm"
+                            elevation="2"
+                            block
+                        >
+                            {{ $t('stepView.backToPresentation') }}
                         </v-btn>
                     </div>
                 </v-fade-transition>
@@ -136,10 +149,11 @@
 import { computed, watch, ref, onMounted } from 'vue'
 import GameTask from './GameTask.vue'
 import { useGoTo } from 'vuetify'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 const expansionPanels = ref([0])
 const route = useRoute()
+const router = useRouter()
 const isGame = computed(() => {
     return route.path.startsWith('/game')
 })
@@ -187,6 +201,10 @@ const header = computed(() => {
 })
 const contentItems = computed(() => {
     return currentStep.value?.content || []
+})
+
+const isLastStep = computed(() => {
+    return props.activeIndex >= props.steps.length - 1
 })
 
 watch(
@@ -244,8 +262,11 @@ const goToNextStep = () => {
     expansionPanels.value = [0]
 }
 
+const goToPresentation = () => {
+    router.push('/game')
+}
+
 const onTaskCompleted = () => {
-    expansionPanels.value = []
     setTimeout(() => {
         const contentSheet = document.getElementById('contentSheet')
         if (contentSheet) {

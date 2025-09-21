@@ -15,6 +15,11 @@ let _simulationInterval = null
 export const checkGpsAccessAndAccuracy = async () => {
     const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)
 
+    // Jeśli nie mobilne urządzenie i środowisko dev, symuluj dostęp GPS
+    if (!isMobile && import.meta.env.DEV) {
+        return { access: true, accuracy: 10, isMobile }
+    }
+
     if (!('geolocation' in navigator)) {
         return { access: false, reason: 'Geolocation API not available' }
     }

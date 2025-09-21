@@ -26,59 +26,95 @@
             }
         },
         {
-            "title": "stepOne",
+            "title": "storyTwo.taskFour",
             "bgImage": {
-                "src": "imageOne.png"
+                "src": "taskImageOne.png"
             },
-            "header": "stepOneSubheader",
+            "header": "storyTwo.taskFourHeader",
             "spacer": {},
             "content": [
                 {
-                    "type": "image",
-                    "src": "photoFour.png",
-                    "alt": "stepOneImageAlt"
-                },
-                {
-                    "type": "subheader",
-                    "text": "historySubheader"
-                },
-                {
                     "type": "p",
-                    "text": "stepOneParagraphOne"
-                },
-                {
-                    "type": "p",
-                    "text": "stepOneParagraphTwo"
-                },
-                {
-                    "type": "images",
-                    "list": [
-                        {
-                            "src": "photoOne.png",
-                            "alt": "stepOnePhotoAlt"
-                        },
-                        {
-                            "src": "photoTwo.png",
-                            "alt": "stepOnePhotoAlt"
-                        },
-                        {
-                            "src": "photoThree.png",
-                            "alt": "stepOnePhotoAlt"
-                        }
-                    ]
+                    "text": "storyTwo.taskThreeParagraphOne"
                 }
             ],
             "task": {
-                "question": "storyTwo.questionOne",
+                "question": "storyTwo.taskFourQuestion",
                 "answers": [
-                    "Jan Nepomucen",
-                    "św. Jan Nepomucen",
-                    "św Jan Nepomucen",
-                    "św. Nepomucen",
-                    "św Nepomucen"
+                    "Dożynki Piskorzów",
+                    "dożynki piskorzów",
+                    "dozynki piskorzow",
+                    "dozynki Piskorzow",
+                    "Dożynki piskorzow",
+                    "dożynki Piskorzów"
                 ],
-                "incorrectMessage": "storyTwo.incorrectMessageOne",
-                "tip": "storyTwo.tipOne"
+                "image": {
+                    "src": "imageFive.png",
+                    "alt": "storyTwo.taskFourImageAlt"
+                },
+                "tip": "storyTwo.taskFourTip"
+            },
+            "hiddenPosition": [16.5637337, 50.7328456],
+            "accuracy": 20
+        },
+        {
+            "title": "storyTwo.taskOne",
+            "bgImage": {
+                "src": "taskOneImage.png",
+                "alt": "storyTwo.taskOneImageAlt",
+                "blur": true
+            },
+            "header": "storyTwo.taskOneHeader",
+            "spacer": {},
+            "content": [
+                {
+                    "type": "p",
+                    "text": "storyTwo.taskOneParagraphOne"
+                },
+                {
+                    "type": "image",
+                    "src": "taskImageTwo.png",
+                    "alt": "storyTwo.taskImageTwoAlt"
+                }
+            ],
+            "task": {
+                "question": "storyTwo.taskOneQuestion",
+                "image": {
+                    "src": "taskImageTwo.png",
+                    "alt": "storyTwo.taskImageOneAlt"
+                },
+                "tip": "storyTwo.taskOneTip"
+            },
+            "hiddenPosition": [16.5637352, 50.7307916],
+            "accuracy": 20
+        },
+        {
+            "title": "storyTwo.taskTwo",
+            "bgImage": {
+                "src": "taskOneImage.png",
+                "blur": true
+            },
+            "header": "storyTwo.taskTwoHeader",
+            "spacer": {},
+            "content": [
+                {
+                    "type": "p",
+                    "text": "storyTwo.taskTwoParagraphOne"
+                }
+            ],
+            "task": {
+                "question": "storyTwo.taskTwoQuestion",
+                "answers": ["Radunia"],
+                "image": {
+                    "src": "imageFour.png",
+                    "alt": "storyTwo.taskTwoImageAlt"
+                },
+                "tip": "storyTwo.taskTwoTip"
+            },
+            "view": {
+                "center": [16.564899, 50.7328209],
+                "zoom": 17,
+                "duration": 2000
             },
             "feature": {
                 "type": "Feature",
@@ -86,111 +122,53 @@
                     "type": "Polygon",
                     "coordinates": [
                         [
-                            [16.5613954, 50.7334371],
-                            [16.5616315, 50.7334937],
-                            [16.561619, 50.7335197],
-                            [16.5617446, 50.7335504],
-                            [16.5618023, 50.7334537],
-                            [16.56171, 50.733432],
-                            [16.5617149, 50.7334236],
-                            [16.5614417, 50.7333579],
-                            [16.5613954, 50.7334371]
+                            [16.564899, 50.7328209],
+                            [16.5649997, 50.732792],
+                            [16.5646495, 50.7327971]
                         ]
                     ]
                 },
                 "properties": {}
-            },
-            "view": {
-                "center": [16.5615568, 50.7334326],
-                "zoom": 18,
-                "duration": 2000
             },
             "accuracy": 20
         },
         {
-            "title": "stepOne",
+            "title": "storyTwo.taskThree",
             "bgImage": {
-                "src": "imageOne.png"
+                "src": "taskImageOne.png"
             },
-            "header": "stepOneSubheader",
+            "header": "storyTwo.taskThreeHeader",
             "spacer": {},
             "content": [
                 {
-                    "type": "image",
-                    "src": "photoFour.png",
-                    "alt": "stepOneImageAlt"
-                },
-                {
-                    "type": "subheader",
-                    "text": "historySubheader"
-                },
-                {
                     "type": "p",
-                    "text": "stepOneParagraphOne"
-                },
-                {
-                    "type": "p",
-                    "text": "stepOneParagraphTwo"
-                },
-                {
-                    "type": "images",
-                    "list": [
-                        {
-                            "src": "photoOne.png",
-                            "alt": "stepOnePhotoAlt"
-                        },
-                        {
-                            "src": "photoTwo.png",
-                            "alt": "stepOnePhotoAlt"
-                        },
-                        {
-                            "src": "photoThree.png",
-                            "alt": "stepOnePhotoAlt"
-                        }
-                    ]
+                    "text": "storyTwo.taskThreeParagraphOne"
                 }
             ],
             "task": {
-                "question": "questionOne",
+                "question": "storyTwo.taskThreeQuestion",
                 "image": {
-                    "src": "taskImageOne.png",
-                    "alt": "taskImageOneAlt"
+                    "src": "imageTwo.png",
+                    "alt": "storyTwo.taskThreeImageAlt"
                 },
-                "answers": [
-                    "Jan Nepomucen",
-                    "św Jan Nepomucen",
-                    "św Jan Nepomucen",
-                    "św. Nepomucen",
-                    "św Nepomucen"
-                ],
-                "incorrectMessage": "incorrectMessageOne",
-                "tip": "tipOne"
+                "tip": "storyTwo.taskThreeTip"
             },
-            "feature": {
-                "type": "Feature",
-                "geometry": {
-                    "type": "Polygon",
-                    "coordinates": [
-                        [
-                            [16.5613954, 50.7334371],
-                            [16.5616315, 50.7334937],
-                            [16.561619, 50.7335197],
-                            [16.5617446, 50.7335504],
-                            [16.5618023, 50.7334537],
-                            [16.56171, 50.733432],
-                            [16.5617149, 50.7334236],
-                            [16.5614417, 50.7333579],
-                            [16.5613954, 50.7334371]
-                        ]
-                    ]
-                },
-                "properties": {}
+            "hiddenPosition": [16.5632315, 50.7318578],
+            "accuracy": 5000
+        },
+        {
+            "title": "storyTwo.ending",
+            "bgImage": {
+                "src": "taskImageOne.png"
             },
-            "view": {
-                "center": [16.5615568, 50.7334326],
-                "zoom": 18,
-                "duration": 2000
-            }
+            "header": "storyTwo.endingHeader",
+            "spacer": {},
+            "content": [
+                {
+                    "type": "p",
+                    "text": "storyTwo.endingParagraphOne"
+                }
+            ]
         }
     ]
 }

@@ -1,73 +1,87 @@
 <template>
     <div class="game-task">
-        <transition
-            name="task-transition"
-            mode="out-in"
+        <div
+            v-if="!showAccuracyMessage"
+            key="task"
         >
+            <div class="task-text mb-3">
+                {{ $t(task.question) }}
+            </div>
+            <v-img
+                v-if="task.image"
+                :src="`/stories/${storyId}/${task.image.src}`"
+                :alt="task.image.alt || 'Obraz'"
+                class="rounded-sm elevation-4 mb-4"
+                :style="task.image.blur ? 'filter: blur(3px);' : ''"
+                contain
+            />
+            <v-text-field
+                v-if="task.answers"
+                v-model="answer"
+                :label="$t('task.yourAnswer')"
+                density="compact"
+                variant="outlined"
+                class="mb-2"
+                :class="{ 'success-field': isCorrect }"
+                @focus="showTipLink = true"
+                :error="answer.length > 0 && !isCorrect"
+                :success="isCorrect"
+                :rules="validationRules"
+                :prepend-inner-icon="isCorrect ? 'mdi-thumb-up-outline' : undefined"
+            />
+
             <div
-                v-if="!showAccuracyMessage"
-                key="task"
+                v-if="task.tip"
+                class="tip-link mb-1"
             >
-                <div class="task-text mb-3">
-                    {{ $t(task.question) }}
-                </div>
-                <v-text-field
-                    v-model="answer"
-                    :label="$t('task.yourAnswer')"
-                    density="compact"
-                    variant="outlined"
-                    class="mb-2"
-                    :class="{ 'success-field': isCorrect }"
-                    @focus="showTipLink = true"
-                    :error="answer.length > 0 && !isCorrect"
-                    :success="isCorrect"
-                    :rules="validationRules"
-                    :prepend-inner-icon="isCorrect ? 'mdi-thumb-up-outline' : undefined"
-                    :readonly="fieldReadOnly"
-                />
-                <div
-                    v-if="task.tip"
-                    class="tip-link mb-1"
+                <a
+                    v-if="!showTip"
+                    href="#"
+                    @click.prevent="showTip = true"
+                    >{{ $t('task.showTip') }}</a
                 >
-                    <a
-                        v-if="!showTip"
-                        href="#"
-                        @click.prevent="showTip = true"
-                        >{{ $t('task.showTip') }}</a
+            </div>
+            <v-alert
+                v-if="showTip && task.tip"
+                type="info"
+                variant="tonal"
+            >
+                {{ $t(task.tip) }}
+            </v-alert>
+        </div>
+        <div
+            v-else
+            key="message"
+            class=""
+        >
+            <div class="task-text mb-3">
+                {{ $t(task.question) }}
+            </div>
+            <v-img
+                v-if="task.image"
+                :src="`/stories/${storyId}/${task.image.src}`"
+                :alt="task.image.alt || 'Obraz'"
+                class="rounded-sm elevation-4 mb-4"
+                contain
+            />
+            <v-alert
+                color="warning"
+                variant="tonal"
+                class="mb-3"
+            >
+                <div class="text-center">
+                    <v-icon
+                        size="48"
+                        class="mb-2"
+                        >mdi-map-marker-distance</v-icon
                     >
-                </div>
-                <v-alert
-                    v-if="showTip && task.tip && !fieldReadOnly"
-                    type="info"
-                    variant="tonal"
-                >
-                    {{ $t(task.tip) }}
-                </v-alert>
-            </div>
-            <div
-                v-else
-                key="message"
-                class="accuracy-message"
-            >
-                <v-alert
-                    color="warning"
-                    variant="tonal"
-                    class="mb-3"
-                >
-                    <div class="text-center">
-                        <v-icon
-                            size="48"
-                            class="mb-2"
-                            >mdi-map-marker-distance</v-icon
-                        >
-                        <div class="text-h6 mb-2">{{ $t('task.approachTarget') }}</div>
-                        <div class="text-h4 font-weight-bold">
-                            {{ remainingDistance }} {{ $t('task.meters') }}
-                        </div>
+                    <div class="text-h6 mb-2">{{ $t('task.approachTarget') }}</div>
+                    <div class="text-h4 font-weight-bold">
+                        {{ remainingDistance }} {{ $t('task.meters') }}
                     </div>
-                </v-alert>
-            </div>
-        </transition>
+                </div>
+            </v-alert>
+        </div>
     </div>
 </template>
 
@@ -84,6 +98,10 @@ onMounted(() => {
 })
 
 const props = defineProps({
+    storyId: {
+        type: String,
+        required: true,
+    },
     task: {
         type: Object,
         required: true,
@@ -98,21 +116,67 @@ const props = defineProps({
         required: false,
         default: null,
     },
+    hiddenPosition: {
+        type: Array,
+        required: false,
+        default: null,
+    },
 })
 const emit = defineEmits(['task-completed', 'answer-correct'])
 const answer = ref('')
 const showTip = ref(false)
 const showTipLink = ref(false)
-const fieldReadOnly = ref(false)
 const showAccuracyMessage = ref(false)
 const remainingDistance = ref(0)
 const isCorrect = computed(() => {
-    if (!props.task || !props.task.answers || !Array.isArray(props.task.answers)) return false
-    return props.task.answers.some(
-        (ans) =>
-            typeof ans === 'string' &&
-            answer.value.trim().toLowerCase() === ans.trim().toLowerCase(),
-    )
+    if (props.task.answers && Array.isArray(props.task.answers)) {
+        // Zadanie tekstowe: sprawdź odpowiedź
+        return props.task.answers.some(
+            (ans) =>
+                typeof ans === 'string' &&
+                answer.value.trim().toLowerCase() === ans.trim().toLowerCase(),
+        )
+    } else {
+        // Zadanie GPS: sprawdź odległość
+        if (
+            (!props.feature && !props.hiddenPosition) ||
+            !props.accuracy ||
+            !appStore.getUserGpsPosition
+        ) {
+            return false
+        }
+
+        let points = []
+
+        if (props.feature) {
+            const geom = props.feature.geometry
+            if (geom.type === 'Polygon') {
+                points = geom.coordinates[0]
+            } else if (geom.type === 'LineString') {
+                points = geom.coordinates
+            } else {
+                return false
+            }
+        } else if (props.hiddenPosition) {
+            points = [props.hiddenPosition]
+        } else {
+            return false
+        }
+
+        const userCoord = [appStore.getUserGpsPosition.lon, appStore.getUserGpsPosition.lat]
+        const gpsAccuracy = appStore.getUserGpsPosition.accuracy || 20
+        let minDistance = Infinity
+
+        for (const point of points) {
+            const distance = getDistance(userCoord, point)
+            if (distance < minDistance) {
+                minDistance = distance
+            }
+        }
+
+        const effectiveDistance = Math.max(0, minDistance - gpsAccuracy)
+        return effectiveDistance <= props.accuracy
+    }
 })
 
 const validationRules = computed(() => {
@@ -138,26 +202,36 @@ const validationRules = computed(() => {
 })
 
 const computeDistance = () => {
-    if (!props.feature || !props.accuracy || !appStore.getUserGpsPosition) {
+    if (
+        (!props.feature && !props.hiddenPosition) ||
+        !props.accuracy ||
+        !appStore.getUserGpsPosition
+    ) {
         showAccuracyMessage.value = false
         return
     }
 
-    const geom = props.feature.geometry
     let points = []
 
-    if (geom.type === 'Polygon') {
-        points = geom.coordinates[0]
-    } else if (geom.type === 'LineString') {
-        points = geom.coordinates
+    if (props.feature) {
+        const geom = props.feature.geometry
+        if (geom.type === 'Polygon') {
+            points = geom.coordinates[0]
+        } else if (geom.type === 'LineString') {
+            points = geom.coordinates
+        } else {
+            showAccuracyMessage.value = false
+            return
+        }
+    } else if (props.hiddenPosition) {
+        points = [props.hiddenPosition]
     } else {
         showAccuracyMessage.value = false
         return
     }
 
     const userCoord = [appStore.getUserGpsPosition.lon, appStore.getUserGpsPosition.lat]
-    // const gpsAccuracy = appStore.getUserGpsPosition.accuracy || 0
-    const gpsAccuracy = 20
+    const gpsAccuracy = 20 // Stała dokładność GPS dla symulacji
     let minDistance = Infinity
 
     for (const point of points) {
@@ -168,7 +242,7 @@ const computeDistance = () => {
     }
 
     const effectiveDistance = Math.max(0, minDistance - gpsAccuracy)
-    const hasAccuracy = effectiveDistance < props.accuracy
+    const hasAccuracy = effectiveDistance <= props.accuracy
     showAccuracyMessage.value = !hasAccuracy
     remainingDistance.value = hasAccuracy ? 0 : Math.ceil(effectiveDistance - props.accuracy)
 }
@@ -180,7 +254,6 @@ watch(
             if (navigator.vibrate) {
                 navigator.vibrate(100)
             }
-            fieldReadOnly.value = true
             emit('task-completed', newValue)
         }
     },
