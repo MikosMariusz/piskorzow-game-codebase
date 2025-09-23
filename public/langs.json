@@ -143,12 +143,22 @@
             "gpsStartError": "Nie udało się uruchomić śledzenia GPS.",
             "retryGps": "Spróbuj ponownie"
         },
+        "game": {
+            "resumeDialogTitle": "Wykryto zapisane postępy gry",
+            "resumeDialogText": "Czy chcesz kontynuować od ostatniego miejsca, czy zacząć od nowa?",
+            "resumeDialogContinue": "Kontynuuj",
+            "resumeDialogRestart": "Zacznij od nowa"
+        },
         "stepView": {
             "noStepAvailable": "Brak dostępnego kroku",
             "sectionContent": "Opis",
             "sectionTask": "Wyzwanie",
             "nextStep": "Następny krok",
-            "backToPresentation": "Powrót do scenariuszy"
+            "backToPresentation": "Powrót do scenariuszy",
+            "leaveDialogTitle": "Czy na pewno chcesz opuścić grę terenową?",
+            "leaveDialogText": "Twój postęp zostanie zapisany. Możesz wrócić później i kontynuować od tego miejsca.",
+            "leaveDialogYes": "Tak",
+            "leaveDialogNo": "Nie"
         },
         "task": {
             "yourAnswer": "Twoja odpowiedź",
@@ -281,12 +291,22 @@
             "gpsStartError": "Failed to start GPS tracking.",
             "retryGps": "Try again"
         },
+        "game": {
+            "resumeDialogTitle": "Saved game progress detected",
+            "resumeDialogText": "Do you want to continue from where you left off or start over?",
+            "resumeDialogContinue": "Continue",
+            "resumeDialogRestart": "Start over"
+        },
         "stepView": {
             "noStepAvailable": "No step available",
             "sectionContent": "Description",
             "sectionTask": "Challenge",
             "nextStep": "Next step",
-            "backToPresentation": "Back to presentation"
+            "backToPresentation": "Back to presentation",
+            "leaveDialogTitle": "Are you sure you want to leave the field game?",
+            "leaveDialogText": "Your progress will be saved. You can return later and continue from this point.",
+            "leaveDialogYes": "Yes",
+            "leaveDialogNo": "No"
         },
         "task": {
             "yourAnswer": "Your answer",

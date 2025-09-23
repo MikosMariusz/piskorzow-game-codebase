@@ -3,6 +3,11 @@
         v-if="currentStep"
         class="game-step"
     >
+        <GameDialog
+            v-model="showLeaveDialog"
+            @confirm="confirmLeave"
+            @cancel="cancelLeave"
+        />
         <div
             v-if="bgImage"
             class="bg-image-container"
@@ -147,7 +152,9 @@
 
 <script setup>
 import { computed, watch, ref, onMounted } from 'vue'
+import { onBeforeRouteLeave } from 'vue-router'
 import GameTask from './GameTask.vue'
+import GameDialog from './GameDialog.vue'
 import { useGoTo } from 'vuetify'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -157,6 +164,9 @@ const router = useRouter()
 const isGame = computed(() => {
     return route.path.startsWith('/game')
 })
+
+const showLeaveDialog = ref(false)
+let leaveResolve = null
 
 const props = defineProps({
     steps: {
@@ -263,8 +273,59 @@ const goToNextStep = () => {
 }
 
 const goToPresentation = () => {
-    router.push('/game')
+    router.push('/presentation')
 }
+
+// Mechanizm blokowania opuszczenia strony gry
+const saveGameProgress = () => {
+    const key = `gameProgress_${props.storyId}`
+    const currentProgress = {
+        route: route.fullPath,
+        stepIndex: props.activeIndex,
+        storyId: props.storyId,
+    }
+    const saved = localStorage.getItem(key)
+    if (saved) {
+        try {
+            const savedProgress = JSON.parse(saved)
+            // Zapisz tylko jeśli nie ma zapisu lub zapisany stepIndex jest niższy
+            if (savedProgress.stepIndex >= currentProgress.stepIndex) {
+                return
+            }
+        } catch (e) {}
+    }
+    localStorage.setItem(key, JSON.stringify(currentProgress))
+}
+
+const confirmLeave = () => {
+    showLeaveDialog.value = false
+    saveGameProgress()
+    if (leaveResolve) leaveResolve(true)
+}
+const cancelLeave = () => {
+    showLeaveDialog.value = false
+    if (leaveResolve) leaveResolve(false)
+}
+
+const waitForLeaveDialog = () => {
+    showLeaveDialog.value = true
+    return new Promise((resolve) => {
+        leaveResolve = resolve
+    })
+}
+
+onBeforeRouteLeave(async (to, from, next) => {
+    if (isGame.value && props.activeIndex > 0) {
+        const result = await waitForLeaveDialog()
+        if (result) {
+            next()
+        } else {
+            next(false)
+        }
+    } else {
+        next()
+    }
+})
 
 const onTaskCompleted = () => {
     setTimeout(() => {
@@ -288,6 +349,13 @@ const setNextStepActive = () => {
 
 onMounted(() => {
     setNextStepActive()
+    window.addEventListener('beforeunload', (e) => {
+        if (isGame.value && props.activeIndex > 0 && !isTaskCompleted.value) {
+            saveGameProgress()
+            e.preventDefault()
+            e.returnValue = ''
+        }
+    })
 })
 
 watch(

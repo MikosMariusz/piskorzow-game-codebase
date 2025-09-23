@@ -15,6 +15,7 @@ declare module 'vue' {
     AppFooter: typeof import('./src/components/AppFooter.vue')['default']
     CardWrapper: typeof import('./src/components/CardWrapper.vue')['default']
     GameCard: typeof import('./src/components/GameCard.vue')['default']
+    GameDialog: typeof import('./src/components/GameDialog.vue')['default']
     GameGpsUnavailableCard: typeof import('./src/components/GameGpsUnavailableCard.vue')['default']
     GameStaticContent: typeof import('./src/components/GameStaticContent.vue')['default']
     GameStep: typeof import('./src/components/GameStep.vue')['default']

@@ -37,6 +37,16 @@
                 >{{ $t('storyView.loadingError') }} {{ error }}</v-alert
             >
         </div>
+        <GameDialog
+            v-if="showResumeDialog"
+            v-model="showResumeDialog"
+            :title-key="'game.resumeDialogTitle'"
+            :text-key="'game.resumeDialogText'"
+            :confirm-key="'game.resumeDialogContinue'"
+            :cancel-key="'game.resumeDialogRestart'"
+            @confirm="resumeGame"
+            @cancel="restartGame"
+        />
         <div
             v-if="config"
             class="story-container"
@@ -114,8 +124,8 @@
             </div>
             <GameStep
                 :steps="config.steps || []"
-                :active-index="activeIndex"
-                :story-id="storyId"
+                :activeIndex="activeIndex"
+                :storyId="storyId"
                 @update-title="updateCardTitle"
                 @next-step="nextStep"
             />
@@ -132,6 +142,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import CardWrapper from '@/components/CardWrapper.vue'
 import GameStep from '@/components/GameStep.vue'
+import GameDialog from '@/components/GameDialog.vue'
 
 import { setStoryView, createMap } from '@/services/olMap'
 import {
@@ -151,6 +162,8 @@ const gpsError = ref(null)
 const config = ref(null)
 const cardTitle = ref('scenario')
 const activeIndex = ref(0)
+const showResumeDialog = ref(false)
+let resumeStepIndex = 0
 const { t } = useI18n()
 const appStore = useAppStore()
 
@@ -222,8 +235,31 @@ async function loadConfig() {
         if (!res.ok) throw new Error('Nie można pobrać configu scenariusza')
         const conf = await res.json()
         config.value = conf
-        activeIndex.value = 0
+        // Sprawdź zapisane postępy
+        const key = `gameProgress_${storyId.value}`
+        const saved = localStorage.getItem(key)
+        if (saved) {
+            try {
+                const savedProgress = JSON.parse(saved)
+                if (
+                    typeof savedProgress.stepIndex === 'number' &&
+                    savedProgress.stepIndex > 0 &&
+                    savedProgress.stepIndex < (conf.steps?.length || 0)
+                ) {
+                    resumeStepIndex = savedProgress.stepIndex
+                    showResumeDialog.value = true
+                    // Nie ustawiaj activeIndex, czekaj na wybór użytkownika
+                } else {
+                    activeIndex.value = 0
+                }
+            } catch (e) {
+                activeIndex.value = 0
+            }
+        } else {
+            activeIndex.value = 0
+        }
 
+        // Ustaw tytuł i mapę dla pierwszego kroku (lub po wyborze)
         if (conf.steps && conf.steps.length > 0 && conf.steps[0].title) {
             updateCardTitle(conf.steps[0].title)
             setStoryView({
@@ -237,6 +273,38 @@ async function loadConfig() {
         error.value = e.message
     } finally {
         loading.value = false
+    }
+}
+
+const resumeGame = () => {
+    activeIndex.value = resumeStepIndex
+    showResumeDialog.value = false
+    // Ustaw mapę i tytuł dla wznowionego kroku
+    const step = config.value?.steps?.[activeIndex.value]
+    if (step) {
+        updateCardTitle(step.title)
+        setStoryView({ feature: step.feature, view: step.view })
+    }
+}
+
+const restartGame = () => {
+    activeIndex.value = 0
+    showResumeDialog.value = false
+    // Nadpisz zapis w localStorage
+    const key = `gameProgress_${storyId.value}`
+    localStorage.setItem(
+        key,
+        JSON.stringify({
+            route: route.fullPath,
+            stepIndex: 0,
+            storyId: storyId.value,
+        }),
+    )
+    // Ustaw mapę i tytuł dla pierwszego kroku
+    const step = config.value?.steps?.[0]
+    if (step) {
+        updateCardTitle(step.title)
+        setStoryView({ feature: step.feature, view: step.view })
     }
 }
 
