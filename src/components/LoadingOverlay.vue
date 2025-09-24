@@ -9,7 +9,10 @@
             fluid
             class="loading-container d-flex justify-center align-center pa-0"
         >
-            <AppBackground />
+            <AppBackground
+                :blur="true"
+                :brightness="0.7"
+            />
 
             <AppCard
                 class="loading-card"

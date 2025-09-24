@@ -2,27 +2,30 @@
     <div
         v-if="currentStep"
         class="game-step"
+        :style="{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }"
     >
         <GameDialog
             v-model="showLeaveDialog"
             @confirm="confirmLeave"
             @cancel="cancelLeave"
         />
-        <div
+        <AppBackground
             v-if="bgImage"
-            class="bg-image-container"
-        >
-            <v-img
-                :src="`/stories/${storyId}/${bgImage.src}`"
-                :alt="bgImage.alt || 'Obraz tła'"
-                class="bg-image"
-                :style="{ filter: bgImage.blur ? 'blur(3px)' : 'none' }"
-                cover
-            />
-        </div>
+            :image-src="`/stories/${storyId}/${bgImage.src}`"
+            :blur="bgImage.blur"
+            :style="{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0 }"
+        />
         <div
             id="contentSheet"
-            class="step-content"
+            class="step-content pa-5"
+            :class="{ 'px-0': $vuetify.display.smAndDown }"
+            :style="{
+                position: 'relative',
+                zIndex: 1,
+                height: '100%',
+                maxHeight: '85vh',
+                overflowY: 'auto',
+            }"
             @scroll="resetScrollOffset"
         >
             <!-- Spacer jeśli istnieje -->
@@ -35,9 +38,10 @@
             <!-- Zawartość owinięta w v-sheet -->
             <v-sheet
                 v-if="contentItems.length > 0"
-                class="content-sheet pa-2"
+                class="pa-2"
+                style="position: relative"
                 elevation="4"
-                rounded="lg"
+                :rounded="$vuetify.display.mdAndUp ? 'lg' : 0"
             >
                 <v-card-title
                     v-if="header"
@@ -137,6 +141,7 @@
                     rounded="sm"
                     color="primary"
                     class="scroll-top-btn"
+                    :style="{ position: 'absolute', top: '10px', right: '10px', zIndex: 5000 }"
                     @click="() => scrollToTop()"
                 />
             </v-sheet>
@@ -155,6 +160,7 @@ import { computed, watch, ref, onMounted } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 import GameTask from './GameTask.vue'
 import GameDialog from './GameDialog.vue'
+import AppBackground from './AppBackground.vue'
 import { useGoTo } from 'vuetify'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -366,61 +372,3 @@ watch(
     },
 )
 </script>
-
-<style scoped>
-.game-step {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-}
-
-.bg-image-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 0;
-}
-
-.bg-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.step-content {
-    position: relative;
-    z-index: 1;
-    padding: 20px;
-    height: 100%;
-    max-height: 85vh;
-    overflow-y: auto;
-}
-
-.step-title {
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 8px;
-    padding: 16px;
-    margin-bottom: 16px !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.content-sheet {
-    position: relative;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(2px);
-}
-
-.scroll-top-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    z-index: 5000;
-}
-
-.scroll-top-btn:hover {
-    transform: scale(1.1);
-}
-</style>

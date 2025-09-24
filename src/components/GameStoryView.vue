@@ -1,9 +1,11 @@
 <template>
     <CardWrapper
+        ref="cardWrapperRef"
         :visible="true"
         :title="computedTitle"
         :desktopWidth="600"
         :closable="false"
+        :maximized="maximized"
     >
         <template #header-buttons-left>
             <v-btn
@@ -163,6 +165,8 @@ const config = ref(null)
 const cardTitle = ref('scenario')
 const activeIndex = ref(0)
 const showResumeDialog = ref(false)
+const maximized = ref(false)
+const cardWrapperRef = ref(null)
 let resumeStepIndex = 0
 const { t } = useI18n()
 const appStore = useAppStore()
@@ -309,6 +313,9 @@ const restartGame = () => {
 }
 
 const focusStepOnMap = () => {
+    if (cardWrapperRef.value) {
+        cardWrapperRef.value.offMaximize()
+    }
     const step = config.value?.steps?.[activeIndex.value]
     if (step) {
         setStoryView({

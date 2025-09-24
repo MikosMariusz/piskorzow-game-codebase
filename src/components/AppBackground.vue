@@ -1,8 +1,40 @@
 <template>
     <div class="app-background">
-        <div class="background-image"></div>
+        <div
+            class="background-image"
+            :style="{
+                backgroundImage: `url(${backgroundImageUrl})`,
+                filter: `blur(${blur ? 3 : 0}px) brightness(${brightness})`,
+            }"
+        ></div>
     </div>
 </template>
+
+<script setup>
+import { computed } from 'vue'
+
+const props = defineProps({
+    imageSrc: {
+        type: String,
+        default: '../assets/images/app-background.png',
+    },
+    blur: {
+        type: Boolean,
+        default: false,
+    },
+    brightness: {
+        type: Number,
+        default: 1,
+    },
+})
+
+const backgroundImageUrl = computed(() => {
+    if (props.imageSrc.startsWith('/')) {
+        return props.imageSrc
+    }
+    return new URL(props.imageSrc, import.meta.url).href
+})
+</script>
 
 <style scoped>
 .app-background {
@@ -21,10 +53,8 @@
     left: -10px;
     width: calc(100% + 20px);
     height: calc(100% + 20px);
-    background-image: url('@/assets/images/app-background.png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    filter: blur(5px) brightness(0.7);
 }
 </style>

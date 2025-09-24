@@ -240,6 +240,12 @@ const toggleMaximize = () => {
     isMobileMaximized.value = !isMobileMaximized.value
 }
 
+const offMaximize = () => {
+    if (isMobileMaximized.value) {
+        isMobileMaximized.value = false
+    }
+}
+
 const closeCard = () => {
     if (!props.closable) return
     isMobileMaximized.value = false
@@ -253,14 +259,14 @@ const buttonConfigs = computed(() => [
         icon: smAndDown.value ? 'mdi-chevron-down' : 'mdi-chevron-up',
         title: 'gameCard.minimize',
         action: toggleMinimize,
-        visible: !isMinimized.value && props.minimize,
+        visible: !isMinimized.value && props.minimize && !isMobileMaximized.value,
     },
     {
         key: 'restore',
         icon: smAndDown.value ? 'mdi-chevron-up' : 'mdi-chevron-down',
         title: 'gameCard.restore',
         action: toggleMinimize,
-        visible: isMinimized.value && props.minimize,
+        visible: isMinimized.value && props.minimize && !isMobileMaximized.value,
     },
     {
         key: 'maximize',
@@ -284,6 +290,10 @@ const buttonConfigs = computed(() => [
         visible: props.closable,
     },
 ])
+
+defineExpose({
+    offMaximize,
+})
 </script>
 
 <style scoped>
