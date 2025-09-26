@@ -8,16 +8,12 @@
         :maximized="maximized"
     >
         <template #header-buttons-left>
-            <v-btn
-                icon="mdi-map-marker"
-                variant="elevated"
-                size="small"
+            <GameButton
+                v-if="hasFeatures"
                 class="mr-2"
-                elevation="2"
-                rounded="sm"
-                color="primary"
-                :title="$t('storyView.focusStepOnMap')"
-                @click="focusStepOnMap"
+                icon="mdi-map-marker"
+                title="storyView.focusStepOnMap"
+                :action="focusStepOnMap"
             />
         </template>
         <div
@@ -72,21 +68,14 @@
                         class="d-flex mt-2"
                         style="gap: 8px"
                     >
-                        <v-btn
-                            size="small"
-                            variant="elevated"
-                            @click="retryGpsAccess"
-                        >
-                            {{ $t('storyView.retryGps') }}
-                        </v-btn>
-                        <v-btn
-                            size="small"
-                            variant="elevated"
-                            elevation="2"
-                            @click="goToPresentation"
-                        >
-                            {{ $t('goToPresentation') }}
-                        </v-btn>
+                        <GameButton
+                            label="storyView.retryGps"
+                            :action="retryGpsAccess"
+                        />
+                        <GameButton
+                            label="goToPresentation"
+                            :action="goToPresentation"
+                        />
                     </v-row>
                 </v-alert>
             </div>
@@ -94,17 +83,13 @@
                 class="navigation-buttons"
                 v-if="config.steps && config.steps.length > 1 && !isGame"
             >
-                <v-btn
+                <GameButton
                     :disabled="!hasPrev"
-                    @click="prevStep"
-                    variant="outlined"
-                    size="small"
+                    :action="() => prevStep()"
                     class="nav-btn"
-                >
-                    <v-icon left>mdi-chevron-left</v-icon>
-                    {{ $t('storyView.previousStep') }}
-                </v-btn>
-
+                    icon="mdi-chevron-left"
+                    label="storyView.previousStep"
+                />
                 <span class="step-counter">
                     {{
                         $t('storyView.stepCounter', {
@@ -113,16 +98,14 @@
                         })
                     }}
                 </span>
-                <v-btn
+                <GameButton
                     :disabled="!hasNext"
-                    @click="nextStep"
-                    variant="outlined"
-                    size="small"
+                    :action="() => nextStep()"
                     class="nav-btn"
-                >
-                    {{ $t('storyView.nextStep') }}
-                    <v-icon right>mdi-chevron-right</v-icon>
-                </v-btn>
+                    label="storyView.nextStep"
+                    icon="mdi-chevron-right"
+                    right
+                />
             </div>
             <GameStep
                 :steps="config.steps || []"
@@ -145,6 +128,7 @@ import { useI18n } from 'vue-i18n'
 import CardWrapper from '@/components/CardWrapper.vue'
 import GameStep from '@/components/GameStep.vue'
 import GameDialog from '@/components/GameDialog.vue'
+import GameButton from '@/components/GameButton.vue'
 
 import { setStoryView, createMap } from '@/services/olMap'
 import {
@@ -181,6 +165,13 @@ const hasPrev = computed(() => {
 })
 const isGame = computed(() => {
     return route.path.startsWith('/game')
+})
+
+const hasFeatures = computed(() => {
+    const steps = config.value?.steps
+    if (!steps || !Array.isArray(steps)) return false
+    const step = steps[activeIndex.value]
+    return !!(step && Array.isArray(step.features) && step.features.length > 0)
 })
 
 const computedTitle = computed(() => {

@@ -90,12 +90,13 @@ let _gpsPositionCallback = null
 let _currentPosition = null
 let _positionUpdateCallback = null
 let _simulationInterval = null
+let _simulateGPS = false
 
 export const checkGpsAccessAndAccuracy = async () => {
     const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)
 
     // Jeśli nie mobilne urządzenie i środowisko dev, symuluj dostęp GPS
-    if (!isMobile && import.meta.env.DEV) {
+    if (!isMobile && import.meta.env.DEV && _simulateGPS) {
         return { access: true, accuracy: 10, isMobile }
     }
 
@@ -262,7 +263,7 @@ export const startGpsTracking = async (map) => {
     const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)
 
     // Jeśli nie mobilne urządzenie i środowisko dev, uruchom symulację
-    if (!isMobile && import.meta.env.DEV) {
+    if (!isMobile && import.meta.env.DEV && _simulateGPS) {
         return startGpsSimulation(map)
     }
 

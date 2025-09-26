@@ -5,14 +5,12 @@
         rounded="sm"
     >
         <v-card-text class="gps-buttons pa-0">
-            <v-btn
-                variant="text"
-                size="small"
-                density="compact"
+            <GameButton
                 :icon="gpsIcon"
-                @click="handleGpsToggle"
+                :action="handleGpsToggle"
                 :aria-label="gpsAriaLabel"
                 class="gps-button"
+                color="''"
                 :class="gpsButtonClass"
             />
         </v-card-text>
@@ -36,6 +34,7 @@ import {
     getCurrentPosition,
 } from '@/services/gps'
 import { useAppStore } from '@/stores/app'
+import GameButton from '@/components/GameButton.vue'
 
 const appStore = useAppStore()
 

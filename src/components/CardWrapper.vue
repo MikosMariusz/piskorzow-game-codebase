@@ -31,17 +31,12 @@
                             v-for="btn in buttonConfigs"
                             :key="btn.key"
                         >
-                            <v-btn
+                            <GameButton
                                 v-if="btn.visible"
                                 :icon="btn.icon"
-                                variant="elevated"
-                                size="small"
-                                rounded="sm"
-                                @click="btn.action"
-                                :title="t(btn.title)"
+                                :action="btn.action"
+                                :title="btn.title"
                                 class="mr-2"
-                                elevation="2"
-                                color="primary"
                             />
                         </template>
                     </div>
@@ -66,6 +61,7 @@ import { useDisplay } from 'vuetify'
 import { useI18n } from 'vue-i18n'
 import { useAppStore } from '@/stores/app'
 import AppCard from '@/components/AppCard.vue'
+import GameButton from '@/components/GameButton.vue'
 
 const { smAndDown, mdAndUp } = useDisplay()
 const { t } = useI18n()

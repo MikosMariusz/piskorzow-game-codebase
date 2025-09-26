@@ -10,29 +10,20 @@
         <div class="mb-4 text-body-1">
             {{ $t('terrainGameUnavailableDescription') }}
         </div>
-        <v-btn
-            color="primary"
-            elevation="4"
-            rounded="sm"
-            @click="goToPresentation"
-        >
-            {{ $t('goToPresentation') }}
-        </v-btn>
+        <GameButton
+            :action="goToPresentation"
+            :label="'goToPresentation'"
+        />
     </div>
 </template>
 
 <script setup>
 import { useRouter } from 'vue-router'
-import { onMounted } from 'vue'
+import GameButton from '@/components/GameButton.vue'
 
 const router = useRouter()
 
-onMounted(() => {
-    console.log('🚫 GameGpsUnavailableCard mounted!')
-})
-
 const goToPresentation = () => {
-    console.log('🎯 Going to presentation page')
     router.push('/presentation')
 }
 </script>
@@ -45,6 +36,5 @@ const goToPresentation = () => {
     align-items: center;
     justify-content: center;
     text-align: center;
-    box-sizing: border-box;
 }
 </style>

@@ -17,8 +17,8 @@
         />
         <div
             id="contentSheet"
-            class="step-content pa-5"
-            :class="{ 'px-0': $vuetify.display.smAndDown }"
+            class="pa-5"
+            :class="{ 'px-0': $vuetify.display.xs }"
             :style="{
                 position: 'relative',
                 zIndex: 1,
@@ -41,7 +41,7 @@
                 class="pa-2"
                 style="position: relative"
                 elevation="4"
-                :rounded="$vuetify.display.mdAndUp ? 'lg' : 0"
+                :rounded="$vuetify.display.smAndUp ? 'lg' : 0"
             >
                 <v-card-title
                     v-if="header"
@@ -104,44 +104,31 @@
                         v-if="(isGame && !hasTask) || (isGame && isTaskCompleted)"
                         class="mt-3 mb-2 px-0"
                     >
-                        <v-btn
+                        <GameButton
                             v-if="!isLastStep"
-                            color="primary"
-                            @click="goToNextStep"
-                            rounded="sm"
-                            elevation="2"
+                            :action="goToNextStep"
                             :disabled="!nextStepActive"
                             block
-                        >
-                            {{ $t('stepView.nextStep') }}
-                        </v-btn>
-                        <v-btn
+                            label="stepView.nextStep"
+                        />
+                        <GameButton
                             v-else
-                            color="primary"
-                            @click="goToPresentation"
-                            rounded="sm"
-                            elevation="2"
+                            :action="goToPresentation"
                             block
-                        >
-                            {{ $t('stepView.backToPresentation') }}
-                        </v-btn>
+                            label="stepView.backToPresentation"
+                        />
                     </div>
                 </v-fade-transition>
-
-                <v-btn
+                <GameButton
+                    v-if="contentItems.length > 0"
                     :icon="
                         scrollOffset === 0
                             ? 'mdi-arrow-up-bold-outline'
                             : 'mdi-arrow-down-bold-outline'
                     "
-                    variant="elevated"
-                    size="small"
-                    elevation="4"
-                    rounded="sm"
-                    color="primary"
                     class="scroll-top-btn"
                     :style="{ position: 'absolute', top: '10px', right: '10px', zIndex: 5000 }"
-                    @click="() => scrollToTop()"
+                    :action="() => scrollToTop()"
                 />
             </v-sheet>
         </div>
@@ -159,6 +146,7 @@ import { computed, watch, ref, onMounted } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 import GameTask from './GameTask.vue'
 import GameDialog from './GameDialog.vue'
+import GameButton from '@/components/GameButton.vue'
 import AppBackground from './AppBackground.vue'
 import { useGoTo } from 'vuetify'
 import { useRoute, useRouter } from 'vue-router'

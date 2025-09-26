@@ -19,32 +19,28 @@
                 ></v-img>
             </div>
         </template>
-        <v-btn
+        <GameButton
             v-if="!appStore.isHomePage"
-            icon="mdi-arrow-left"
-            variant="elevated"
-            size="small"
             class="ml-2"
-            elevation="4"
-            rounded="sm"
-            :title="$t('navigation.backToHome')"
-            @click="goBack"
+            icon="mdi-arrow-left"
+            color="''"
+            title="navigation.backToHome"
+            :action="goBack"
         />
         <v-toolbar-title :class="{ 'text-shadow text-white': appStore.isHomePage }">{{
             $t('gameTitle')
         }}</v-toolbar-title>
         <v-spacer />
-        <v-btn
+        <GameButton
             icon="mdi-information-outline"
-            variant="elevated"
-            size="small"
-            elevation="4"
-            rounded="sm"
-            class="mr-5"
-            color="primary"
-            :title="$t('projectInfo.showInfo')"
-            @click="$emit('show-project-info')"
+            title="projectInfo.showInfo"
+            :action="
+                () => {
+                    $emit('show-project-info')
+                }
+            "
             @contextmenu.prevent="$emit('reset-project-info')"
+            class="mr-5"
         />
         <lang-switcher class="mr-4" />
     </v-app-bar>
@@ -55,6 +51,7 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import { getOSMDuration } from '@/services/olMap'
+import GameButton from '@/components/GameButton.vue'
 
 defineEmits(['show-project-info', 'reset-project-info'])
 
@@ -98,11 +95,5 @@ const goBack = () => {
     width: 100%;
     height: 100%;
     transition: opacity 0.3s ease-in-out;
-}
-
-/* Hover effect for buttons */
-.v-btn:hover {
-    transform: translateY(-1px);
-    transition: transform 0.2s ease-in-out;
 }
 </style>

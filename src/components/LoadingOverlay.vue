@@ -49,6 +49,7 @@
                             <v-img
                                 src="@/assets/images/project-logos.png"
                                 alt="Logotypy projektu"
+                                height="200"
                                 class="logos-image"
                                 contain
                             />
@@ -71,7 +72,7 @@ import AppBackground from './AppBackground.vue'
 const appStore = useAppStore()
 const { t } = useI18n()
 
-const currentStatus = ref('')
+const currentStatus = ref('...')
 
 // Computed properties
 const isVisible = computed(() => appStore.getIsLoading)

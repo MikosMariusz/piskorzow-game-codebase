@@ -25,17 +25,17 @@
                     {{ $t(textKey) }}
                 </div>
                 <div class="d-flex justify-end align-center">
-                    <v-btn
+                    <GameButton
+                        :label="cancelKey"
                         color="secondary"
-                        @click="onCancel"
-                        >{{ $t(cancelKey) }}</v-btn
-                    >
+                        :action="onCancel"
+                    />
                     <v-spacer />
-                    <v-btn
+                    <GameButton
+                        :label="confirmKey"
                         color="primary"
-                        @click="onConfirm"
-                        >{{ $t(confirmKey) }}</v-btn
-                    >
+                        :action="onConfirm"
+                    />
                 </div>
             </div>
         </AppCard>
@@ -44,6 +44,7 @@
 
 <script setup>
 import AppCard from '@/components/AppCard.vue'
+import GameButton from '@/components/GameButton.vue'
 import { computed } from 'vue'
 const props = defineProps({
     modelValue: Boolean,
