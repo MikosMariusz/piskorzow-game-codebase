@@ -330,15 +330,15 @@ defineExpose({
 
     /* Fallback dla starszych przeglądarek */
     .card-wrapper--fullscreen {
-        height: calc(100vh - 64px) !important;
-        max-height: calc(100vh - 64px) !important;
+        height: 100vh !important;
+        max-height: 100vh !important;
     }
 
     /* Nowoczesne przeglądarki z obsługą dvh */
     @supports (height: 100dvh) {
         .card-wrapper--fullscreen {
-            height: calc(100dvh - 64px) !important;
-            max-height: calc(100dvh - 64px) !important;
+            height: 100dvh !important;
+            max-height: 100dvh !important;
         }
     }
 }
@@ -367,8 +367,6 @@ defineExpose({
     border-radius: 0 !important;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
     bottom: 0 !important;
-    height: calc(100dvh - 64px) !important;
-    max-height: calc(100dvh - 64px) !important;
     transform-origin: bottom center;
 }
 
@@ -428,7 +426,7 @@ defineExpose({
 }
 
 .card-content-scroll {
-    height: calc(100% - 64px);
+    height: 100%;
     overflow-y: auto;
 }
 

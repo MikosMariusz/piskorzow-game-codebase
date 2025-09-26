@@ -161,8 +161,8 @@ onBeforeUnmount(() => {
 <style scoped>
 .map-gps-controls {
     position: fixed;
-    top: 158px; /* Pod zoom controls (72px + 40px + 40px + 6px + 6px) */
-    left: 8px;
+    top: 162px; /* Pod zoom controls (72px + 40px + 40px + 6px + 6px) */
+    left: 12px;
     z-index: 1000;
     min-width: auto;
 }

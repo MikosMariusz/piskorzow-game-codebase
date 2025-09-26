@@ -92,7 +92,6 @@
 <script setup>
 import { ref } from 'vue'
 import { useTheme } from 'vuetify'
-import { getCurrentZoom } from '@/services/olMap'
 
 const theme = useTheme()
 const isExpanded = ref(false)
@@ -137,8 +136,8 @@ defineExpose({
 <style scoped>
 .map-attributions {
     position: fixed;
-    bottom: 8px;
-    left: 8px;
+    bottom: 12px;
+    left: 12px;
     min-width: 200px;
     max-width: 400px;
     z-index: 1000;

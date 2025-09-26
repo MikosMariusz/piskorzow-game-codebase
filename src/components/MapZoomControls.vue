@@ -77,8 +77,8 @@ onBeforeUnmount(() => {
 <style scoped>
 .map-zoom-controls {
     position: fixed;
-    top: 72px; /* Tuż pod v-app-bar (64px + 8px margin) */
-    left: 8px;
+    top: 76px; /* Tuż pod v-app-bar (64px + 8px margin) */
+    left: 12px;
     z-index: 1000;
     min-width: auto;
 }

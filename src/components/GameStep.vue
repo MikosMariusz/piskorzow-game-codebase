@@ -13,7 +13,7 @@
             v-if="bgImage"
             :image-src="`/stories/${storyId}/${bgImage.src}`"
             :blur="bgImage.blur"
-            :style="{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0 }"
+            :style="{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: -1 }"
         />
         <div
             id="contentSheet"
@@ -23,7 +23,7 @@
                 position: 'relative',
                 zIndex: 1,
                 height: '100%',
-                maxHeight: '85vh',
+                maxHeight: 'calc(100vh - 68px)',
                 overflowY: 'auto',
             }"
             @scroll="resetScrollOffset"
