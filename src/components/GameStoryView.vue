@@ -49,7 +49,6 @@
             v-if="config"
             class="story-container"
         >
-            <!-- Alert GPS - pozycjonowany absolutnie na górze -->
             <div
                 v-if="gpsError"
                 class="gps-alert-container"
@@ -177,7 +176,6 @@ const hasFeatures = computed(() => {
 const computedTitle = computed(() => {
     const baseTitle = t(cardTitle.value)
 
-    // Dodaj licznik kroków jeśli jesteśmy w grze
     if (isGame.value && config.value?.steps) {
         const stepCounter = `(${activeIndex.value + 1}/${config.value.steps.length})`
         return `${stepCounter} ${baseTitle}`
@@ -230,7 +228,6 @@ async function loadConfig() {
         if (!res.ok) throw new Error('Nie można pobrać configu scenariusza')
         const conf = await res.json()
         config.value = conf
-        // Sprawdź zapisane postępy
         const key = `gameProgress_${storyId.value}`
         const saved = localStorage.getItem(key)
         if (saved) {
@@ -243,7 +240,6 @@ async function loadConfig() {
                 ) {
                     resumeStepIndex = savedProgress.stepIndex
                     showResumeDialog.value = true
-                    // Nie ustawiaj activeIndex, czekaj na wybór użytkownika
                 } else {
                     activeIndex.value = 0
                 }
@@ -254,7 +250,6 @@ async function loadConfig() {
             activeIndex.value = 0
         }
 
-        // Ustaw tytuł i mapę dla pierwszego kroku (lub po wyborze)
         if (conf.steps && conf.steps.length > 0 && conf.steps[0].title) {
             updateCardTitle(conf.steps[0].title)
             setStoryView({
@@ -274,7 +269,6 @@ async function loadConfig() {
 const resumeGame = () => {
     activeIndex.value = resumeStepIndex
     showResumeDialog.value = false
-    // Ustaw mapę i tytuł dla wznowionego kroku
     const step = config.value?.steps?.[activeIndex.value]
     if (step) {
         updateCardTitle(step.title)
@@ -285,7 +279,6 @@ const resumeGame = () => {
 const restartGame = () => {
     activeIndex.value = 0
     showResumeDialog.value = false
-    // Nadpisz zapis w localStorage
     const key = `gameProgress_${storyId.value}`
     localStorage.setItem(
         key,
@@ -295,7 +288,6 @@ const restartGame = () => {
             storyId: storyId.value,
         }),
     )
-    // Ustaw mapę i tytuł dla pierwszego kroku
     const step = config.value?.steps?.[0]
     if (step) {
         updateCardTitle(step.title)
@@ -316,31 +308,21 @@ const focusStepOnMap = () => {
     }
 }
 
-/**
- * Automatycznie włącza GPS w trybie ENABLED (pokazuje pozycję bez centrowania)
- */
 const initializeGps = async () => {
     try {
-        // Sprawdź dostęp do GPS
         const gpsResult = await checkGpsAccessAndAccuracy()
 
         if (!gpsResult.access) {
-            // Ustaw komunikat błędu w zależności od przyczyny
             if (gpsResult.error === 1) {
-                // PERMISSION_DENIED
                 gpsError.value = t('storyView.gpsPermissionDenied')
             } else if (gpsResult.error === 2) {
-                // POSITION_UNAVAILABLE
                 gpsError.value = t('storyView.gpsUnavailable')
             } else if (gpsResult.error === 3) {
-                // TIMEOUT
                 gpsError.value = t('storyView.gpsTimeout')
             } else if (gpsResult.reason?.includes('Accuracy')) {
                 if (import.meta.env.DEV) {
-                    // W trybie deweloperskim ignoruj niską dokładność dla celów testowych
                     const map = createMap()
 
-                    // Zarejestruj callback dla aktualizacji pozycji w store
                     setPositionUpdateCallback((position) => {
                         appStore.setGpsPosition(position)
                     })
@@ -362,10 +344,8 @@ const initializeGps = async () => {
             return
         }
 
-        // GPS dostępny - włącz w trybie ENABLED (pokazuj pozycję, nie centruj)
         const map = createMap()
 
-        // Zarejestruj callback dla aktualizacji pozycji w store
         setPositionUpdateCallback((position) => {
             appStore.setGpsPosition(position)
         })
@@ -375,7 +355,6 @@ const initializeGps = async () => {
         if (success) {
             gpsStarted = true
             gpsError.value = null
-            // Ustaw globalny stan GPS na ENABLED
             appStore.enableGps()
         } else {
             gpsError.value = t('storyView.gpsStartError')
@@ -386,9 +365,6 @@ const initializeGps = async () => {
     }
 }
 
-/**
- * Ponowna próba dostępu do GPS
- */
 const retryGpsAccess = () => {
     gpsError.value = null
     initializeGps()
@@ -400,12 +376,10 @@ const goToPresentation = () => {
 
 onMounted(() => {
     loadConfig()
-    // Automatycznie włącz GPS przy wejściu w grę terenową
     initializeGps()
 })
 
 onBeforeUnmount(() => {
-    // Zatrzymaj GPS przy wyjściu z gry tylko jeśli był uruchomiony przez ten komponent
     if (gpsStarted) {
         const map = createMap()
         stopGpsTracking(map)

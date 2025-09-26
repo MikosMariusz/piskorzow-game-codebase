@@ -58,13 +58,11 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { useDisplay } from 'vuetify'
-import { useI18n } from 'vue-i18n'
 import { useAppStore } from '@/stores/app'
 import AppCard from '@/components/AppCard.vue'
 import GameButton from '@/components/GameButton.vue'
 
 const { smAndDown, mdAndUp } = useDisplay()
-const { t } = useI18n()
 const appStore = useAppStore()
 
 const props = defineProps({
@@ -304,7 +302,6 @@ defineExpose({
     max-height: calc(100vh - 85px);
 }
 
-/* Fallback dla mobilnych przeglądarek z problemami vh */
 @supports (height: 100dvh) {
     .card-wrapper {
         height: calc(100dvh - 85px);
@@ -328,13 +325,11 @@ defineExpose({
         border-radius: 0 !important;
     }
 
-    /* Fallback dla starszych przeglądarek */
     .card-wrapper--fullscreen {
         height: 100vh !important;
         max-height: 100vh !important;
     }
 
-    /* Nowoczesne przeglądarki z obsługą dvh */
     @supports (height: 100dvh) {
         .card-wrapper--fullscreen {
             height: 100dvh !important;
@@ -352,7 +347,6 @@ defineExpose({
         width: v-bind(formattedDesktopWidth) !important;
     }
 
-    /* Wyśrodkowane okna na desktopie */
     .card-wrapper--centered {
         top: 50% !important;
         left: 50% !important;

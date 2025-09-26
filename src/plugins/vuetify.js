@@ -1,26 +1,15 @@
-/**
- * plugins/vuetify.js
- *
- * Framework documentation: https://vuetifyjs.com`
- */
-
-// Composables
 import { createVuetify } from 'vuetify'
 import { pl, en } from 'vuetify/locale'
-
-// Styles
 import '@mdi/font/css/materialdesignicons.css'
-
 import 'vuetify/styles'
 
-// https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides
 export default createVuetify({
     theme: {
         defaultTheme: 'light',
         themes: {
             light: {
                 colors: {
-                    primary: '#D4851C', // Szlachetny złoto-pomarańczowy
+                    primary: '#D4851C',
                     'primary-darken-1': '#B8721A',
                     secondary: '#5A6C7D',
                     accent: '#E6A84A',
@@ -38,7 +27,7 @@ export default createVuetify({
             },
             dark: {
                 colors: {
-                    primary: '#F4A836', // Jaśniejszy odcień dla ciemnego motywu
+                    primary: '#F4A836',
                     'primary-darken-1': '#D4851C',
                     secondary: '#7B8A9B',
                     accent: '#F4C266',

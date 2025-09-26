@@ -137,14 +137,12 @@ const arrowAngle = ref(0)
 
 const isCorrect = computed(() => {
     if (props.task.answers && Array.isArray(props.task.answers)) {
-        // Zadanie tekstowe: sprawdź odpowiedź
         return props.task.answers.some(
             (ans) =>
                 typeof ans === 'string' &&
                 answer.value.trim().toLowerCase() === ans.trim().toLowerCase(),
         )
     } else {
-        // Zadanie GPS: sprawdź odległość
         if (!props.position || !props.accuracy || !appStore.getUserGpsPosition) {
             return false
         }
@@ -168,21 +166,19 @@ const distanceUnit = computed(() => {
 const validationRules = computed(() => {
     return [
         (value) => {
-            if (!value || value.trim() === '') return true // Nie waliduj pustych pól
+            if (!value || value.trim() === '') return true
 
-            // Sprawdź czy odpowiedź jest poprawna
             const correct = props.task.answers?.some(
                 (ans) =>
                     typeof ans === 'string' &&
                     value.trim().toLowerCase() === ans.trim().toLowerCase(),
             )
 
-            // Jeśli niepoprawna, zwróć komunikat błędu
             if (!correct && props.task.incorrectMessage) {
                 return t(props.task.incorrectMessage)
             }
 
-            return true // Poprawna odpowiedź
+            return true
         },
     ]
 })
@@ -194,12 +190,13 @@ const computeDistance = () => {
     }
 
     const userCoord = [appStore.getUserGpsPosition.lon, appStore.getUserGpsPosition.lat]
+
     if (!userCoord[0] || !userCoord[1]) {
         showAccuracyMessage.value = false
         return
     }
 
-    const gpsAccuracy = 20 // Stała dokładność GPS dla symulacji
+    const gpsAccuracy = 20
     const distance = getDistance(userCoord, props.position)
     const effectiveDistance = Math.max(0, distance - gpsAccuracy)
     const hasAccuracy = effectiveDistance <= props.accuracy
@@ -250,7 +247,6 @@ watch(
     min-height: 200px;
 }
 
-/* Animacje przełączania */
 .task-transition-enter-active,
 .task-transition-leave-active {
     transition: all 0.5s ease;
@@ -284,7 +280,6 @@ watch(
     color: #757575;
 }
 
-/* Stylowanie pola przy poprawnej odpowiedzi */
 .success-field :deep(.v-field) {
     background-color: rgba(76, 175, 80, 0.08);
     border-color: #4caf50 !important;

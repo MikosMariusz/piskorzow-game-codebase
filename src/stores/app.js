@@ -3,26 +3,22 @@ import { defineStore } from 'pinia'
 import { checkGpsAccessAndAccuracy } from '@/services/gps'
 
 export const useAppStore = defineStore('app', () => {
-    // State
+    const GPS_STATE = {
+        DISABLED: 0,
+        ENABLED: 1,
+        TRACKING: 2,
+    }
+
     const homePageActive = ref(true)
     const gpsAccess = ref(null)
     const isLoading = ref(true)
     const gameCardVisible = ref(false)
     const userGpsPosition = ref(null)
-
-    // GPS States - globalne stany GPS dla synchronizacji między komponentami
-    const GPS_STATE = {
-        DISABLED: 0, // GPS wyłączony
-        ENABLED: 1, // GPS włączony - pokazuje pozycję
-        TRACKING: 2, // GPS śledzony - centruje mapę na pozycji
-    }
     const gpsState = ref(GPS_STATE.DISABLED)
-
     const activeWindow = ref(null)
     const projectInfoDismissed = ref(localStorage.getItem('projectInfoDialogDismissed') === 'true')
     const isWindowClosedByReplacement = ref(false)
 
-    // Getters
     const isHomePage = computed(() => homePageActive.value)
     const hasGpsAccess = computed(() => {
         return gpsAccess.value === true
@@ -35,8 +31,6 @@ export const useAppStore = defineStore('app', () => {
         () => !isLoading.value && !projectInfoDismissed.value && activeWindow.value === null,
     )
     const getIsWindowClosedByReplacement = computed(() => isWindowClosedByReplacement.value)
-
-    // GPS getters
     const getGpsState = computed(() => gpsState.value)
     const getUserGpsPosition = computed(() => userGpsPosition.value)
     const isGpsEnabled = computed(
@@ -44,20 +38,17 @@ export const useAppStore = defineStore('app', () => {
     )
     const isGpsTracking = computed(() => gpsState.value === GPS_STATE.TRACKING)
 
-    // Actions
     const setHomePage = (value) => {
         homePageActive.value = value
     }
     const setGpsPosition = (position) => {
         userGpsPosition.value = position
     }
-
     const updateHomePageFromRoute = (routePath) => {
         const shouldBeHomePage = routePath === '/' || routePath === '/index'
         setHomePage(shouldBeHomePage)
         return shouldBeHomePage
     }
-
     const checkGpsAccess = async () => {
         try {
             const gpsResult = await checkGpsAccessAndAccuracy()
@@ -81,11 +72,9 @@ export const useAppStore = defineStore('app', () => {
             }, 3000)
         }
     }
-
     const setLoading = (loadingState) => {
         isLoading.value = loadingState
     }
-
     const setGameCardVisible = (visible) => {
         if (visible && activeWindow.value !== 'game') {
             openWindow('game')
@@ -93,7 +82,6 @@ export const useAppStore = defineStore('app', () => {
             closeWindow()
         }
     }
-
     const toggleGameCard = () => {
         if (activeWindow.value === 'game') {
             closeWindow()
@@ -101,7 +89,6 @@ export const useAppStore = defineStore('app', () => {
             openWindow('game')
         }
     }
-
     const openWindow = (windowType) => {
         if (activeWindow.value) {
             isWindowClosedByReplacement.value = true
@@ -117,7 +104,6 @@ export const useAppStore = defineStore('app', () => {
             gameCardVisible.value = true
         }
     }
-
     const closeWindow = () => {
         const currentWindow = activeWindow.value
         activeWindow.value = null
@@ -127,18 +113,14 @@ export const useAppStore = defineStore('app', () => {
         }
 
         if (!isWindowClosedByReplacement.value) {
-            // Normal close - keep animation enabled
         }
     }
-
     const openProjectInfo = () => {
         openWindow('projectInfo')
     }
-
     const closeProjectInfo = () => {
         closeWindow()
     }
-
     const dismissProjectInfo = (permanently = false) => {
         if (permanently) {
             projectInfoDismissed.value = true
@@ -146,12 +128,10 @@ export const useAppStore = defineStore('app', () => {
         }
         closeProjectInfo()
     }
-
     const resetProjectInfoDismissal = () => {
         projectInfoDismissed.value = false
         localStorage.removeItem('projectInfoDialogDismissed')
     }
-
     const checkAndShowProjectInfo = () => {
         if (shouldShowProjectInfo.value) {
             openProjectInfo()
@@ -159,28 +139,22 @@ export const useAppStore = defineStore('app', () => {
         }
         return false
     }
-
-    // GPS Actions
     const setGpsState = (newState) => {
         if (Object.values(GPS_STATE).includes(newState)) {
             gpsState.value = newState
         }
     }
-
     const enableGps = () => {
         gpsState.value = GPS_STATE.ENABLED
     }
-
     const startGpsTracking = () => {
         gpsState.value = GPS_STATE.TRACKING
     }
-
     const disableGps = () => {
         gpsState.value = GPS_STATE.DISABLED
     }
 
     return {
-        // state
         homePageActive,
         gpsAccess,
         isLoading,
@@ -190,7 +164,6 @@ export const useAppStore = defineStore('app', () => {
         isWindowClosedByReplacement,
         GPS_STATE,
         gpsState,
-        // getters
         isHomePage,
         hasGpsAccess,
         isGpsChecked,
@@ -203,7 +176,6 @@ export const useAppStore = defineStore('app', () => {
         isGpsEnabled,
         isGpsTracking,
         getUserGpsPosition,
-        // actions
         setHomePage,
         updateHomePageFromRoute,
         checkGpsAccess,

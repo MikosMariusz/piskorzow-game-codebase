@@ -1,11 +1,4 @@
-/**
- * router/index.ts
- *
- * Automatic routes for `./src/pages/*.vue`
- */
-
 import { setupLayouts } from 'virtual:generated-layouts'
-// Composables
 import { createRouter, createWebHistory } from 'vue-router'
 import { routes } from 'vue-router/auto-routes'
 import { useAppStore } from '@/stores/app'
@@ -29,11 +22,9 @@ const router = createRouter({
     routes: routesWithStories,
 })
 
-// Global before guard - aktualizuj home page przed każdą nawigacją
 router.beforeEach((to, from, next) => {
     const appStore = useAppStore()
     appStore.updateHomePageFromRoute(to.path)
-    // Zamknij wszystkie karty przy przejściu na stronę domową
     if (
         to.path === '/' ||
         to.path === '/index' ||
@@ -50,7 +41,6 @@ router.beforeEach((to, from, next) => {
     next()
 })
 
-// Workaround for https://github.com/vitejs/vite/issues/11804
 router.onError((err, to) => {
     if (err?.message?.includes?.('Failed to fetch dynamically imported module')) {
         if (localStorage.getItem('vuetify:dynamic-reload')) {

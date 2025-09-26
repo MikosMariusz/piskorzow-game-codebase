@@ -56,16 +56,13 @@ const handleZoomOut = () => {
 
 const updateZoomLevel = (zoom) => {
     if (zoom !== null && zoom !== undefined) {
-        currentZoom.value = Math.round(zoom * 10) / 10 // Zaokrąglenie do 1 miejsca po przecinku
+        currentZoom.value = Math.round(zoom * 10) / 10
     }
 }
 
 onMounted(() => {
-    // Inicjalne ustawienie poziomu zoom
     const initialZoom = getCurrentZoom()
     updateZoomLevel(initialZoom)
-
-    // Rejestracja callback'a dla zmian zoom
     setZoomCallback(updateZoomLevel)
 })
 
@@ -77,7 +74,7 @@ onBeforeUnmount(() => {
 <style scoped>
 .map-zoom-controls {
     position: fixed;
-    top: 76px; /* Tuż pod v-app-bar (64px + 8px margin) */
+    top: 76px;
     left: 12px;
     z-index: 1000;
     min-width: auto;
@@ -106,13 +103,11 @@ onBeforeUnmount(() => {
     border-bottom-right-radius: 4px !important;
 }
 
-/* Responsive */
 @media (max-width: 480px) {
     .map-zoom-controls {
-        top: 80px; /* Zwiększone z 70px na 80px dla lepszego odstępu od AppBar na mobile */
+        top: 80px;
         left: 8px;
     }
-
     .zoom-button {
         width: 36px !important;
         height: 36px !important;

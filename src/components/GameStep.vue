@@ -28,14 +28,12 @@
             }"
             @scroll="resetScrollOffset"
         >
-            <!-- Spacer jeśli istnieje -->
             <div
                 v-if="spacer"
                 class="spacer"
                 :style="{ height: 'calc(100% - 44px)' }"
             ></div>
 
-            <!-- Zawartość owinięta w v-sheet -->
             <v-sheet
                 v-if="contentItems.length > 0"
                 class="pa-2"
@@ -233,14 +231,11 @@ const scrollToTop = (toEnd) => {
 
     let targetPosition
     if (toEnd !== undefined) {
-        // Jeśli przekazano toEnd, użyj go ale ogranicz do dostępnego zakresu
         targetPosition = scrollHeight - parentHeight - 10
     } else {
-        // Standardowe przełączanie między górą a wysokością rodzica
         targetPosition = scrollOffset.value === 0 ? parentHeight : 0
     }
 
-    // Upewnij się, że pozycja nie jest ujemna
     targetPosition = Math.max(0, targetPosition)
 
     goTo(targetPosition, {
@@ -272,7 +267,6 @@ const goToPresentation = () => {
     router.push(isGame.value ? '/game' : '/presentation')
 }
 
-// Mechanizm blokowania opuszczenia strony gry
 const saveGameProgress = () => {
     const key = `gameProgress_${props.storyId}`
     const currentProgress = {
@@ -284,7 +278,6 @@ const saveGameProgress = () => {
     if (saved) {
         try {
             const savedProgress = JSON.parse(saved)
-            // Zapisz tylko jeśli nie ma zapisu lub zapisany stepIndex jest niższy
             if (savedProgress.stepIndex >= currentProgress.stepIndex) {
                 return
             }

@@ -32,7 +32,6 @@ const backgroundImageUrl = computed(() => {
     if (props.imageSrc.startsWith('/')) {
         return props.imageSrc
     }
-    // fallback na assety z src/assets/images (np. dla testów)
     return new URL(props.imageSrc, import.meta.url).href
 })
 </script>

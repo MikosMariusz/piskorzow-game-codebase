@@ -169,7 +169,6 @@ const handleClick = () => {
     cursor: not-allowed !important;
 }
 
-/* Responsywność dla różnych rozmiarów ekranów */
 @media (max-width: 599px) {
     .tile-wrapper {
         max-width: min(70vw, 320px);
@@ -242,7 +241,6 @@ const handleClick = () => {
     }
 }
 
-/* Orientacja landscape na mobilnych */
 @media (max-width: 959px) and (orientation: landscape) and (max-height: 600px) {
     .tile-wrapper {
         max-width: min(40vh, 250px);

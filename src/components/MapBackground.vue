@@ -28,7 +28,6 @@ import {
     setClickCallback,
     clearClickCallback,
     clearZoomCallback,
-    setInitialViewForPage,
     animateToMode,
 } from '@/services/olMap'
 import { useAppStore } from '@/stores/app'
@@ -39,7 +38,7 @@ import MapGpsControls from './MapGpsControls.vue'
 const props = defineProps({
     interactive: { type: Boolean, default: true },
     zIndex: { type: [Number, String], default: 0 },
-    center: { type: Array, default: () => [16.62, 50.69] }, // lon, lat (WGS84)
+    center: { type: Array, default: () => [16.62, 50.69] },
     zoom: { type: Number, default: 12 },
 })
 
@@ -73,11 +72,6 @@ watch(mapHeight, () => {
 watch(smAndDown, () => {
     if (mapEl.value) {
         updateSize()
-        const path = window.location.pathname
-        const isGameOrPresentation = path.startsWith('/game') || path.startsWith('/presentation')
-        if (isGameOrPresentation && appStore.gameCardVisible) {
-            setTimeout(() => setInitialViewForPage(), 100)
-        }
     }
 })
 

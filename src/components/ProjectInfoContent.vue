@@ -65,7 +65,6 @@
             </v-list-item>
         </v-list>
 
-        <!-- Don't show again checkbox -->
         <v-divider class="my-4" />
         <v-checkbox
             v-model="dontShowAgain"
@@ -87,7 +86,6 @@ const appStore = useAppStore()
 
 const dontShowAgain = ref(appStore.isProjectInfoDismissed)
 
-// Zapisuj do storage, ale nie zamykaj okna
 watch(dontShowAgain, (value) => {
     if (value) {
         appStore.dismissProjectInfo(true)
@@ -114,7 +112,6 @@ const objectives = computed(() => [
     line-height: 1.6;
 }
 
-/* Responsywność */
 @media (max-width: 600px) {
     .project-info-content {
         padding: 0;

@@ -68,16 +68,10 @@ import { useAppStore } from '@/stores/app'
 import AppCard from './AppCard.vue'
 import AppBackground from './AppBackground.vue'
 
-// Stores
 const appStore = useAppStore()
 const { t } = useI18n()
-
 const currentStatus = ref('...')
-
-// Computed properties
 const isVisible = computed(() => appStore.getIsLoading)
-
-// Status message keys for translation
 const statusMessageKeys = [
     'loading.status.loading',
     'loading.status.components',
@@ -86,7 +80,6 @@ const statusMessageKeys = [
     'loading.status.game',
 ]
 
-// Methods
 const updateStatus = () => {
     let messageIndex = 0
     const interval = setInterval(() => {
@@ -98,7 +91,6 @@ const updateStatus = () => {
         }
     }, 800)
 
-    // Clean up interval when component is hidden
     watch(isVisible, (newValue) => {
         if (!newValue) {
             clearInterval(interval)
@@ -106,14 +98,12 @@ const updateStatus = () => {
     })
 }
 
-// Lifecycle
 onMounted(() => {
     if (isVisible.value) {
         updateStatus()
     }
 })
 
-// Watch for visibility changes
 watch(isVisible, (newValue) => {
     if (newValue) {
         currentStatus.value = t(statusMessageKeys[0])
@@ -160,7 +150,6 @@ watch(isVisible, (newValue) => {
     opacity: 1;
 }
 
-/* Responsywność dla logotypów */
 @media (max-width: 600px) {
     .logos-image {
         max-height: 80px;
@@ -182,12 +171,10 @@ watch(isVisible, (newValue) => {
     }
 }
 
-/* Transition dla overlay */
 .v-overlay__content {
     transition: all 0.3s ease-in-out;
 }
 
-/* Zapobiegaj migotaniu podczas ładowania */
 .v-overlay--active {
     opacity: 1 !important;
 }

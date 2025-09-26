@@ -78,9 +78,7 @@ function getTileTitle(tile) {
     overflow: hidden;
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
         env(safe-area-inset-left);
-    padding-top: calc(
-        64px + env(safe-area-inset-top)
-    ); /* Dodaj padding dla AppBar (64px to standardowa wysokość v-app-bar) */
+    padding-top: calc(64px + env(safe-area-inset-top));
 }
 
 .tiles-container {
@@ -98,16 +96,13 @@ function getTileTitle(tile) {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     max-width: 100%;
     width: 100%;
-    max-width: 1200px; /* maksymalna szerokość całego kontenera */
+    max-width: 1200px;
     justify-items: center;
 }
 
-/* Responsywność dla różnych rozmiarów ekranów */
 @media (max-width: 599px) {
     .home-layer {
-        padding-top: calc(
-            64px + env(safe-area-inset-top) + 10px
-        ); /* Dodatkowe 10px marginesu na mobile */
+        padding-top: calc(64px + env(safe-area-inset-top) + 10px);
     }
 
     .tiles-grid {
@@ -157,7 +152,6 @@ function getTileTitle(tile) {
     }
 }
 
-/* Dla bardzo dużych ekranów - możemy pokazać 3 kafelki, jeśli jest więcej */
 @media (min-width: 1600px) {
     .tiles-grid {
         grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
@@ -165,7 +159,6 @@ function getTileTitle(tile) {
     }
 }
 
-/* Orientacja landscape na mobilnych */
 @media (max-width: 959px) and (orientation: landscape) and (max-height: 600px) {
     .tiles-grid {
         grid-template-columns: repeat(2, 1fr);
