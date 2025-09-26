@@ -50,7 +50,6 @@ export const useAppStore = defineStore('app', () => {
     }
     const setGpsPosition = (position) => {
         userGpsPosition.value = position
-        console.log('Aktualna pozycja GPS ustawiona na:', userGpsPosition.value)
     }
 
     const updateHomePageFromRoute = (routePath) => {

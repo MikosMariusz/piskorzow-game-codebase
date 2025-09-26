@@ -8,47 +8,45 @@
             :class="cardClasses"
             :style="cardStyles"
             :has-border="true"
-            rounded="0"
-            elevation="6"
         >
-            <v-card-title
-                class="d-flex align-center justify-space-between pa-4 pt-3 card-header-with-bg"
-                :class="{ 'card-header--minimized': isMinimized }"
-                @click="isMinimized ? toggleMinimize() : null"
-                style="user-select: none; height: 64px; min-height: 64px; max-height: 64px"
-            >
-                <div class="header-background"></div>
-                <span
-                    class="text-h6 header-title font-weight-light text-truncate"
-                    style="max-width: 300px"
-                    >{{ title }}</span
-                >
+            <template #header>
                 <div
-                    class="d-flex align-center header-controls"
-                    v-if="buttonConfigs.length"
-                    @click.stop
+                    class="d-flex align-center justify-space-between pa-4 pt-3"
+                    :class="{ 'card-header--minimized': isMinimized }"
+                    @click="isMinimized ? toggleMinimize() : null"
+                    style="height: 64px; min-height: 64px; max-height: 64px"
                 >
-                    <slot name="header-buttons-left" />
-                    <template
-                        v-for="btn in buttonConfigs"
-                        :key="btn.key"
+                    <span
+                        class="text-h6 font-weight-light text-truncate"
+                        style="max-width: 300px; z-index: 3"
+                        >{{ title }}</span
                     >
-                        <v-btn
-                            v-if="btn.visible"
-                            :icon="btn.icon"
-                            variant="elevated"
-                            size="small"
-                            rounded="sm"
-                            @click="btn.action"
-                            :title="t(btn.title)"
-                            class="mr-2"
-                            elevation="2"
-                            color="primary"
-                        />
-                    </template>
+                    <div
+                        class="d-flex align-center"
+                        v-if="buttonConfigs.length"
+                        @click.stop
+                    >
+                        <slot name="header-buttons-left" />
+                        <template
+                            v-for="btn in buttonConfigs"
+                            :key="btn.key"
+                        >
+                            <v-btn
+                                v-if="btn.visible"
+                                :icon="btn.icon"
+                                variant="elevated"
+                                size="small"
+                                rounded="sm"
+                                @click="btn.action"
+                                :title="t(btn.title)"
+                                class="mr-2"
+                                elevation="2"
+                                color="primary"
+                            />
+                        </template>
+                    </div>
                 </div>
-            </v-card-title>
-
+            </template>
             <v-card-text
                 :class="{ 'd-none': isMinimized }"
                 class="pa-0"
@@ -320,57 +318,6 @@ defineExpose({
 
 .card-wrapper--centered {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18) !important;
-}
-
-.card-header-with-bg {
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
-    z-index: 1;
-    height: 64px;
-    min-height: 64px;
-    max-height: 64px;
-}
-
-.header-background {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: url('@/assets/images/bar-background.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    z-index: 0;
-}
-
-.header-background::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(
-        90deg,
-        rgba(182, 227, 182, 0.7) 0%,
-        rgba(120, 200, 120, 0.7) 50%,
-        rgba(163, 193, 218, 0.5) 100%
-    );
-    z-index: 1;
-}
-
-.header-title {
-    position: relative;
-    z-index: 2;
-    color: #000000;
-    font-weight: 500;
-}
-
-.header-controls {
-    position: relative;
-    z-index: 2;
 }
 
 @media (max-width: 959px) {

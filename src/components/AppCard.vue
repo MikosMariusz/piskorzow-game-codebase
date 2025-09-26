@@ -1,9 +1,26 @@
 <template>
     <v-card
-        :class="['app-card', { 'app-card--bordered': hasBorder }]"
-        :style="{ opacity: opacity }"
+        :style="{
+            opacity: opacity,
+            border: hasBorder ? '2px solid rgb(var(--v-theme-primary))' : 'none',
+        }"
         :rounded="rounded"
     >
+        <template v-if="$slots.header">
+            <div class="card-header pa-0 elevation-4">
+                <v-img
+                    src="@/assets/images/bar-background.png"
+                    gradient="to right, rgba(182,227,182,0.7), rgba(120,200,120,0.7) 50%, rgba(163,193,218,0.5) 100%"
+                    cover
+                    height="100%"
+                    width="100%"
+                    class="header-background-img"
+                />
+                <div style="z-index: 1">
+                    <slot name="header" />
+                </div>
+            </div>
+        </template>
         <slot />
     </v-card>
 </template>
@@ -26,37 +43,14 @@ defineProps({
 </script>
 
 <style scoped>
-.app-card {
-    background-color: rgb(var(--v-theme-surface));
-    background-image: linear-gradient(
-        135deg,
-        rgba(var(--v-theme-primary), 0.1) 0%,
-        rgba(var(--v-theme-accent), 0.05) 100%
-    );
+.card-header {
+    position: relative;
+    overflow: hidden;
+    height: 64px;
 }
-
-.app-card--bordered {
-    border: 3px solid rgb(var(--v-theme-primary));
-}
-
-.app-card :deep(.v-card-title) {
-    font-weight: 600;
-}
-
-.app-card :deep(.v-card-text) {
-    line-height: 1.6;
-}
-
-/* Responsywność */
-@media (max-width: 960px) {
-    .app-card--bordered {
-        border-width: 2px;
-    }
-}
-
-@media (max-width: 600px) {
-    .app-card--bordered {
-        border-width: 1px;
-    }
+.header-background-img {
+    position: absolute;
+    pointer-events: none;
+    z-index: 0;
 }
 </style>

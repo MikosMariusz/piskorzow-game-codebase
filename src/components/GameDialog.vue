@@ -4,31 +4,46 @@
         persistent
         max-width="500"
     >
-        <v-card>
-            <v-card-title class="text-h6 font-weight-medium">
-                {{ $t(titleKey) }}
-            </v-card-title>
-            <v-card-text>
-                {{ $t(textKey) }}
-            </v-card-text>
-            <v-card-actions>
-                <v-btn
-                    color="secondary"
-                    @click="onCancel"
-                    >{{ $t(cancelKey) }}</v-btn
+        <AppCard :has-border="true">
+            <template #header>
+                <div
+                    class="d-flex align-center justify-space-between pa-4 pt-3"
+                    style="height: 64px; min-height: 64px; max-height: 64px"
                 >
-                <v-spacer />
-                <v-btn
-                    color="primary"
-                    @click="onConfirm"
-                    >{{ $t(confirmKey) }}</v-btn
+                    <span
+                        class="text-h6 header-title font-weight-light text-truncate"
+                        style="z-index: 3"
+                        >{{ $t(titleKey) }}</span
+                    >
+                </div>
+            </template>
+            <div class="pa-4">
+                <div
+                    class="mb-4"
+                    style="z-index: 3"
                 >
-            </v-card-actions>
-        </v-card>
+                    {{ $t(textKey) }}
+                </div>
+                <div class="d-flex justify-end align-center">
+                    <v-btn
+                        color="secondary"
+                        @click="onCancel"
+                        >{{ $t(cancelKey) }}</v-btn
+                    >
+                    <v-spacer />
+                    <v-btn
+                        color="primary"
+                        @click="onConfirm"
+                        >{{ $t(confirmKey) }}</v-btn
+                    >
+                </div>
+            </div>
+        </AppCard>
     </v-dialog>
 </template>
 
 <script setup>
+import AppCard from '@/components/AppCard.vue'
 import { computed } from 'vue'
 const props = defineProps({
     modelValue: Boolean,
