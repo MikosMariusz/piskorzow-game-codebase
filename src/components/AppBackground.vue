@@ -16,7 +16,7 @@ import { computed } from 'vue'
 const props = defineProps({
     imageSrc: {
         type: String,
-        default: '../assets/images/app-background.png',
+        default: '/images/app-background.png',
     },
     blur: {
         type: Boolean,
@@ -32,6 +32,7 @@ const backgroundImageUrl = computed(() => {
     if (props.imageSrc.startsWith('/')) {
         return props.imageSrc
     }
+    // fallback na assety z src/assets/images (np. dla testów)
     return new URL(props.imageSrc, import.meta.url).href
 })
 </script>
