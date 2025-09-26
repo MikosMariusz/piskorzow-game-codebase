@@ -6,8 +6,8 @@ import { fromLonLat, toLonLat } from 'ol/proj'
 import XYZ from 'ol/source/XYZ'
 import View from 'ol/View'
 import { GeoJSON } from 'ol/format'
-import { Style, Stroke, Fill } from 'ol/style'
-import { Circle as CircleGeom } from 'ol/geom'
+import { Style, Stroke, Fill, Icon } from 'ol/style'
+import { Circle as CircleGeom, Point } from 'ol/geom'
 import Feature from 'ol/Feature'
 import { useAppStore } from '@/stores/app'
 
@@ -363,17 +363,37 @@ const addGeometryToMap = (geometry, locationName, properties = {}) => {
 
     let newFeatures = []
 
-    if (geometry.type === 'Point' && properties.radius) {
-        // Point z radius traktuj jako Circle
+    if (geometry.type === 'Point') {
         const center = fromLonLat(geometry.coordinates)
-        const radius = properties.radius
-        const circleGeom = new CircleGeom(center, radius)
-        const olFeature = new Feature(circleGeom)
-        olFeature.setProperties({
-            name: locationName,
-            ...properties,
-        })
-        newFeatures = [olFeature]
+        if (properties.radius) {
+            // Circle
+            const radius = properties.radius
+            const circleGeom = new CircleGeom(center, radius)
+            const olFeature = new Feature(circleGeom)
+            olFeature.setProperties({
+                name: locationName,
+                ...properties,
+            })
+            newFeatures = [olFeature]
+        } else {
+            const olFeature = new Feature({ geometry: new Point(center) })
+            olFeature.setProperties({
+                name: locationName,
+                ...properties,
+            })
+            olFeature.setStyle(
+                new Style({
+                    image: new Icon({
+                        anchor: [0.5, 1],
+                        anchorXUnits: 'fraction',
+                        anchorYUnits: 'fraction',
+                        src: '/images/pointer.png',
+                        scale: 1,
+                    }),
+                }),
+            )
+            newFeatures = [olFeature]
+        }
     } else {
         // Standardowe GeoJSON
         const feature = {

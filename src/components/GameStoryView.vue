@@ -351,7 +351,6 @@ const initializeGps = async () => {
 
                     // Zarejestruj callback dla aktualizacji pozycji w store
                     setPositionUpdateCallback((position) => {
-                        console.log('Aktualizacja pozycji GPS:', position)
                         appStore.setGpsPosition(position)
                     })
 
@@ -377,7 +376,6 @@ const initializeGps = async () => {
 
         // Zarejestruj callback dla aktualizacji pozycji w store
         setPositionUpdateCallback((position) => {
-            console.log('Aktualizacja pozycji GPS:', position)
             appStore.setGpsPosition(position)
         })
 

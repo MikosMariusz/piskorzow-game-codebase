@@ -52,9 +52,7 @@
                         "type": "Point",
                         "coordinates": [16.5637181, 50.7308779]
                     },
-                    "properties": {
-                        "radius": 200
-                    }
+                    "properties": {}
                 }
             ],
             "view": {

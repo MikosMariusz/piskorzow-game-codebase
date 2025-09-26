@@ -105,9 +105,6 @@ const toggleExpanded = () => {
 const updateCoordinates = (lat, lon) => {
     coordinates.value.lat = lat
     coordinates.value.lon = lon
-    console.log(
-        `📍 Updated coordinates and current zoom level: ${lon}, ${lat}, ${getCurrentZoom()}`,
-    )
 }
 
 const clearCoordinates = () => {
