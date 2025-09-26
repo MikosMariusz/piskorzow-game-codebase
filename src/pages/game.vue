@@ -27,7 +27,7 @@ import { useAppStore } from '@/stores/app'
 import { useI18n } from 'vue-i18n'
 import CardWrapper from '@/components/CardWrapper.vue'
 import GameGpsUnavailableCard from '@/components/GameGpsUnavailableCard.vue'
-import { animateToMode, loadDefaultGeometry } from '@/services/olMap'
+import { animateToMode, getDefaultGeometry, setStoryView } from '@/services/olMap'
 
 const appStore = useAppStore()
 const { t } = useI18n()
@@ -40,7 +40,8 @@ onMounted(async () => {
         hasGpsAccess.value = false
         cardTitle.value = t('terrainGameModuleUnavailable')
         animateToMode({ forceDark: true, forceFlight: true, setStartView: true })
-        loadDefaultGeometry()
+        const feature = getDefaultGeometry()
+        setStoryView({ feature })
     } else {
         hasGpsAccess.value = true
         cardTitle.value = t('selectTerrainGame')

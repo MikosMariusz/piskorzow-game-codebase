@@ -70,14 +70,26 @@
                 class="mb-3"
             >
                 <div class="text-center">
-                    <v-icon
-                        size="48"
-                        class="mb-2"
-                        >mdi-map-marker-distance</v-icon
+                    <div
+                        style="
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            gap: 16px;
+                        "
                     >
-                    <div class="text-h6 mb-2">{{ $t('task.approachTarget') }}</div>
-                    <div class="text-h4 font-weight-bold">
-                        {{ remainingDistance }} {{ $t('task.meters') }}
+                        <v-icon
+                            size="48"
+                            class="mb-2"
+                            :style="`transition: transform 0.3s; transform: rotate(${arrowAngle}deg);`"
+                            >mdi-arrow-up-bold</v-icon
+                        >
+                        <div>
+                            <div class="text-h6 mb-2">{{ $t('task.approachTarget') }}</div>
+                            <div class="text-h4 font-weight-bold">
+                                {{ remainingDistance }} {{ $t(distanceUnit) }}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </v-alert>
@@ -86,16 +98,14 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAppStore } from '@/stores/app'
 import { getDistance } from 'ol/sphere'
+import { setDirectionCallback, startHeadingTracking, stopHeadingTracking } from '@/services/gps'
+
 const appStore = useAppStore()
 const { t } = useI18n()
-
-onMounted(() => {
-    console.log('Komponent GameTask został zamontowany', appStore.getUserGpsPosition)
-})
 
 const props = defineProps({
     storyId: {
@@ -111,12 +121,7 @@ const props = defineProps({
         required: false,
         default: null,
     },
-    feature: {
-        type: Object,
-        required: false,
-        default: null,
-    },
-    hiddenPosition: {
+    position: {
         type: Array,
         required: false,
         default: null,
@@ -128,6 +133,8 @@ const showTip = ref(false)
 const showTipLink = ref(false)
 const showAccuracyMessage = ref(false)
 const remainingDistance = ref(0)
+const arrowAngle = ref(0)
+
 const isCorrect = computed(() => {
     if (props.task.answers && Array.isArray(props.task.answers)) {
         // Zadanie tekstowe: sprawdź odpowiedź
@@ -138,45 +145,24 @@ const isCorrect = computed(() => {
         )
     } else {
         // Zadanie GPS: sprawdź odległość
-        if (
-            (!props.feature && !props.hiddenPosition) ||
-            !props.accuracy ||
-            !appStore.getUserGpsPosition
-        ) {
-            return false
-        }
-
-        let points = []
-
-        if (props.feature) {
-            const geom = props.feature.geometry
-            if (geom.type === 'Polygon') {
-                points = geom.coordinates[0]
-            } else if (geom.type === 'LineString') {
-                points = geom.coordinates
-            } else {
-                return false
-            }
-        } else if (props.hiddenPosition) {
-            points = [props.hiddenPosition]
-        } else {
+        if (!props.position || !props.accuracy || !appStore.getUserGpsPosition) {
             return false
         }
 
         const userCoord = [appStore.getUserGpsPosition.lon, appStore.getUserGpsPosition.lat]
         const gpsAccuracy = appStore.getUserGpsPosition.accuracy || 20
-        let minDistance = Infinity
-
-        for (const point of points) {
-            const distance = getDistance(userCoord, point)
-            if (distance < minDistance) {
-                minDistance = distance
-            }
-        }
-
-        const effectiveDistance = Math.max(0, minDistance - gpsAccuracy)
+        const distance = getDistance(userCoord, props.position)
+        const effectiveDistance = Math.max(0, distance - gpsAccuracy)
         return effectiveDistance <= props.accuracy
     }
+})
+
+const distanceUnit = computed(() => {
+    const dist = remainingDistance.value
+    if (dist === 1) return 'task.meter'
+    if (dist % 10 >= 2 && dist % 10 <= 4 && (dist % 100 < 10 || dist % 100 >= 20))
+        return 'task.metersTwo'
+    return 'task.meters'
 })
 
 const validationRules = computed(() => {
@@ -202,50 +188,37 @@ const validationRules = computed(() => {
 })
 
 const computeDistance = () => {
-    if (
-        (!props.feature && !props.hiddenPosition) ||
-        !props.accuracy ||
-        !appStore.getUserGpsPosition
-    ) {
-        showAccuracyMessage.value = false
-        return
-    }
-
-    let points = []
-
-    if (props.feature) {
-        const geom = props.feature.geometry
-        if (geom.type === 'Polygon') {
-            points = geom.coordinates[0]
-        } else if (geom.type === 'LineString') {
-            points = geom.coordinates
-        } else {
-            showAccuracyMessage.value = false
-            return
-        }
-    } else if (props.hiddenPosition) {
-        points = [props.hiddenPosition]
-    } else {
+    if (!props.position || !props.accuracy || !appStore.getUserGpsPosition) {
         showAccuracyMessage.value = false
         return
     }
 
     const userCoord = [appStore.getUserGpsPosition.lon, appStore.getUserGpsPosition.lat]
-    const gpsAccuracy = 20 // Stała dokładność GPS dla symulacji
-    let minDistance = Infinity
-
-    for (const point of points) {
-        const distance = getDistance(userCoord, point)
-        if (distance < minDistance) {
-            minDistance = distance
-        }
+    if (!userCoord[0] || !userCoord[1]) {
+        showAccuracyMessage.value = false
+        return
     }
 
-    const effectiveDistance = Math.max(0, minDistance - gpsAccuracy)
+    const gpsAccuracy = 20 // Stała dokładność GPS dla symulacji
+    const distance = getDistance(userCoord, props.position)
+    const effectiveDistance = Math.max(0, distance - gpsAccuracy)
     const hasAccuracy = effectiveDistance <= props.accuracy
     showAccuracyMessage.value = !hasAccuracy
     remainingDistance.value = hasAccuracy ? 0 : Math.ceil(effectiveDistance - props.accuracy)
 }
+
+onMounted(() => {
+    if (props.position) {
+        setDirectionCallback(({ arrowAngle: angle }) => {
+            arrowAngle.value = angle
+        })
+        startHeadingTracking(props.position)
+    }
+})
+
+onUnmounted(() => {
+    stopHeadingTracking()
+})
 
 watch(
     isCorrect,

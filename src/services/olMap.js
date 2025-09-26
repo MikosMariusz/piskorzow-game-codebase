@@ -7,6 +7,8 @@ import XYZ from 'ol/source/XYZ'
 import View from 'ol/View'
 import { GeoJSON } from 'ol/format'
 import { Style, Stroke, Fill } from 'ol/style'
+import { Circle as CircleGeom } from 'ol/geom'
+import Feature from 'ol/Feature'
 import { useAppStore } from '@/stores/app'
 
 let _map = null
@@ -359,23 +361,39 @@ const addGeometryToMap = (geometry, locationName, properties = {}) => {
 
     _vectorLayer.getSource().clear()
 
-    const feature = {
-        type: 'Feature',
-        geometry: geometry,
-        properties: {
+    let newFeatures = []
+
+    if (geometry.type === 'Point' && properties.radius) {
+        // Point z radius traktuj jako Circle
+        const center = fromLonLat(geometry.coordinates)
+        const radius = properties.radius
+        const circleGeom = new CircleGeom(center, radius)
+        const olFeature = new Feature(circleGeom)
+        olFeature.setProperties({
             name: locationName,
             ...properties,
-        },
-    }
+        })
+        newFeatures = [olFeature]
+    } else {
+        // Standardowe GeoJSON
+        const feature = {
+            type: 'Feature',
+            geometry: geometry,
+            properties: {
+                name: locationName,
+                ...properties,
+            },
+        }
 
-    const geojsonObject = {
-        type: 'FeatureCollection',
-        features: [feature],
-    }
+        const geojsonObject = {
+            type: 'FeatureCollection',
+            features: [feature],
+        }
 
-    const newFeatures = new GeoJSON().readFeatures(geojsonObject, {
-        featureProjection: 'EPSG:3857',
-    })
+        newFeatures = new GeoJSON().readFeatures(geojsonObject, {
+            featureProjection: 'EPSG:3857',
+        })
+    }
 
     _vectorLayer.getSource().addFeatures(newFeatures)
 }
@@ -584,7 +602,7 @@ export const animateToMode = (opts = {}) => {
     requestAnimationFrame(animateOpacity)
 }
 
-export const setStoryView = ({ feature, view = startView, sidebarWidthPx = 500 }) => {
+export const setStoryView = ({ features, feature, view = startView, sidebarWidthPx = 500 }) => {
     if (_isFlying) {
         stopFlightAnimation()
     }
@@ -608,6 +626,17 @@ export const setStoryView = ({ feature, view = startView, sidebarWidthPx = 500 }
                 feature.properties?.name || 'Obszar',
                 feature.properties,
             )
+        }
+        if (features && Array.isArray(features)) {
+            features.forEach((feat) => {
+                if (feat && feat.geometry) {
+                    addGeometryToMap(
+                        feat.geometry,
+                        feat.properties?.name || 'Obszar',
+                        feat.properties,
+                    )
+                }
+            })
         }
     }, 200)
 }

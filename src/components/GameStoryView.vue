@@ -201,7 +201,7 @@ const nextStep = () => {
         const step = config.value?.steps?.[activeIndex.value]
         if (step) {
             setStoryView({
-                feature: step.feature,
+                features: step.features,
                 view: step.view,
             })
         }
@@ -214,7 +214,7 @@ const prevStep = () => {
         const step = config.value?.steps?.[activeIndex.value]
         if (step) {
             setStoryView({
-                feature: step.feature,
+                features: step.features,
                 view: step.view,
             })
         }
@@ -267,7 +267,7 @@ async function loadConfig() {
         if (conf.steps && conf.steps.length > 0 && conf.steps[0].title) {
             updateCardTitle(conf.steps[0].title)
             setStoryView({
-                feature: conf.steps[0].feature,
+                features: conf.steps[0].features,
                 view: conf.steps[0].view,
             })
         } else {
@@ -287,7 +287,7 @@ const resumeGame = () => {
     const step = config.value?.steps?.[activeIndex.value]
     if (step) {
         updateCardTitle(step.title)
-        setStoryView({ feature: step.feature, view: step.view })
+        setStoryView({ features: step.features, view: step.view })
     }
 }
 
@@ -308,7 +308,7 @@ const restartGame = () => {
     const step = config.value?.steps?.[0]
     if (step) {
         updateCardTitle(step.title)
-        setStoryView({ feature: step.feature, view: step.view })
+        setStoryView({ features: step.features, view: step.view })
     }
 }
 
@@ -319,7 +319,7 @@ const focusStepOnMap = () => {
     const step = config.value?.steps?.[activeIndex.value]
     if (step) {
         setStoryView({
-            feature: step.feature,
+            features: step.features,
             view: step.view,
         })
     }

@@ -45,6 +45,23 @@
                     "alt": "storyTwo.taskImageTwoAlt"
                 }
             ],
+            "features": [
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [16.5637181, 50.7308779]
+                    },
+                    "properties": {
+                        "radius": 200
+                    }
+                }
+            ],
+            "view": {
+                "center": [16.5637352, 50.7307916],
+                "zoom": 15,
+                "duration": 2000
+            },
             "task": {
                 "question": "storyTwo.taskOneQuestion",
                 "image": {
@@ -53,7 +70,7 @@
                 },
                 "tip": "storyTwo.taskOneTip"
             },
-            "hiddenPosition": [16.5637352, 50.7307916],
+            "position": [16.5637352, 50.7307916],
             "accuracy": 20
         },
         {
@@ -84,20 +101,19 @@
                 "zoom": 17,
                 "duration": 2000
             },
-            "feature": {
-                "type": "Feature",
-                "geometry": {
-                    "type": "Polygon",
-                    "coordinates": [
-                        [
-                            [16.564899, 50.7328209],
-                            [16.5649997, 50.732792],
-                            [16.5646495, 50.7327971]
-                        ]
-                    ]
-                },
-                "properties": {}
-            },
+            "features": [
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [16.564899, 50.7328209]
+                    },
+                    "properties": {
+                        "radius": 5
+                    }
+                }
+            ],
+            "position": [16.564899, 50.7328209],
             "accuracy": 20
         },
         {
@@ -121,7 +137,19 @@
                 },
                 "tip": "storyTwo.taskThreeTip"
             },
-            "hiddenPosition": [16.5632315, 50.7318578],
+            "features": [
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [16.5632315, 50.7318578]
+                    },
+                    "properties": {
+                        "radius": 5
+                    }
+                }
+            ],
+            "position": [16.5632315, 50.7318578],
             "accuracy": 20
         },
         {
@@ -153,7 +181,19 @@
                 },
                 "tip": "storyTwo.taskFourTip"
             },
-            "hiddenPosition": [16.5637337, 50.7328456],
+            "features": [
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [16.5637337, 50.7328456]
+                    },
+                    "properties": {
+                        "radius": 5
+                    }
+                }
+            ],
+            "position": [16.5637337, 50.7328456],
             "accuracy": 20
         },
         {

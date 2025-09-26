@@ -5,7 +5,7 @@
         :style="{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }"
     >
         <GameDialog
-            v-model="showLeaveDialog"
+            v-model="showDialog"
             @confirm="confirmLeave"
             @cancel="cancelLeave"
         />
@@ -64,8 +64,7 @@
                                 :story-id="props.storyId"
                                 :task="currentStep.task"
                                 :accuracy="currentStep.accuracy"
-                                :feature="currentStep.feature"
-                                :hiddenPosition="currentStep.hiddenPosition"
+                                :position="currentStep.position"
                                 @task-completed="onTaskCompleted"
                             />
                         </v-expansion-panel-text>
@@ -171,7 +170,7 @@ const isGame = computed(() => {
     return route.path.startsWith('/game')
 })
 
-const showLeaveDialog = ref(false)
+const showDialog = ref(false)
 let leaveResolve = null
 
 const props = defineProps({
@@ -279,7 +278,10 @@ const goToNextStep = () => {
 }
 
 const goToPresentation = () => {
-    router.push('/presentation')
+    if (isGame.value) {
+        localStorage.removeItem(`gameProgress_${props.storyId}`)
+    }
+    router.push(isGame.value ? '/game' : '/presentation')
 }
 
 // Mechanizm blokowania opuszczenia strony gry
@@ -304,24 +306,24 @@ const saveGameProgress = () => {
 }
 
 const confirmLeave = () => {
-    showLeaveDialog.value = false
+    showDialog.value = false
     saveGameProgress()
     if (leaveResolve) leaveResolve(true)
 }
 const cancelLeave = () => {
-    showLeaveDialog.value = false
+    showDialog.value = false
     if (leaveResolve) leaveResolve(false)
 }
 
 const waitForLeaveDialog = () => {
-    showLeaveDialog.value = true
+    showDialog.value = true
     return new Promise((resolve) => {
         leaveResolve = resolve
     })
 }
 
 onBeforeRouteLeave(async (to, from, next) => {
-    if (isGame.value && props.activeIndex > 0) {
+    if (isGame.value && props.activeIndex > 0 && !isLastStep.value) {
         const result = await waitForLeaveDialog()
         if (result) {
             next()

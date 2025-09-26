@@ -171,7 +171,9 @@
             "tooFarTitle": "Za daleko od miejsca",
             "tooFarMessage": "Musisz podejść bliżej do miejsca (odległość: {distance}m)",
             "approachTarget": "Podejdź bliżej celu! Brakuje jeszcze",
-            "meters": "metrów."
+            "meters": "metrów.",
+            "metersTwo": "metry.",
+            "meter": "metr."
         }
     },
     "en": {
@@ -319,7 +321,9 @@
             "tooFarTitle": "Too far from location",
             "tooFarMessage": "You need to get closer to the location (distance: {distance}m)",
             "approachTarget": "Get closer to the target! You still need",
-            "meters": "meters."
+            "meters": "meters.",
+            "metersTwo": "meters.",
+            "meter": "meter."
         }
     }
 }

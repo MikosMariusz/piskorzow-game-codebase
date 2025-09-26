@@ -1,3 +1,82 @@
+// --- Obsługa heading/bearing (kompas do celu) ---
+let _heading = null
+let _bearingToTarget = null
+let _directionCallback = null
+let _headingListener = null
+
+/**
+ * Ustawia callback wywoływany przy zmianie kierunku (heading/bearing)
+ * @param {Function} cb - Funkcja wywoływana z obiektem { heading, bearing, arrowAngle }
+ */
+export const setDirectionCallback = (cb) => {
+    _directionCallback = cb
+}
+
+// Funkcja do liczenia azymutu do celu (bearing)
+function calculateBearing(from, to) {
+    const toRad = (deg) => (deg * Math.PI) / 180
+    const toDeg = (rad) => (rad * 180) / Math.PI
+
+    const lat1 = toRad(from[1])
+    const lon1 = toRad(from[0])
+    const lat2 = toRad(to[1])
+    const lon2 = toRad(to[0])
+
+    const dLon = lon2 - lon1
+    const y = Math.sin(dLon) * Math.cos(lat2)
+    const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon)
+    let brng = Math.atan2(y, x)
+    brng = toDeg(brng)
+    return (brng + 360) % 360
+}
+
+/**
+ * Rozpoczyna nasłuchiwanie headingu i wylicza kąt do celu
+ * @param {Array} targetLonLat - [lon, lat] celu
+ */
+export const startHeadingTracking = (targetLonLat) => {
+    if (_headingListener) return
+    _headingListener = (event) => {
+        let heading = null
+        if (typeof event.webkitCompassHeading === 'number') {
+            heading = event.webkitCompassHeading
+        } else if (event.absolute && typeof event.alpha === 'number') {
+            heading = 360 - event.alpha
+        } else if (typeof event.alpha === 'number') {
+            heading = 360 - event.alpha
+        }
+        if (typeof heading !== 'number' || isNaN(heading)) return
+        _heading = heading
+        // Wylicz bearing do celu jeśli mamy pozycję i target
+        if (_currentPosition && targetLonLat) {
+            const from = [_currentPosition.lon, _currentPosition.lat]
+            const to = targetLonLat
+            _bearingToTarget = calculateBearing(from, to)
+            // Kąt do obrotu strzałki: różnica między bearing a heading
+            const arrowAngle = (_bearingToTarget - _heading + 360) % 360
+            if (_directionCallback) {
+                _directionCallback({ heading: _heading, bearing: _bearingToTarget, arrowAngle })
+            }
+        }
+    }
+    window.addEventListener('deviceorientationabsolute', _headingListener, true)
+    window.addEventListener('deviceorientation', _headingListener, true)
+}
+
+/**
+ * Zatrzymuje nasłuchiwanie headingu
+ */
+export const stopHeadingTracking = () => {
+    if (_headingListener) {
+        window.removeEventListener('deviceorientationabsolute', _headingListener, true)
+        window.removeEventListener('deviceorientation', _headingListener, true)
+        _headingListener = null
+    }
+    _heading = null
+    _bearingToTarget = null
+    _directionCallback = null
+}
+// --- KONIEC obsługi heading/bearing ---
 import { fromLonLat } from 'ol/proj'
 import { Point, Circle } from 'ol/geom'
 import { Feature } from 'ol'
