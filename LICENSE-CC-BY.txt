@@ -1,0 +1,15 @@
+Creative Commons Uznanie Autorstwa 3.0 Polska (CC BY 3.0 PL)
+
+Pełny tekst licencji: https://creativecommons.org/licenses/by/3.0/pl/
+
+Skrót:
+Możesz:
+- kopiować, rozpowszechniać, odtwarzać i wykonywać utwór
+- tworzyć utwory zależne
+
+Na następujących warunkach:
+- Uznanie autorstwa – należy podać odpowiednie informacje o autorze, tytule, źródle i licencji.
+
+Nie ma dodatkowych ograniczeń – nie możesz stosować ograniczeń prawnych ani technologicznych, które ograniczałyby innych w korzystaniu z utworu na warunkach licencji.
+
+UWAGA: Dotyczy wyłącznie treści, grafik i tekstów powstałych w ramach projektu. Kod źródłowy objęty jest licencją MIT.
