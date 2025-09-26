@@ -53,6 +53,14 @@
                                 class="logos-image"
                                 contain
                             />
+                            <a
+                                href="https://wies20.pl"
+                                target="_blank"
+                                rel="noopener"
+                                class="logos-text text-primary text-decoration-underline"
+                            >
+                                {{ $t('projectInfo.logosText') }}
+                            </a>
                         </v-sheet>
                     </div>
                 </v-card-text>
