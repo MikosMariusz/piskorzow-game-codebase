@@ -47,6 +47,7 @@ defineProps({
     position: relative;
     overflow: hidden;
     height: 64px;
+    z-index: 10;
 }
 .header-background-img {
     position: absolute;

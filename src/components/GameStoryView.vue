@@ -50,7 +50,7 @@
             class="story-container"
         >
             <div
-                v-if="gpsError"
+                v-if="gpsError && isGame"
                 class="gps-alert-container"
             >
                 <v-alert
@@ -366,6 +366,7 @@ const initializeGps = async () => {
 }
 
 const retryGpsAccess = () => {
+    if (!isGame.value) return
     gpsError.value = null
     initializeGps()
 }
@@ -376,7 +377,9 @@ const goToPresentation = () => {
 
 onMounted(() => {
     loadConfig()
-    initializeGps()
+    if (isGame.value) {
+        initializeGps()
+    }
 })
 
 onBeforeUnmount(() => {
