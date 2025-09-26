@@ -121,21 +121,21 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, onBeforeUnmount } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useI18n } from 'vue-i18n'
 import CardWrapper from '@/components/CardWrapper.vue'
-import GameStep from '@/components/GameStep.vue'
-import GameDialog from '@/components/GameDialog.vue'
 import GameButton from '@/components/GameButton.vue'
+import GameDialog from '@/components/GameDialog.vue'
+import GameStep from '@/components/GameStep.vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useRoute, useRouter } from 'vue-router'
 
-import { setStoryView, createMap } from '@/services/olMap'
 import {
-    startGpsTracking,
-    stopGpsTracking,
     checkGpsAccessAndAccuracy,
     setPositionUpdateCallback,
+    startGpsTracking,
+    stopGpsTracking,
 } from '@/services/gps'
+import { createMap, setStoryView } from '@/services/olMap'
 import { useAppStore } from '@/stores/app'
 
 const route = useRoute()
